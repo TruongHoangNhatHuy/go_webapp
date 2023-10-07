@@ -1,0 +1,1 @@
+Folder component chứa các component giao diện đơn giản, stateless, dùng chung cho các page của webapp.
