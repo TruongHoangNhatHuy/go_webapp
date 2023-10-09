@@ -1,11 +1,13 @@
 import './assets/App.css';
 import { BrowserRouter } from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
+import CustomerLayout from './layouts/CustomerLayout';
+import DriverLayout from './layouts/DriverLayout';
+import AdminLayout from './layouts/AdminLayout';
 
 function App() {
   return (
     <BrowserRouter>
-      <MainLayout/>
+      <CustomerLayout/>
     </BrowserRouter>
   );
 }
