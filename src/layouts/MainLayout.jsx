@@ -1,6 +1,7 @@
 import { Container, Stack, Typography } from "@mui/material";
 import NavMenu from "./NavMenu";
 import { Route, Routes, useLocation } from "react-router-dom";
+import Map from "../services/mapbox/Map";
 
 // List menu mẫu
 // const menu = [
@@ -35,9 +36,9 @@ const MainLayout = (props) => {
 		<Stack direction={'row'} minHeight='100%'>
 			<NavMenu menu={menu}/>
 			<Container maxWidth='100%' sx={{ bgcolor: 'cyan'}}>
-				<text>Cửa sổ con</text><br/>
 				{/* Xác định các path được route, và component tương ứng */}
 				<Routes>
+					<Route index element={<Map/>}/>
 					<Route path='*' element={<text>404 Not Found</text>}/>
 					{// Render path theo list menu
             menu.map(({to, menuItem}) => (
