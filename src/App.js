@@ -3,13 +3,12 @@ import { BrowserRouter } from 'react-router-dom';
 import CustomerLayout from './layouts/CustomerLayout';
 import DriverLayout from './layouts/DriverLayout';
 import AdminLayout from './layouts/AdminLayout';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
+import SignInSide from './pages/SignInSide'
 
 function App() {
   return (
     <BrowserRouter>
-      <CustomerLayout/>
+      <SignInSide/>
     </BrowserRouter>
   );
 }
