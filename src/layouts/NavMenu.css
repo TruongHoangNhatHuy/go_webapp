@@ -1,0 +1,22 @@
+.list-box {
+  display: flex;
+  flex-direction: column;
+  padding: 0%;
+  background-color: #282c34;
+  height: 100vh;
+  min-width: 200px;
+}
+
+.list-item {
+  padding-left: 0px!important;
+  padding-right: 0px!important;
+}
+
+.list-item-btn:hover {
+  background-color: darkgreen!important;
+  /* opacity: 0.8; */
+}
+
+.list-item-btn.Mui-selected {
+  background-color: green!important;
+}

@@ -9,7 +9,7 @@ import SignUp from './pages/SignUp';
 function App() {
   return (
     <BrowserRouter>
-      <SignUp/>
+      <CustomerLayout/>
     </BrowserRouter>
   );
 }

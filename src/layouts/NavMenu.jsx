@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useState } from "react";
-import { Box, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import './NavMenu.css';
 
 // Link routing
 const Link = forwardRef((itemProps, ref) => {
@@ -19,19 +20,17 @@ const NavMenu = (props) => {
 	}, [url]);
 
 	return (
-		<Box sx={{ width: '100%', maxWidth: 240, bgcolor: "#282c34"}}>
-			<List disablePadding>
-				{// Render menu item theo list menu
-					menu.map(({to, menuItem}) => (
-						<ListItem component={Link} to={to}>
-							<ListItemButton selected={seletedItem === to}>
-								<ListItemText primary={menuItem} sx={{ color: "white"}}/>
-							</ListItemButton>
-						</ListItem>
-					))
-				}
-			</List>
-		</Box>
+		<List className='list-box'>
+			{// Render menu item theo list menu
+				menu.map(({to, menuItem}) => (
+					<ListItem className='list-item' component={Link} to={to}>
+						<ListItemButton className="list-item-btn" selected={seletedItem === to}>
+							<ListItemText primary={menuItem} sx={{ color: "white"}}/>
+						</ListItemButton>
+					</ListItem>
+				))
+			}
+		</List>
 	)
 }
 

@@ -1,4 +1,4 @@
-import { Container, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import NavMenu from "./NavMenu";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Map from "../services/mapbox/Map";
@@ -35,7 +35,7 @@ const MainLayout = (props) => {
 	return (
 		<Stack direction={'row'} minHeight='100%'>
 			<NavMenu menu={menu}/>
-			<Container maxWidth='100%' sx={{ bgcolor: 'cyan'}}>
+			<Box sx={{ bgcolor: 'cyan', padding: 0, margin: 0, width: "100%"}}>
 				{/* Xác định các path được route, và component tương ứng */}
 				<Routes>
 					<Route index element={<Map/>}/>
@@ -46,7 +46,7 @@ const MainLayout = (props) => {
             ))
           }
 				</Routes>
-			</Container>
+			</Box>
 		</Stack>
 	)
 }
