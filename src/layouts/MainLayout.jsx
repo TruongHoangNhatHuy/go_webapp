@@ -1,23 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material";
 import NavMenu from "./NavMenu";
-import { Route, Routes, useLocation } from "react-router-dom";
-import Map from "../services/mapbox/Map";
-
-// List menu mẫu
-// const menu = [
-// 	{
-// 		to: "/",
-// 		menuItem: "Home",
-// 	},
-// 	{
-// 		to: "booking",
-// 		menuItem: "Booking",
-// 	},
-// 	{
-// 		to: "about",
-// 		menuItem: "About",
-// 	},
-// ]
+import { Outlet, useLocation } from "react-router-dom";
 
 // Component ghi path lên màn hình
 const Content = () => {
@@ -29,23 +12,12 @@ const Content = () => {
 	);
 }
 
-const MainLayout = (props) => {
-	const { menu } = props;
-
+const MainLayout = () => {
 	return (
 		<Stack direction={'row'} minHeight='100%'>
-			<NavMenu menu={menu}/>
+			<NavMenu/>
 			<Box sx={{ bgcolor: 'cyan', padding: 0, margin: 0, width: "100%"}}>
-				{/* Xác định các path được route, và component tương ứng */}
-				<Routes>
-					<Route index element={<Map/>}/>
-					<Route path='*' element={<text>404 Not Found</text>}/>
-					{// Render path theo list menu
-            menu.map(({to, menuItem}) => (
-              <Route path={to} element={<text>{menuItem}</text>}/>
-            ))
-          }
-				</Routes>
+				<Outlet/>
 			</Box>
 		</Stack>
 	)

@@ -3,13 +3,75 @@ import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import './NavMenu.css';
 
+// List menu của khách hàng
+const customerMenu = [
+  {
+		to: "account",
+		menuItem: "Tài khoản",
+	},
+	{
+		to: "booking",
+		menuItem: "Đặt xe",
+	},
+	{
+		to: "orders",
+		menuItem: "Đơn đặt",
+	},
+	{
+		to: "bills",
+		menuItem: "Lịch sử thanh toán",
+	},
+  {
+		to: "favorites",
+		menuItem: "Địa điểm yêu thích",
+	},
+]
+// List menu của tài xế
+const driverMenu = [
+  {
+		to: "account",
+		menuItem: "Tài khoản",
+	},
+	{
+		to: "orders",
+		menuItem: "Đơn đặt",
+	},
+	{
+		to: "analysis",
+		menuItem: "Thống kê",
+	},
+  {
+		to: "ratings",
+		menuItem: "Đánh giá",
+	},
+]
+// List menu của admin
+const adminMenu = [
+  {
+		to: "account",
+		menuItem: "Tài khoản",
+	},
+  {
+		to: "customers",
+		menuItem: "Quản lí khách hàng",
+	},
+	{
+		to: "drivers",
+		menuItem: "Quản lí tài xế",
+	},
+	{
+		to: "analysis",
+		menuItem: "Thống kê",
+	},
+]
+
 // Link routing
 const Link = forwardRef((itemProps, ref) => {
   return <RouterLink ref={ref} {...itemProps} role={undefined}/>;
 });
 
-const NavMenu = (props) => {
-	const { menu } = props;
+const NavMenu = () => {
+	const menu = customerMenu;
 	const [seletedItem, setSelectedItem] = useState('');
 	
 	// Lấy location hiện tại của url
