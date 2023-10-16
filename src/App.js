@@ -11,6 +11,7 @@ function App() {
       <Routes>
         {/* Trang đăng nhập */}
         <Route index element={<SignInSide/>}/>
+        <Route path='*' element={<h1>404 Not Found</h1>}/>
     	  <Route path='signup' element={<SignUp/>}/>
         {/* Sau khi đăng nhập */}
         <Route path='app' element={<MainLayout/>}>
