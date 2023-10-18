@@ -22,15 +22,14 @@ function Copyright(props) {
 }
 
 const SignUpForm = () => {
-  const [driverForm, setDriverForm] = useState(false);
+  const [form, setForm] = useState('');
   const navigate = useNavigate();
 
-  const handleDriverSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      firstName: data.get('firstName'),
-      lastName: data.get('lastName'),
+      fullName: data.get('fullName'),
       gender: data.get('gender'),
       birthday: data.get('birthday'),
       phoneNumber: data.get('phoneNumber'),
@@ -39,47 +38,26 @@ const SignUpForm = () => {
       portraitImage: data.get('portraitImage'),
       licenseImage: data.get('licenseImage'),
     });
+
+    if (form === 'customer')
+      navigate('/app/booking');
   };
 
-  if (!driverForm)
+  if (form === 'driver')
     return (
-      <Box sx={{ mt: 2 }}>
-        <Typography sx={{ mb: 2 }}>
-          Chào mừng bạn đến với Go. Bạn đăng kí với vai trò gì.
-        </Typography>
-        <Button fullWidth variant="outlined" sx={{ mb: 2 }} onClick={() => navigate('/app/booking')}>
-          Tôi là khách hàng
-        </Button>
-        <Button fullWidth variant="outlined" sx={{ mb: 2 }} onClick={() => setDriverForm(true)}>
-          Tôi là tài xế
-        </Button>
-      </Box>
-    )
-  else // Form đăng kí của tài xế
-    return (
-      <Box component="form" onSubmit={handleDriverSubmit} sx={{ mt: 2 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
         <Typography sx={{ mb: 2 }}>
           Xin vui lòng cung cấp thông tin của tài xế.
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <TextField
               required
               fullWidth
-              id="lastName"
-              label="Họ"
-              name="lastName"
-              autoComplete="family-name"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              required
-              fullWidth
-              id="firstName"
-              label="Tên"
-              name="firstName"
-              autoComplete="given-name"
+              id="fullName"
+              label="Họ tên"
+              name="fullName"
+              autoComplete="name"
               autoFocus
             />
           </Grid>
@@ -118,6 +96,7 @@ const SignUpForm = () => {
             <TextField
               required
               fullWidth
+              type="tel"
               id="phoneNumber"
               label="Số điện thoại"
               name="phoneNumber"
@@ -187,9 +166,96 @@ const SignUpForm = () => {
           fullWidth
           variant="outlined"
           sx={{ mb: 2 }}
-          onClick={()=> setDriverForm(false)}
+          onClick={()=> setForm('')}
         >
           Hủy
+        </Button>
+      </Box>
+    )
+  else if (form === 'customer')
+    return (
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+        <Typography sx={{ mb: 2 }}>
+          Xin vui lòng cung cấp thông tin của khách hàng.
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              type="tel"
+              id="phoneNumber"
+              label="Số điện thoại"
+              name="phoneNumber"
+              autoComplete="tel"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              select
+              fullWidth
+              id="gender"
+              label="Giới tính"
+              name="gender"
+              autoComplete='sex'
+            >
+              <MenuItem value={'male'}>Nam</MenuItem>
+              <MenuItem value={'female'}>Nữ</MenuItem>
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
+              <DatePicker label="Ngày sinh" disableFuture
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    id: "birthday",
+                    name: "birthday"
+                  },
+                  actionBar: {
+                    actions: ['clear']
+                  }
+                }}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={<Checkbox required value="allowExtraEmails" color="primary"/>}
+              label="Tôi đã đọc và đồng ý với Chính sách của công ty"
+            />
+          </Grid>
+        </Grid>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 2, mb: 2 }}
+        >
+          Đăng kí
+        </Button>
+        <Button
+          type="reset"
+          fullWidth
+          variant="outlined"
+          sx={{ mb: 2 }}
+          onClick={()=> setForm('')}
+        >
+          Hủy
+        </Button>
+      </Box>
+    )
+  else
+    return (
+      <Box sx={{ mt: 2 }}>
+        <Typography sx={{ mb: 2 }}>
+          Chào mừng bạn đến với Go. Bạn đăng kí với vai trò gì.
+        </Typography>
+        <Button fullWidth variant="outlined" sx={{ mb: 2 }} onClick={() => setForm('customer')}>
+          Tôi là khách hàng
+        </Button>
+        <Button fullWidth variant="outlined" sx={{ mb: 2 }} onClick={() => setForm('driver')}>
+          Tôi là tài xế
         </Button>
       </Box>
     )

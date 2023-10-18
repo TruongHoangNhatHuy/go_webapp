@@ -28,7 +28,10 @@ export const GoogleLogin = () => {
         // User successfully signed in.
         // Return type determines whether we continue the redirect automatically
         // or whether we leave that to developer to handle.
-        console.log(auth.currentUser.uid);
+        console.log({
+          access_token: auth.currentUser.accessToken,
+          uid: auth.currentUser.uid,
+        });
         return true;
       }
     },
