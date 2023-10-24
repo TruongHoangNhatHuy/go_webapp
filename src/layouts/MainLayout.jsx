@@ -14,9 +14,9 @@ const Content = () => {
 
 const MainLayout = () => {
 	return (
-		<Stack direction={'row'} minHeight='100%'>
+		<Stack direction={'row'} minHeight='100%' overflow={"hidden"}>
 			<NavMenu/>
-			<Box sx={{ bgcolor: 'cyan', padding: 0, margin: 0, width: "100%"}}>
+			<Box sx={{ bgcolor: 'lightgreen', padding: 0, margin: 0, width: "100%"}}>
 				<Outlet/>
 			</Box>
 		</Stack>

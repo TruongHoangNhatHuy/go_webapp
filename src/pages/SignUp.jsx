@@ -37,6 +37,7 @@ const SignUpForm = () => {
       address: data.get('address'),
       portraitImage: data.get('portraitImage'),
       licenseImage: data.get('licenseImage'),
+      vehicleType: data.get('vehicleType'),
     });
 
     if (form === 'customer')
@@ -116,11 +117,28 @@ const SignUpForm = () => {
             <TextField
               required
               fullWidth
+              multiline
+              rows={2}
               id="address"
               label="Địa chỉ"
               name="address"
               autoComplete="address-line1"
             />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              select
+              required
+              fullWidth
+              id="vehicleType"
+              label="Loại phương tiện"
+              name="vehicleType"
+            >
+              <MenuItem value={'bike'}>Xe máy</MenuItem>
+              <MenuItem value={'car'}>Ôtô 4 chỗ</MenuItem>
+              <MenuItem value={'car'}>Ôtô 7 chỗ</MenuItem>
+              <MenuItem value={'car'}>Xe bán tải</MenuItem>
+            </TextField>
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -148,7 +166,7 @@ const SignUpForm = () => {
           </Grid>
           <Grid item xs={12}>
             <FormControlLabel
-              control={<Checkbox required value="allowExtraEmails" color="primary"/>}
+              control={<Checkbox required color="primary"/>}
               label="Tôi đã đọc và đồng ý với Chính sách của công ty"
             />
           </Grid>

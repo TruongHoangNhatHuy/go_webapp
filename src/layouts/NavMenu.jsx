@@ -1,7 +1,8 @@
 import { forwardRef, useEffect, useState } from "react";
-import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Box, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import './NavMenu.css';
+import GoLogo from '../assets/1200px-Go_Logo_Green.png'
 
 // List menu của khách hàng
 const customerMenu = [
@@ -83,6 +84,15 @@ const NavMenu = () => {
 
 	return (
 		<List className='list-box'>
+			<Box component="img" 
+				src={GoLogo}
+				sx={{
+					height: 56,
+					width: 150,
+					padding: 2,
+					paddingBottom: 1
+				}}
+			/>
 			{// Render menu item theo list menu
 				menu.map(({to, menuItem}) => (
 					<ListItem className='list-item' component={Link} to={to}>

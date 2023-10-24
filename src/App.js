@@ -4,6 +4,7 @@ import MainLayout from './layouts/MainLayout';
 import SignInSide from './pages/SignInSide';
 import Booking from './pages/Booking';
 import SignUp from './pages/SignUp';
+import Account from './pages/Account';
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
     	  <Route path='signup' element={<SignUp/>}/>
         {/* Sau khi đăng nhập */}
         <Route path='app' element={<MainLayout/>}>
-          <Route path='account' element={<text>Tài khoản</text>}/>
+          <Route path='account' element={<Account/>}/>
           <Route path='booking' element={<Booking/>}/>
           <Route path='orders' element={<text>Đơn đặt</text>}/>
           <Route path='bills' element={<text>Lịch sử thanh toán</text>}/>
