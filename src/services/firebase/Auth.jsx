@@ -29,8 +29,7 @@ export const GoogleLogin = () => {
         // Return type determines whether we continue the redirect automatically
         // or whether we leave that to developer to handle.
         console.log({
-          access_token: auth.currentUser.accessToken,
-          uid: auth.currentUser.uid,
+          id_token: auth.currentUser.accessToken
         });
         return true;
       }

@@ -134,10 +134,8 @@ const SignUpForm = () => {
               label="Loại phương tiện"
               name="vehicleType"
             >
-              <MenuItem value={'bike'}>Xe máy</MenuItem>
-              <MenuItem value={'car'}>Ôtô 4 chỗ</MenuItem>
-              <MenuItem value={'car'}>Ôtô 7 chỗ</MenuItem>
-              <MenuItem value={'car'}>Xe bán tải</MenuItem>
+              <MenuItem value={'MOTOBIKE'}>Xe máy</MenuItem>
+              <MenuItem value={'CAR'}>Ôtô</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={12}>
@@ -206,6 +204,16 @@ const SignUpForm = () => {
               label="Số điện thoại"
               name="phoneNumber"
               autoComplete="tel"
+              autoFocus
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              id="fullName"
+              label="Họ tên"
+              name="fullName"
+              autoComplete="name"
             />
           </Grid>
           <Grid item xs={12} sm={6}>
