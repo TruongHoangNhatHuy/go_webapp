@@ -1,9 +1,9 @@
 .list-box {
   display: flex;
   flex-direction: column;
-  padding: 0%;
+  padding: 0;
   background-color: #282c34;
-  max-height: 100vh;
+  height: 97vh;
   min-width: 200px;
 }
 
