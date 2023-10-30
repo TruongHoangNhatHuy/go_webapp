@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, MenuItem, Select, Stack, Step, StepLabel, Stepper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { AppBar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, Stack, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableContainer, TableRow, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -29,7 +29,7 @@ const LocationInput = ({ bookingRef, setBookingForm }) => {
               id='startLocation'
               name='startLocation'
               placeholder='Nhập điểm đi'
-              sx={{ bgcolor: 'white'}}
+              sx={{ bgcolor: 'white' }}
             />
           </Grid>
           <Grid item xs={6} lg>
@@ -40,13 +40,13 @@ const LocationInput = ({ bookingRef, setBookingForm }) => {
               id='endLocation'
               name='endLocation'
               placeholder='Nhập điểm đến'
-              sx={{ bgcolor: 'white'}}
+              sx={{ bgcolor: 'white' }}
             />
           </Grid>
           <Grid item xs={12} lg={2}>
-            <Button 
-              type='submit' 
-              fullWidth 
+            <Button
+              type='submit'
+              fullWidth
               variant='contained'
             >Đặt xe</Button>
           </Grid>
@@ -57,7 +57,7 @@ const LocationInput = ({ bookingRef, setBookingForm }) => {
 }
 
 // Form đặt xe
-const BookingForm = ({ bookingRef, setBookingForm, setIsBooking }) => {
+const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [errorStep, setErrorStep] = useState(-1);
   const [vehicleType, setVehicleType] = useState(null);
@@ -78,7 +78,10 @@ const BookingForm = ({ bookingRef, setBookingForm, setIsBooking }) => {
       setErrorStep(1);
       return;
     }
-    else bookingRef.current.paymentMethod = paymentMethod;
+    else {
+      bookingRef.current.paymentMethod = paymentMethod;
+      bookingRef.current.payment = 123456;
+    }
     // Ổn hết
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setErrorStep(-1);
@@ -86,14 +89,14 @@ const BookingForm = ({ bookingRef, setBookingForm, setIsBooking }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    bookingRef.current.timeSubmit = dayjs().toString();
+    bookingRef.current.timeSubmit = dayjs(); // return current time, as dayjs object
     console.log('bookingForm', bookingRef.current);
     setBookingForm(false);
-    setIsBooking(true);
+    setHadBooking(true);
   };
 
   return (
-    <Box sx={{ width: '100%'}} component='form' onSubmit={handleSubmit}>
+    <Box sx={{ width: '100%' }} component='form' onSubmit={handleSubmit}>
       <Stepper activeStep={activeStep}>
         <Step index={0}>
           <StepLabel error={errorStep === 0}>Chọn loại phương tiện</StepLabel>
@@ -117,25 +120,25 @@ const BookingForm = ({ bookingRef, setBookingForm, setIsBooking }) => {
           value={vehicleType}
           exclusive
           color='primary'
-          onChange={(_, value)=> setVehicleType(value)}
+          onChange={(_, value) => setVehicleType(value)}
         >
-          <ToggleButton 
+          <ToggleButton
             value='MOTORBIKE'
-            variant='outlined' 
-            sx={{ height: '30vh', width: '30vh' }} 
+            variant='outlined'
+            sx={{ height: '30vh', width: '30vh' }}
           >
             <Stack alignItems='center'>
-              <TwoWheelerIcon sx={{ height: 100, width: 70}}/>
+              <TwoWheelerIcon sx={{ height: 100, width: 70 }} />
               Xe máy
             </Stack>
           </ToggleButton>
           <ToggleButton
             value='CAR'
-            variant='outlined' 
+            variant='outlined'
             sx={{ height: '30vh', width: '30vh' }}
           >
             <Stack alignItems='center'>
-              <DirectionsCarIcon sx={{ height: 100, width: 70}}/>
+              <DirectionsCarIcon sx={{ height: 100, width: 70 }} />
               Oto
             </Stack>
           </ToggleButton>
@@ -152,7 +155,7 @@ const BookingForm = ({ bookingRef, setBookingForm, setIsBooking }) => {
         <TextField
           select
           label='Phương thức thanh toán'
-          onChange={(_, item)=> setPaymentMethod(item.props.value)}
+          onChange={(_, item) => setPaymentMethod(item.props.value)}
         >
           <MenuItem value='Momo'>Momo</MenuItem>
           <MenuItem value='Paypal'>Paypal</MenuItem>
@@ -166,14 +169,33 @@ const BookingForm = ({ bookingRef, setBookingForm, setIsBooking }) => {
         flexDirection: 'column',
         paddingTop: 3
       }}>
-        <Typography variant='body1'>Điểm đi: {bookingRef.current.startLocation}</Typography>
-        <Typography variant='body1'>Điểm đến: {bookingRef.current.endLocation}</Typography>
-        <Typography variant='body1'>Loại phương tiện: {
-          (bookingRef.current.vehicleType === 'MOTORBIKE') ? 'Xe máy' :
-          (bookingRef.current.vehicleType === 'CAR') ? 'Oto' : null
-        }</Typography>
-        <Typography variant='body1'>Phương thức thanh toán: {bookingRef.current.paymentMethod}</Typography>
-        <Typography variant='h6'>Thành tiền: 123456</Typography>
+        <Table size='small' sx={{ minWidth: 400 }}>
+          <TableBody>
+            <TableRow>
+              <TableCell component="th" scope="row">Điểm đi</TableCell>
+              <TableCell align='right'>{bookingRef.current.startLocation}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell component="th" scope="row">Điểm đến</TableCell>
+              <TableCell align='right'>{bookingRef.current.endLocation}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell component="th" scope="row">Loại xe</TableCell>
+              <TableCell align='right'>{
+                (bookingRef.current.vehicleType === 'MOTORBIKE') ? 'Xe máy' :
+                (bookingRef.current.vehicleType === 'CAR') ? 'Oto' : null
+              }</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell component="th" scope="row">Phương thức thanh toán</TableCell>
+              <TableCell align='right'>{bookingRef.current.paymentMethod}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell variant='head' component="th" scope="row" >Tổng tiền</TableCell>
+              <TableCell variant='head' align='right'>{bookingRef.current.payment}</TableCell>
+            </TableRow>
+        </TableBody>
+      </Table>
       </Stack>
 
       <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
@@ -185,7 +207,7 @@ const BookingForm = ({ bookingRef, setBookingForm, setIsBooking }) => {
         >
           Trở lại
         </Button>
-        <Box sx={{ flex: '1 1 auto' }}/>
+        <Box sx={{ flex: '1 1 auto' }} />
         <Button disabled={activeStep === 2} onClick={handleNext}>Tiếp</Button>
         <Button disabled={activeStep !== 2} type='submit' variant='contained'>Đặt xe</Button>
       </Box>
@@ -193,53 +215,124 @@ const BookingForm = ({ bookingRef, setBookingForm, setIsBooking }) => {
   )
 }
 
+// Hiện thị thông tin đơn đặt
+const BookingDetail = ({ bookingRef }) => {
+  const data = bookingRef.current
+
+  return (
+    <TableContainer component={Box}>
+      <Table size='small' sx={{ minWidth: 400 }}>
+        <TableBody>
+          <TableRow>
+            <TableCell component="th" scope="row">Trạng thái đơn đặt</TableCell>
+            <TableCell align='right'>{data.status}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell component="th" scope="row">Thời gian đặt</TableCell>
+            <TableCell align='right'>{data.timeSubmit.$d.toString()}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell component="th" scope="row">Điểm đi</TableCell>
+            <TableCell align='right'>{data.startLocation}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell component="th" scope="row">Điểm đến</TableCell>
+            <TableCell align='right'>{data.endLocation}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell component="th" scope="row">Loại xe</TableCell>
+            <TableCell align='right'>{
+              (data.vehicleType === 'MOTORBIKE') ? 'Xe máy' :
+              (data.vehicleType === 'CAR') ? 'Oto' : null
+            }</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell component="th" scope="row">Phương thức thanh toán</TableCell>
+            <TableCell align='right'>{data.paymentMethod}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell variant='head' component="th" scope="row" >Tổng tiền</TableCell>
+            <TableCell variant='head' align='right'>{data.payment}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )
+}
+
 const Booking = () => {
   const [bookingForm, setBookingForm] = useState(false)
-  const [isBooking, setIsBooking] = useState(false)
+  const [bookingDetail, setBookingDetail] = useState(false)
+  const [hadBooking, setHadBooking] = useState(false)
   // Thông tin đơn đặt
   const bookingRef = useRef({
-    startLocation: null,
-    endLocation: null,
-    vehicleType: null,
-    paymentMethod: null,
-    timeSubmit: null
+    status: 'none',
+    startLocation: '1',
+    endLocation: '2',
+    vehicleType: '3',
+    paymentMethod: '4',
+    payment: '5',
+    timeSubmit: '6'
   })
 
   const handleCancel = () => {
-    setIsBooking(false)
+    setBookingDetail(false);
+    setHadBooking(false);
   }
 
   return (
     <>
-      <Map/>
+      <Map />
       {
         // Hiện/ẩn thanh nhập địa chỉ khi chưa/đã đặt xe
-        isBooking ? (
-          <AppBar position='relative' color='' >
-            <Stack flexDirection='row' alignItems='center'>
-              <Typography>Đã đặt xe</Typography>
-              <Button onClick={handleCancel}>Hủy</Button>
+        hadBooking ? (
+          <AppBar position='relative' color=''>
+            <Stack flexDirection='row' alignItems='center' padding={1}>
+              <Typography variant='h6'>Đã đặt xe</Typography>
+              <Box sx={{ flex: '1 1 auto' }}/>
+              <Button variant='outlined' onClick={() => setBookingDetail(true)}>Chi tiết</Button>
             </Stack>
           </AppBar>
         ) : (
-          <LocationInput bookingRef={bookingRef} setBookingForm={setBookingForm}/>
+          <LocationInput bookingRef={bookingRef} setBookingForm={setBookingForm} />
         )
       }
       {/* Cửa sổ mở Booking Form */}
       <Dialog open={bookingForm}>
-        <DialogTitle>ĐẶT XE</DialogTitle>
+        <DialogTitle sx={{ paddingBottom: 0 }}>ĐẶT XE</DialogTitle>
         <IconButton
           aria-label="close"
           onClick={() => setBookingForm(false)}
-          sx={{ position: 'absolute', right: 8, top: 8,
+          sx={{
+            position: 'absolute', right: 8, top: 8,
             color: (theme) => theme.palette.grey[500],
           }}
         >
-          <CloseIcon/>
+          <CloseIcon />
         </IconButton>
         <DialogContent>
-          <BookingForm bookingRef={bookingRef} setBookingForm={setBookingForm} setIsBooking={setIsBooking}/>
+          <BookingForm bookingRef={bookingRef} setBookingForm={setBookingForm} setHadBooking={setHadBooking} />
         </DialogContent>
+      </Dialog>
+      {/* Cửa sổ mở Booking Detail */}
+      <Dialog open={bookingDetail}>
+        <DialogTitle sx={{ paddingBottom: 0 }}>CHI TIẾT ĐẶT XE</DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={() => setBookingDetail(false)}
+          sx={{
+            position: 'absolute', right: 8, top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent sx={{ padding: 1}}>
+          <BookingDetail bookingRef={bookingRef}/>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='outlined' color='error' onClick={handleCancel}>Hủy đơn</Button>
+        </DialogActions>
       </Dialog>
     </>
   )
