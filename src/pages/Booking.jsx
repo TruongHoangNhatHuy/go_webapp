@@ -2,9 +2,10 @@ import { AppBar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
 import CloseIcon from '@mui/icons-material/Close';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import Map from '../services/mapbox/Map';
+import Map from '../services/vietmap/Map';
 import { useRef, useState } from 'react';
 import dayjs from 'dayjs';
+import { getLocationByAddress, getCoordinatesByRefid } from '../utils/vietmap/geocode';
 
 // Thanh nhập địa chỉ
 const LocationInput = ({ bookingRef, setBookingForm }) => {
@@ -13,7 +14,12 @@ const LocationInput = ({ bookingRef, setBookingForm }) => {
     const data = new FormData(event.currentTarget);
     bookingRef.current.startLocation = data.get('startLocation');
     bookingRef.current.endLocation = data.get('endLocation');
-    console.log('locationInput', bookingRef.current);
+
+    const locationList = getLocationByAddress(bookingRef.current.startLocation);
+    console.log(locationList);
+    getCoordinatesByRefid(locationList[0][0])
+
+    // console.log('locationInput', bookingRef.current);
     setBookingForm(true);
   };
 
