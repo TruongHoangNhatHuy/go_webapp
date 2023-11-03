@@ -5,9 +5,13 @@ import { useRef, useState } from 'react';
 import { BookingDetail, BookingForm, LocationInput } from '../features/booking';
 
 const Booking = () => {
+  // UI state
   const [bookingForm, setBookingForm] = useState(false)
   const [bookingDetail, setBookingDetail] = useState(false)
   const [hadBooking, setHadBooking] = useState(false)
+
+  const [startLocationInfo, setStartLocationInfo] = useState(null)
+  const [endLocationInfo, setEndLocationInfo] = useState(null)
   // Thông tin đơn đặt
   const bookingRef = useRef({
     status: 'none',
@@ -26,7 +30,8 @@ const Booking = () => {
 
   return (
     <>
-      <Map />
+      {/* props cuar Map để hiển thị marker điểm đi & điểm đến */}
+      <Map startLocationInfo={startLocationInfo} endLocationInfo={endLocationInfo}/>
       {
         // Hiện/ẩn thanh nhập địa chỉ khi chưa/đã đặt xe
         hadBooking ? (
@@ -38,7 +43,7 @@ const Booking = () => {
             </Stack>
           </AppBar>
         ) : (
-          <LocationInput bookingRef={bookingRef} setBookingForm={setBookingForm} />
+          <LocationInput bookingRef={bookingRef} setStartLocationInfo={setStartLocationInfo} setEndLocationInfo={setEndLocationInfo} setBookingForm={setBookingForm} />
         )
       }
       {/* Cửa sổ mở Booking Form */}
