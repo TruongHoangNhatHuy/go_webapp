@@ -1,0 +1,10 @@
+{
+  "be-server": "https://wrathful-card-production.up.railway.app",
+  "mapbox": {
+    "accessToken": "pk.eyJ1IjoiaHV5MjAwMnRobiIsImEiOiJjbG5qempteHUwZ2oxMmtyejllMHlwaHY2In0.A5QuQitx_LYbunhA-F4xJA"
+  },
+  "vietmap": {
+    "primaryToken": "c3d0f188ff669f89042771a20656579073cffec5a8a69747",
+    "secondaryToken": "c34db45b6d1e8e71bfe74bd5139aa592322b463632af3543"
+  }
+}

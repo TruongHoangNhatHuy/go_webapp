@@ -1,8 +1,9 @@
 import { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import './Map.css';
+import config from 'config.json'
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiaHV5MjAwMnRobiIsImEiOiJjbG5qempteHUwZ2oxMmtyejllMHlwaHY2In0.A5QuQitx_LYbunhA-F4xJA';
+mapboxgl.accessToken = config.mapbox.accessToken
 
 const Map = () => {
   const mapContainer = useRef(null);

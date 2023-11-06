@@ -2,9 +2,11 @@ import { useEffect, useRef } from "react";
 
 const Map = ({ startLocationInfo, endLocationInfo }) => {
   const mapRef = useRef(null);
-  const infoMarkerRef = useRef(null);   // marker thông tin
-  const startMarkerRef = useRef(null);  // marker điểm đi
-  const endMarkerRef = useRef(null);    // marker điểm đến
+  const infoMarkerRef = useRef(null);     // marker thông tin
+  const startMarkerRef = useRef(null);    // marker điểm đi
+  const endMarkerRef = useRef(null);      // marker điểm đến
+  const customerMarkerRef = useRef(null); // marker khách hàng
+  const driverMarkerRef = useRef(null);   // marker tài xế
 
   // Xử lý hiện thị marker
   const handleMarker = (markerRef, lngLat = null, color = "#3fb1ce") => {
@@ -42,17 +44,17 @@ const Map = ({ startLocationInfo, endLocationInfo }) => {
     // Gắn marker cho điểm đi
     if (startLocationInfo !== null) {
       var lngLat = [startLocationInfo.coordinates.lng, startLocationInfo.coordinates.lat]
-      handleMarker(startMarkerRef, lngLat, "#0ed145")
+      handleMarker(startMarkerRef, lngLat, "lightgreen")
     }
     else 
-      handleMarker(startMarkerRef, null, "#0ed145")
+      handleMarker(startMarkerRef, null)
     // Gắn marker cho điểm đến
     if (endLocationInfo !== null) {
       var lngLat = [endLocationInfo.coordinates.lng, endLocationInfo.coordinates.lat]
-      handleMarker(endMarkerRef, lngLat, "#f44336")
+      handleMarker(endMarkerRef, lngLat, "darkgreen")
     }
     else
-      handleMarker(endMarkerRef, null, "#f44336")
+      handleMarker(endMarkerRef, null)
   }, [startLocationInfo, endLocationInfo])
 
   return (

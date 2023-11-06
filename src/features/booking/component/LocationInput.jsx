@@ -1,46 +1,59 @@
-import { AppBar, Autocomplete, Box, Button, Grid, TextField } from '@mui/material';
+import { AppBar, Autocomplete, Box, Button, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
+import PlaceIcon from '@mui/icons-material/Place';
 import { debounce } from '@mui/material/utils'
 import { getLocationsByAddress, getCoordinatesByRefid } from '../utils/vietmap_geocode.js';
 import { getLocation } from '../utils/test_geocode_data.js';
 import { useState } from 'react';
 
 const SearchBox = (props) => {
-  const { setLocationInfo, ...tfProps } = props
-  const [options,setOptions] = useState([])
+  const { setLocationInfo, ...tfProps } = props;
+  const [options, setOptions] = useState([]);
 
   // Request API lấy danh sách địa chỉ gợi ý
   // chỉ thực hiện sau khi người dùng ngừng nhập 1s
   const queryOptions = debounce((value) => {
     setOptions(getLocation(value)) // dùng test function để thử nghiệm, không gọi vietmap API
     // setOptions(getLocationsByAddress(value)) // Gọi vietmap API
-  }, 1000)
+  }, 1000);
 
   // Khi chọn 1 địa điểm:
   const handleChange = (_, item) => {
     // console.log('item', item)
     if (item !== null) {
       // lấy tọa độ
-      const locationCoordinates = getCoordinatesByRefid(item.ref_id)
-      console.log('locationCoordinates', locationCoordinates)
+      const locationCoordinates = getCoordinatesByRefid(item.ref_id);
+      console.log('locationCoordinates', locationCoordinates);
       // và gửi thông tin địa điểm để hiển thị marker
       setLocationInfo({
         'location': item,
         'coordinates': locationCoordinates
-      })
+      });
     }
     else
-      setLocationInfo(null)
-  }
+      setLocationInfo(null);
+  };
 
   return (
     <Autocomplete
       disablePortal
       forcePopupIcon={false}
-      getOptionLabel={(options) => options.name}
-      options={options}
-      // filterOptions={(x) => x}
       onInputChange={queryOptions}
       onChange={handleChange}
+      getOptionLabel={(option) => option.name}
+      options={options}
+      noOptionsText="Không có địa điểm gợi ý"
+      // filterOptions={(x) => x}
+      renderOption={(props, option) => (
+        <li {...props} style={{ paddingLeft: 0, paddingRight: 0 }}>
+          <Box padding={1} paddingLeft={0.75}>
+            <PlaceIcon sx={{ color: 'gray' }}/>
+          </Box>
+          <Box>
+            <Typography variant='body1'>{option.name}</Typography>
+            <Typography variant='body2' color='GrayText'>{option.address}</Typography>
+          </Box>
+        </li>
+      )}
       renderInput={(params) => 
         <TextField
           {...params}
@@ -49,6 +62,17 @@ const SearchBox = (props) => {
           fullWidth
           size='small'
           sx={{ bgcolor: 'white' }}
+          InputProps={{
+            ...params.InputProps,
+            startAdornment:
+              <InputAdornment sx={{ margin: 0 }}>
+                <IconButton sx={{ padding: 0 }}
+                  // onClick={}
+                >
+                  <PlaceIcon sx={{ color: tfProps.id === "startLocation" ? 'lightgreen' : 'darkgreen' }}/>
+                </IconButton>
+              </InputAdornment>
+          }}
         />
       }
     />

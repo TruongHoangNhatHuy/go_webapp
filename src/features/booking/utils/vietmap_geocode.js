@@ -1,4 +1,7 @@
-const apiKey = "c3d0f188ff669f89042771a20656579073cffec5a8a69747"
+import config from 'config.json'
+
+const apiKey = config.vietmap.primaryToken // 1000 req/ngày
+// const apiKey = config.vietmap.secondaryToken // 10 req/phút
 
 export function getLocationsByAddress(address) {
   const req = new XMLHttpRequest();

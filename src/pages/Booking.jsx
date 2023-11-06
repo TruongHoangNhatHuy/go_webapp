@@ -6,12 +6,12 @@ import { BookingDetail, BookingForm, LocationInput } from '../features/booking';
 
 const Booking = () => {
   // UI state
-  const [bookingForm, setBookingForm] = useState(false)
-  const [bookingDetail, setBookingDetail] = useState(false)
-  const [hadBooking, setHadBooking] = useState(false)
-
-  const [startLocationInfo, setStartLocationInfo] = useState(null)
-  const [endLocationInfo, setEndLocationInfo] = useState(null)
+  const [bookingForm, setBookingForm] = useState(false);
+  const [bookingDetail, setBookingDetail] = useState(false);
+  const [hadBooking, setHadBooking] = useState(false);
+  // Marker state
+  const [startLocationInfo, setStartLocationInfo] = useState(null);
+  const [endLocationInfo, setEndLocationInfo] = useState(null);
   // Thông tin đơn đặt
   const bookingRef = useRef({
     status: 'none',
@@ -21,16 +21,19 @@ const Booking = () => {
     paymentMethod: '4',
     payment: '5',
     timeSubmit: '6'
-  })
-
+  });
+  
+  // Xử lý hủy đơn
   const handleCancel = () => {
     setBookingDetail(false);
+    setStartLocationInfo(null);
+    setEndLocationInfo(null);
     setHadBooking(false);
-  }
+  };
 
   return (
     <>
-      {/* props cuar Map để hiển thị marker điểm đi & điểm đến */}
+      {/* props của Map: để hiển thị marker điểm đi & điểm đến */}
       <Map startLocationInfo={startLocationInfo} endLocationInfo={endLocationInfo}/>
       {
         // Hiện/ẩn thanh nhập địa chỉ khi chưa/đã đặt xe
