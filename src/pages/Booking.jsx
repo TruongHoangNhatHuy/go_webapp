@@ -9,9 +9,11 @@ const Booking = () => {
   const [bookingForm, setBookingForm] = useState(false);
   const [bookingDetail, setBookingDetail] = useState(false);
   const [hadBooking, setHadBooking] = useState(false);
-  // Marker state
-  const [startLocationInfo, setStartLocationInfo] = useState(null);
-  const [endLocationInfo, setEndLocationInfo] = useState(null);
+  // Map state
+  const [startLocation, setStartLocation] = useState(null);
+  const [endLocation, setEndLocation] = useState(null);
+  // Function ref
+  const setMapCenterRef = useRef({});
   // Thông tin đơn đặt
   const bookingRef = useRef({
     status: 'none',
@@ -26,15 +28,15 @@ const Booking = () => {
   // Xử lý hủy đơn
   const handleCancel = () => {
     setBookingDetail(false);
-    setStartLocationInfo(null);
-    setEndLocationInfo(null);
+    setStartLocation(null);
+    setEndLocation(null);
     setHadBooking(false);
   };
 
   return (
-    <>
+    <div>
       {/* props của Map: để hiển thị marker điểm đi & điểm đến */}
-      <Map startLocationInfo={startLocationInfo} endLocationInfo={endLocationInfo}/>
+      <Map startLocation={startLocation} endLocation={endLocation} setMapCenterRef={setMapCenterRef}/>
       {
         // Hiện/ẩn thanh nhập địa chỉ khi chưa/đã đặt xe
         hadBooking ? (
@@ -46,7 +48,7 @@ const Booking = () => {
             </Stack>
           </AppBar>
         ) : (
-          <LocationInput bookingRef={bookingRef} setStartLocationInfo={setStartLocationInfo} setEndLocationInfo={setEndLocationInfo} setBookingForm={setBookingForm} />
+          <LocationInput bookingRef={bookingRef} setStartLocation={setStartLocation} setEndLocation={setEndLocation} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
         )
       }
       {/* Cửa sổ mở Booking Form */}
@@ -86,7 +88,7 @@ const Booking = () => {
           <Button variant='outlined' color='error' onClick={handleCancel}>Hủy đơn</Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   )
 }
 

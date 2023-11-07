@@ -3,17 +3,19 @@ import PlaceIcon from '@mui/icons-material/Place';
 import { debounce } from '@mui/material/utils'
 import { getLocationsByAddress, getCoordinatesByRefid } from '../utils/vietmap_geocode.js';
 import { getLocation } from '../utils/test_geocode_data.js';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const SearchBox = (props) => {
-  const { setLocationInfo, ...tfProps } = props;
+  const { setLocation, setMapCenterRef, ...tfProps } = props;
   const [options, setOptions] = useState([]);
+  // Thông tin địa điểm được chọn
+  const locationRef = useRef(null);
 
   // Request API lấy danh sách địa chỉ gợi ý
   // chỉ thực hiện sau khi người dùng ngừng nhập 1s
-  const queryOptions = debounce((value) => {
-    setOptions(getLocation(value)) // dùng test function để thử nghiệm, không gọi vietmap API
-    // setOptions(getLocationsByAddress(value)) // Gọi vietmap API
+  const queryOptions = debounce((_, value) => {
+    // setOptions(getLocation(value.trim())) // dùng test function để thử nghiệm, không gọi vietmap API
+    setOptions(getLocationsByAddress(value.trim())) // Gọi vietmap API
   }, 1000);
 
   // Khi chọn 1 địa điểm:
@@ -23,15 +25,23 @@ const SearchBox = (props) => {
       // lấy tọa độ
       const locationCoordinates = getCoordinatesByRefid(item.ref_id);
       console.log('locationCoordinates', locationCoordinates);
-      // và gửi thông tin địa điểm để hiển thị marker
-      setLocationInfo({
+      locationRef.current = {
         'location': item,
         'coordinates': locationCoordinates
-      });
+      }
     }
     else
-      setLocationInfo(null);
+      locationRef.current = null;
+    // và gửi thông tin địa điểm để hiển thị marker
+    setLocation(locationRef.current);
   };
+
+  const handleCenterMap = () => {
+    if (locationRef.current) {
+      var lngLat = [locationRef.current.coordinates.lng, locationRef.current.coordinates.lat];
+      setMapCenterRef.current.setMapCenter(lngLat);
+    }
+  }
 
   return (
     <Autocomplete
@@ -46,7 +56,7 @@ const SearchBox = (props) => {
       renderOption={(props, option) => (
         <li {...props} style={{ paddingLeft: 0, paddingRight: 0 }}>
           <Box padding={1} paddingLeft={0.75}>
-            <PlaceIcon sx={{ color: 'gray' }}/>
+            <PlaceIcon sx={{ color: 'gray' }} />
           </Box>
           <Box>
             <Typography variant='body1'>{option.name}</Typography>
@@ -54,7 +64,7 @@ const SearchBox = (props) => {
           </Box>
         </li>
       )}
-      renderInput={(params) => 
+      renderInput={(params) =>
         <TextField
           {...params}
           {...tfProps}
@@ -65,11 +75,11 @@ const SearchBox = (props) => {
           InputProps={{
             ...params.InputProps,
             startAdornment:
-              <InputAdornment sx={{ margin: 0 }}>
+              <InputAdornment position='start' sx={{ margin: 0 }}>
                 <IconButton sx={{ padding: 0 }}
-                  // onClick={}
+                  onClick={handleCenterMap}
                 >
-                  <PlaceIcon sx={{ color: tfProps.id === "startLocation" ? 'lightgreen' : 'darkgreen' }}/>
+                  <PlaceIcon sx={{ color: tfProps.id === "startLocation" ? 'lightgreen' : 'darkgreen' }} />
                 </IconButton>
               </InputAdornment>
           }}
@@ -80,7 +90,9 @@ const SearchBox = (props) => {
 }
 
 // Thanh nhập địa chỉ
-export const LocationInput = ({ bookingRef, setStartLocationInfo, setEndLocationInfo, setBookingForm }) => {
+export const LocationInput = (props) => {
+  const { bookingRef, setStartLocation, setEndLocation, setMapCenterRef , setBookingForm } = props;
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -90,7 +102,7 @@ export const LocationInput = ({ bookingRef, setStartLocationInfo, setEndLocation
   };
 
   return (
-    <AppBar position='static' color='transparent'>
+    <AppBar position='static' color='transparent' sx={{ zIndex: 100 }}>
       <Box component='form' id='locationInput' onSubmit={handleSubmit}>
         <Grid container flexDirection='row' alignItems='center' spacing={0.5} padding={1}>
           <Grid item xs={6} lg>
@@ -98,7 +110,8 @@ export const LocationInput = ({ bookingRef, setStartLocationInfo, setEndLocation
               id='startLocation'
               name='startLocation'
               placeholder='Nhập điểm đi'
-              setLocationInfo={setStartLocationInfo}
+              setLocation={setStartLocation}
+              setMapCenterRef={setMapCenterRef}
             />
           </Grid>
           <Grid item xs={6} lg>
@@ -106,7 +119,8 @@ export const LocationInput = ({ bookingRef, setStartLocationInfo, setEndLocation
               id='endLocation'
               name='endLocation'
               placeholder='Nhập điểm đến'
-              setLocationInfo={setEndLocationInfo}
+              setLocation={setEndLocation}
+              setMapCenterRef={setMapCenterRef}
             />
           </Grid>
           <Grid item xs={12} lg={2}>

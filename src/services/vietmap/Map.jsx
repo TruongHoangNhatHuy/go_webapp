@@ -1,15 +1,34 @@
 import { useEffect, useRef } from "react";
 
-const Map = ({ startLocationInfo, endLocationInfo }) => {
+const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
+  const vietmapgl = window.vietmapgl;
+
   const mapRef = useRef(null);
+  const mapControlRef = useRef({});
   const infoMarkerRef = useRef(null);     // marker thông tin
   const startMarkerRef = useRef(null);    // marker điểm đi
   const endMarkerRef = useRef(null);      // marker điểm đến
   const customerMarkerRef = useRef(null); // marker khách hàng
   const driverMarkerRef = useRef(null);   // marker tài xế
 
+  // Tạo custom marker
+  const createCustomMarkerElement = (imagePath) => {
+    const el = document.createElement('div');
+    const width = 38;
+    const height = 38;
+    el.className = 'marker';
+    el.style.backgroundImage = 'url(' + imagePath + ')';
+    el.style.width = `${width}px`;
+    el.style.height = `${height}px`;
+    el.style.backgroundSize = '100%';
+    return ({
+      element: el,
+      offset: [0, -height/2]
+    });
+  }
+
   // Xử lý hiện thị marker
-  const handleMarker = (markerRef, lngLat = null, color = "#3fb1ce") => {
+  const handleMarker = (markerRef, lngLat = null, markerOption = null) => {
     // Nếu trên bản đồ tồn tại marker, remove
     if (markerRef.current) {
       markerRef.current.remove()
@@ -17,11 +36,16 @@ const Map = ({ startLocationInfo, endLocationInfo }) => {
     }
     // Thêm marker mới
     if (lngLat !== null) {
-      markerRef.current = new vietmapgl.Marker({ color: color })
+      markerRef.current = new vietmapgl.Marker(markerOption)
         .setLngLat(lngLat)
         .addTo(mapRef.current)
     }
   }
+
+  const setMapCenter = (lngLat) => {
+    mapRef.current.flyTo({ center: lngLat });
+  }
+  setMapCenterRef.current.setMapCenter = setMapCenter;
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -34,31 +58,60 @@ const Map = ({ startLocationInfo, endLocationInfo }) => {
         pitch: 90, // starting zoom
       })
     }
+    // Thêm các control cho map
+    if (!mapControlRef.current.navigationControl) {
+      // Điều khiển map
+      mapControlRef.current.navigationControl = new vietmapgl.NavigationControl();
+      mapRef.current.addControl(mapControlRef.current.navigationControl, 'bottom-left');
+    }
+    if (!mapControlRef.current.geolocateControl) {
+      // Định vị
+      mapControlRef.current.geolocateControl = new vietmapgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showAccuracyCircle: true,
+      })
+      mapRef.current.addControl(mapControlRef.current.geolocateControl, 'bottom-left');
+      
+      mapControlRef.current.geolocateControl.on('geolocate', (e) => {
+        var lng = e.coords.longitude;
+        var lat = e.coords.latitude;
+        var position = [lng, lat];
+        console.log('user position', position);
+      });
+    }
 
     // Mouse click event listener
     mapRef.current.on('click', (e) => {
-      console.log('A click event has occurred at ' + e.lngLat);
-      handleMarker(infoMarkerRef, e.lngLat);
+      // console.log('A click event has occurred at ' + e.lngLat);
+      handleMarker(infoMarkerRef, e.lngLat, { color: "red" });
+      // console.log(infoMarkerRef.current.getElement())
     });
+  }, [])
 
+  useEffect(()=> {
     // Gắn marker cho điểm đi
-    if (startLocationInfo !== null) {
-      var lngLat = [startLocationInfo.coordinates.lng, startLocationInfo.coordinates.lat]
-      handleMarker(startMarkerRef, lngLat, "lightgreen")
+    if (startLocation !== null) {
+      var lngLat = [startLocation.coordinates.lng, startLocation.coordinates.lat];
+      handleMarker(startMarkerRef, lngLat, { color: "lightgreen" });
+      setMapCenter(lngLat);
     }
     else 
-      handleMarker(startMarkerRef, null)
+      handleMarker(startMarkerRef, null);
     // Gắn marker cho điểm đến
-    if (endLocationInfo !== null) {
-      var lngLat = [endLocationInfo.coordinates.lng, endLocationInfo.coordinates.lat]
-      handleMarker(endMarkerRef, lngLat, "darkgreen")
+    if (endLocation !== null) {
+      var lngLat = [endLocation.coordinates.lng, endLocation.coordinates.lat];
+      handleMarker(endMarkerRef, lngLat, { color: "darkgreen" });
+      setMapCenter(lngLat);
     }
     else
-      handleMarker(endMarkerRef, null)
-  }, [startLocationInfo, endLocationInfo])
+      handleMarker(endMarkerRef, null);
+  }, [startLocation, endLocation])
 
   return (
-    <div id="map-container" style={{ position: 'fixed', width: "100%", height: "100vh" }}/>
+    <div id="map-container" style={{ position: 'fixed', width: "84.5vw", height: "100vh", zIndex: 0 }}/>
   )
 }
 
