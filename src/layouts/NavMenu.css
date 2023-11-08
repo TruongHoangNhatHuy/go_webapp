@@ -3,13 +3,17 @@
   flex-direction: column;
   padding: 0;
   background-color: #282c34;
-  height: 97.3vh;
-  min-width: 200px;
+  height: 100vh;
+  /* min-width: 200px; */
 }
 
 .list-item {
   padding-left: 0px!important;
   padding-right: 0px!important;
+}
+
+.list-item-btn {
+  padding-left: 0px!important;
 }
 
 .list-item-btn:hover {

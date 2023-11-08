@@ -79,7 +79,7 @@ const SearchBox = (props) => {
                 <IconButton sx={{ padding: 0 }}
                   onClick={handleCenterMap}
                 >
-                  <PlaceIcon sx={{ color: tfProps.id === "startLocation" ? 'lightgreen' : 'darkgreen' }} />
+                  <PlaceIcon sx={{ color: tfProps.id === "startLocation" ? 'green' : 'red' }} />
                 </IconButton>
               </InputAdornment>
           }}

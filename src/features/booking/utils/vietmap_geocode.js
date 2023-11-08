@@ -1,7 +1,7 @@
 import config from 'config.json'
 
-// const apiKey = config.vietmap.primaryToken // 1000 req/ngày
-const apiKey = config.vietmap.secondaryToken // 10 req/phút
+const apiKey = config.vietmap.primaryToken // 1000 req/ngày
+// const apiKey = config.vietmap.secondaryToken // 10 req/phút
 
 export function getLocationsByAddress(address) {
   if (address === null || address === "")

@@ -86,7 +86,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
     // Mouse click event listener
     mapRef.current.on('click', (e) => {
       // console.log('A click event has occurred at ' + e.lngLat);
-      handleMarker(infoMarkerRef, e.lngLat, { color: "red" });
+      handleMarker(infoMarkerRef, e.lngLat);
       // console.log(infoMarkerRef.current.getElement())
     });
   }, [])
@@ -95,7 +95,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
     // Gắn marker cho điểm đi
     if (startLocation !== null) {
       var lngLat = [startLocation.coordinates.lng, startLocation.coordinates.lat];
-      handleMarker(startMarkerRef, lngLat, { color: "lightgreen" });
+      handleMarker(startMarkerRef, lngLat, { color: "green" });
       setMapCenter(lngLat);
     }
     else 
@@ -103,7 +103,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
     // Gắn marker cho điểm đến
     if (endLocation !== null) {
       var lngLat = [endLocation.coordinates.lng, endLocation.coordinates.lat];
-      handleMarker(endMarkerRef, lngLat, { color: "darkgreen" });
+      handleMarker(endMarkerRef, lngLat, { color: "red" });
       setMapCenter(lngLat);
     }
     else
@@ -111,7 +111,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
   }, [startLocation, endLocation])
 
   return (
-    <div id="map-container" style={{ position: 'fixed', width: "84.5vw", height: "100vh", zIndex: 0 }}/>
+    <div id="map-container" style={{ position: 'fixed', width: "100vw", height: "100vh", zIndex: 0 }}/>
   )
 }
 

@@ -1,18 +1,23 @@
 import { forwardRef, useEffect, useState } from "react";
-import { Box, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import './NavMenu.css';
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import CommuteIcon from '@mui/icons-material/Commute';
 import GoLogo from '../assets/1200px-Go_Logo_Green.png'
+import './NavMenu.css';
 
 // List menu của khách hàng
 const customerMenu = [
   {
 		to: "account",
 		menuItem: "Tài khoản",
+		menuIcon: <AccountBoxIcon/>
 	},
 	{
 		to: "booking",
 		menuItem: "Đặt xe",
+		menuIcon: <CommuteIcon/>
 	},
 	{
 		to: "orders",
@@ -82,27 +87,44 @@ const NavMenu = () => {
 		setSelectedItem(url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
 	}, [url]);
 
+	const drawerWidth = 220;
 	return (
-		<List className='list-box'>
-			<Box component="img" 
-				src={GoLogo}
-				sx={{
-					height: 56,
-					width: 150,
-					padding: 2,
-					paddingBottom: 1
-				}}
-			/>
-			{// Render menu item theo list menu
-				menu.map(({to, menuItem}) => (
-					<ListItem className='list-item' component={Link} to={to}>
-						<ListItemButton className="list-item-btn" selected={seletedItem === to}>
-							<ListItemText primary={menuItem} sx={{ color: "white"}}/>
-						</ListItemButton>
-					</ListItem>
-				))
-			}
-		</List>
+		<Drawer
+			sx={{
+				width: drawerWidth,
+				flexShrink: 0,
+				'& .MuiDrawer-paper': {
+					width: drawerWidth,
+					boxSizing: 'border-box',
+				},
+			}}
+			variant="permanent"
+			anchor="left"
+		>
+			<List className='list-box'>
+				<Box component="img"
+					src={GoLogo}
+					sx={{
+						height: 56,
+						width: 150,
+						padding: 2,
+						paddingBottom: 1
+					}}
+				/>
+				{// Render menu item theo list menu
+					menu.map(({ to, menuItem, menuIcon }) => (
+						<ListItem className='list-item' component={Link} to={to}>
+							<ListItemButton className="list-item-btn" selected={seletedItem === to}>
+								<ListItemIcon sx={{ color: 'white', justifyContent: 'center' }}>
+									{menuIcon ? menuIcon : <DisabledByDefaultIcon/>}
+								</ListItemIcon>
+								<ListItemText primary={menuItem} sx={{ color: "white" }} />
+							</ListItemButton>
+						</ListItem>
+					))
+				}
+			</List>
+		</Drawer>
 	)
 }
 
