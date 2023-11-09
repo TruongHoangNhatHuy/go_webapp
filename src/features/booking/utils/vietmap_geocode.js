@@ -13,7 +13,7 @@ export function getLocationsByAddress(address) {
   req.send(null);
 
   var responseJson = JSON.parse(req.responseText);
-  console.log('getLocationsByAddress', responseJson);
+  // console.log('getLocationsByAddress', responseJson);
   return responseJson
 }
 
@@ -24,6 +24,6 @@ export function getCoordinatesByRefid(refid) {
   req.send(null);
 
   var responseJson = JSON.parse(req.responseText);
-  console.log("getCoordinatesByRefid", [responseJson.lat, responseJson.lng]);
+  // console.log("getCoordinatesByRefid", [responseJson.lat, responseJson.lng]);
   return responseJson
 }

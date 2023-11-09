@@ -1,4 +1,9 @@
 import { useEffect, useRef } from "react";
+import config from 'config.json'
+import { getRoute } from "../utils/vietmap_route";
+
+// const apiKey = config.vietmap.primaryToken // 1000 req/ngày
+const apiKey = config.vietmap.secondaryToken // 10 req/phút
 
 const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
   const vietmapgl = window.vietmapgl;
@@ -8,6 +13,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
   const infoMarkerRef = useRef(null);     // marker thông tin
   const startMarkerRef = useRef(null);    // marker điểm đi
   const endMarkerRef = useRef(null);      // marker điểm đến
+  const routeRef = useRef(null);          // route từ điểm đi tới điểm đến
   const customerMarkerRef = useRef(null); // marker khách hàng
   const driverMarkerRef = useRef(null);   // marker tài xế
 
@@ -52,10 +58,10 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
       // Khởi tạo map ban đầu
       mapRef.current = new vietmapgl.Map({
         container: "map-container",
-        style: "https://maps.vietmap.vn/mt/tm/style.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747", // stylesheet location
+        style: "https://maps.vietmap.vn/mt/tm/style.json?apikey="+ apiKey,
         center: [108.15, 16.075], // starting position [lng, lat]
-        zoom: 15,
-        pitch: 90, // starting zoom
+        zoom: 15, // starting zoom
+        pitch: 90,
       })
     }
     // Thêm các control cho map
@@ -79,7 +85,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
         var lng = e.coords.longitude;
         var lat = e.coords.latitude;
         var position = [lng, lat];
-        console.log('user position', position);
+        // console.log('user position', position);
       });
     }
 
@@ -87,7 +93,6 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
     mapRef.current.on('click', (e) => {
       // console.log('A click event has occurred at ' + e.lngLat);
       handleMarker(infoMarkerRef, e.lngLat);
-      // console.log(infoMarkerRef.current.getElement())
     });
   }, [])
 
@@ -108,6 +113,55 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
     }
     else
       handleMarker(endMarkerRef, null);
+
+    // Vẽ route từ điểm đi tới điểm đến
+    if (startLocation !== null && endLocation !== null) {
+      // Nếu có đủ 2 marker điểm đi & điểm đến:
+      // Gọi API
+      var startLatLng = [startLocation.coordinates.lat, startLocation.coordinates.lng];
+      var endLatLng = [endLocation.coordinates.lat, endLocation.coordinates.lng];
+      var route = getRoute(startLatLng.toString(), endLatLng.toString());
+      // Nếu route cũ đang hiện trên bản đồ, xóa route cũ
+      if (routeRef.current !== null) {
+        mapRef.current.removeLayer("routeLayer");
+        mapRef.current.removeSource("routeSource");
+        // console.log("remove old route");
+      };
+      // Hiện thị route mới trên bản đồ
+      routeRef.current = {};
+      routeRef.current.source = {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          properties: {},
+          geometry: route.paths[0].points,
+        }
+      };
+      routeRef.current.layer = {
+        id: "routeLayer",
+        type: "line",
+        source: "routeSource",
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "gray",
+          "line-width": 7,
+          "line-opacity": 0.7
+        }
+      };
+      mapRef.current.addSource("routeSource", routeRef.current.source);
+      mapRef.current.addLayer(routeRef.current.layer);
+      // console.log("display current route");
+    }
+    else if (routeRef.current !== null) {
+      // Nếu không đủ 2 marker điểm đi & điểm đến, xóa route đang có
+      mapRef.current.removeLayer("routeLayer");
+      mapRef.current.removeSource("routeSource");
+      routeRef.current = null;
+      // console.log("remove current route");
+    };
   }, [startLocation, endLocation])
 
   return (
