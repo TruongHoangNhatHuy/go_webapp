@@ -5,6 +5,7 @@
   },
   "vietmap": {
     "primaryToken": "c3d0f188ff669f89042771a20656579073cffec5a8a69747",
-    "secondaryToken": "c34db45b6d1e8e71bfe74bd5139aa592322b463632af3543"
+    "secondaryToken": "c34db45b6d1e8e71bfe74bd5139aa592322b463632af3543",
+    "thirdToken": "506862bb03a3d71632bdeb7674a3625328cb7e5a9b011841"
   }
 }

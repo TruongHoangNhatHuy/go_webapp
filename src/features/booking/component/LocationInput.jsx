@@ -24,11 +24,11 @@ const SearchBox = (props) => {
     if (item !== null) {
       // lấy tọa độ
       const locationCoordinates = getCoordinatesByRefid(item.ref_id);
-      // console.log('locationCoordinates', locationCoordinates);
       locationRef.current = {
         'location': item,
         'coordinates': locationCoordinates
       }
+      console.log('locationInput', locationRef.current);
     }
     else
       locationRef.current = null;

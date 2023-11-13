@@ -42,8 +42,12 @@ const Booking = () => {
         hadBooking ? (
           <AppBar position='relative' color=''>
             <Stack flexDirection='row' alignItems='center' padding={1}>
-              <Typography variant='h6'>Đã đặt xe</Typography>
+              <Typography variant='h6'>
+                Tài xế: Hoàng
+              </Typography>
+              <Button variant='outlined'>Thông tin</Button>
               <Box sx={{ flex: '1 1 auto' }}/>
+              <Button variant='outlined'>Nhắn tin</Button>
               <Button variant='outlined' onClick={() => setBookingDetail(true)}>Chi tiết</Button>
             </Stack>
           </AppBar>

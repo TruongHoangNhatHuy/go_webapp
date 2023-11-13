@@ -1,9 +1,12 @@
 import { useEffect, useRef } from "react";
 import config from 'config.json'
 import { getRoute } from "../utils/vietmap_route";
+import { getLocationByCoordinates } from "../utils/vietmap_reverse";
+import { getLocationsByAddress } from "../utils/vietmap_geocode";
 
-// const apiKey = config.vietmap.primaryToken // 1000 req/ngày
-const apiKey = config.vietmap.secondaryToken // 10 req/phút
+const apiKey = config.vietmap.primaryToken // 1000 req/ngày
+// const apiKey = config.vietmap.secondaryToken // 10 req/phút
+// const apiKey = config.vietmap.thirdToken // 5000 req/ngày
 
 const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
   const vietmapgl = window.vietmapgl;
@@ -47,6 +50,16 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
         .addTo(mapRef.current)
     }
   }
+  // Marker's popup
+  const handleMarkerPopup = (markerRef, info) => {
+    console.log(info)
+    if (info !== null) {
+      const html = "<h3 style='margin:0'>"+ info.name +"</h3><h4 style='margin:0; color:gray'>"+ info.address +"</h4>"
+      
+      markerRef.current.setPopup(new vietmapgl.Popup({ maxWidth: 'none', closeOnClick: false }).setHTML(html));
+      markerRef.current.togglePopup();
+    }
+  }
 
   const setMapCenter = (lngLat) => {
     mapRef.current.flyTo({ center: lngLat });
@@ -80,6 +93,9 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
         showAccuracyCircle: true,
       })
       mapRef.current.addControl(mapControlRef.current.geolocateControl, 'bottom-left');
+      mapRef.current.on('load', () => {
+        mapControlRef.current.geolocateControl.trigger();
+      })
       
       mapControlRef.current.geolocateControl.on('geolocate', (e) => {
         var lng = e.coords.longitude;
@@ -89,10 +105,15 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
       });
     }
 
+    
+
     // Mouse click event listener
     mapRef.current.on('click', (e) => {
       // console.log('A click event has occurred at ' + e.lngLat);
       handleMarker(infoMarkerRef, e.lngLat);
+      var location = getLocationByCoordinates(e.lngLat.lng, e.lngLat.lat);
+      var info = getLocationsByAddress(location[0].display);
+      handleMarkerPopup(infoMarkerRef, info[1])
     });
   }, [])
 
@@ -101,6 +122,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
     if (startLocation !== null) {
       var lngLat = [startLocation.coordinates.lng, startLocation.coordinates.lat];
       handleMarker(startMarkerRef, lngLat, { color: "green" });
+      handleMarkerPopup(startMarkerRef, startLocation.location);
       setMapCenter(lngLat);
     }
     else 
@@ -109,6 +131,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
     if (endLocation !== null) {
       var lngLat = [endLocation.coordinates.lng, endLocation.coordinates.lat];
       handleMarker(endMarkerRef, lngLat, { color: "red" });
+      handleMarkerPopup(endMarkerRef, endLocation.location);
       setMapCenter(lngLat);
     }
     else
@@ -146,7 +169,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
           "line-cap": "round",
         },
         paint: {
-          "line-color": "gray",
+          "line-color": "#00b0ff",
           "line-width": 7,
           "line-opacity": 0.7
         }
