@@ -2,7 +2,7 @@ import { AppBar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
 import CloseIcon from '@mui/icons-material/Close';
 import Map from '../features/booking/vietmap/Map';
 import { useRef, useState } from 'react';
-import { BookingDetail, BookingForm, LocationInput } from '../features/booking';
+import { BookingDetail, BookingForm, LocationInputSide, LocationInputTop } from '../features/booking';
 
 const Booking = () => {
   // UI state
@@ -12,6 +12,7 @@ const Booking = () => {
   // Map state
   const [startLocation, setStartLocation] = useState(null);
   const [endLocation, setEndLocation] = useState(null);
+  const [vehicleRoute, setVehicleRoute] = useState('motorcycle'); // Hiện thị tuyến đường
   // Function ref
   const setMapCenterRef = useRef({});
   // Thông tin đơn đặt
@@ -36,24 +37,26 @@ const Booking = () => {
   return (
     <div>
       {/* props của Map: để hiển thị marker điểm đi & điểm đến */}
-      <Map startLocation={startLocation} endLocation={endLocation} setMapCenterRef={setMapCenterRef}/>
+      <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setMapCenterRef={setMapCenterRef}/>
+      {/* Location Input Side */}
+      <LocationInputSide bookingRef={bookingRef} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} vehicleRoute={vehicleRoute} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm}/>
       {
-        // Hiện/ẩn thanh nhập địa chỉ khi chưa/đã đặt xe
-        hadBooking ? (
-          <AppBar position='relative' color=''>
-            <Stack flexDirection='row' alignItems='center' padding={1}>
-              <Typography variant='h6'>
-                Tài xế: Hoàng
-              </Typography>
-              <Button variant='outlined'>Thông tin</Button>
-              <Box sx={{ flex: '1 1 auto' }}/>
-              <Button variant='outlined'>Nhắn tin</Button>
-              <Button variant='outlined' onClick={() => setBookingDetail(true)}>Chi tiết</Button>
-            </Stack>
-          </AppBar>
-        ) : (
-          <LocationInput bookingRef={bookingRef} setStartLocation={setStartLocation} setEndLocation={setEndLocation} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
-        )
+        // Location Input Top & Xử lí hiện/ẩn khi chưa/đã đặt xe
+        // hadBooking ? (
+        //   <AppBar position='relative' color=''>
+        //     <Stack flexDirection='row' alignItems='center' padding={1}>
+        //       <Typography variant='h6'>
+        //         Tài xế: Hoàng
+        //       </Typography>
+        //       <Button variant='outlined'>Thông tin</Button>
+        //       <Box sx={{ flex: '1 1 auto' }}/>
+        //       <Button variant='outlined'>Nhắn tin</Button>
+        //       <Button variant='outlined' onClick={() => setBookingDetail(true)}>Chi tiết</Button>
+        //     </Stack>
+        //   </AppBar>
+        // ) : (
+        //   <LocationInputTop bookingRef={bookingRef} setStartLocation={setStartLocation} setEndLocation={setEndLocation} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
+        // )
       }
       {/* Cửa sổ mở Booking Form */}
       <Dialog open={bookingForm}>

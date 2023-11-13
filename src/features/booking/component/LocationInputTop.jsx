@@ -90,7 +90,7 @@ const SearchBox = (props) => {
 }
 
 // Thanh nhập địa chỉ
-export const LocationInput = (props) => {
+export const LocationInputTop = (props) => {
   const { bookingRef, setStartLocation, setEndLocation, setMapCenterRef , setBookingForm } = props;
   
   const handleSubmit = (event) => {

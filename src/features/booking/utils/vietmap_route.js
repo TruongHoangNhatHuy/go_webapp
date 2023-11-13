@@ -10,6 +10,7 @@ export function getRoute(startLatLng, endLatLng, vehicle = "motorcycle") {
   req.send(null);
 
   var responseJson = JSON.parse(req.responseText);
+  console.log("getRoute_vehicle:", vehicle);
   // console.log("getRoute", responseJson);
   return responseJson
 }

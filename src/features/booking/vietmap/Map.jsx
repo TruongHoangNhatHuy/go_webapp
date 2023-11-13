@@ -8,7 +8,7 @@ const apiKey = config.vietmap.primaryToken // 1000 req/ngày
 // const apiKey = config.vietmap.secondaryToken // 10 req/phút
 // const apiKey = config.vietmap.thirdToken // 5000 req/ngày
 
-const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
+const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
   const vietmapgl = window.vietmapgl;
 
   const mapRef = useRef(null);
@@ -105,15 +105,13 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
       });
     }
 
-    
-
     // Mouse click event listener
     mapRef.current.on('click', (e) => {
       // console.log('A click event has occurred at ' + e.lngLat);
       handleMarker(infoMarkerRef, e.lngLat);
-      var location = getLocationByCoordinates(e.lngLat.lng, e.lngLat.lat);
-      var info = getLocationsByAddress(location[0].display);
-      handleMarkerPopup(infoMarkerRef, info[1])
+      // var location = getLocationByCoordinates(e.lngLat.lng, e.lngLat.lat);
+      // var info = getLocationsByAddress(location[0].display);
+      // handleMarkerPopup(infoMarkerRef, info[1])
     });
   }, [])
 
@@ -141,9 +139,9 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
     if (startLocation !== null && endLocation !== null) {
       // Nếu có đủ 2 marker điểm đi & điểm đến:
       // Gọi API
-      var startLatLng = [startLocation.coordinates.lat, startLocation.coordinates.lng];
-      var endLatLng = [endLocation.coordinates.lat, endLocation.coordinates.lng];
-      var route = getRoute(startLatLng.toString(), endLatLng.toString());
+      var startLatLng = [startLocation.coordinates.lat, startLocation.coordinates.lng].toString();
+      var endLatLng = [endLocation.coordinates.lat, endLocation.coordinates.lng].toString();
+      var route = getRoute(startLatLng, endLatLng, vehicleRoute);
       // Nếu route cũ đang hiện trên bản đồ, xóa route cũ
       if (routeRef.current !== null) {
         mapRef.current.removeLayer("routeLayer");
@@ -185,7 +183,7 @@ const Map = ({ startLocation, endLocation, setMapCenterRef }) => {
       routeRef.current = null;
       // console.log("remove current route");
     };
-  }, [startLocation, endLocation])
+  }, [startLocation, endLocation, vehicleRoute])
 
   return (
     <div id="map-container" style={{ position: 'fixed', width: "100vw", height: "100vh", zIndex: 0 }}/>
