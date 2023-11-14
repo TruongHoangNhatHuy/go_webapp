@@ -1,8 +1,8 @@
-import { AppBar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Map from '../features/booking/vietmap/Map';
 import { useRef, useState } from 'react';
-import { BookingDetail, BookingForm, LocationInputSide, LocationInputTop } from '../features/booking';
+import { BookingDetail, BookingForm, BookingInfoSide, LocationInputSide } from '../features/booking';
 
 const Booking = () => {
   // UI state
@@ -27,7 +27,7 @@ const Booking = () => {
   });
   
   // Xử lý hủy đơn
-  const handleCancel = () => {
+  const handleBookingCancel = () => {
     setBookingDetail(false);
     setStartLocation(null);
     setEndLocation(null);
@@ -39,25 +39,11 @@ const Booking = () => {
       {/* props của Map: để hiển thị marker điểm đi & điểm đến */}
       <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setMapCenterRef={setMapCenterRef}/>
       {/* Location Input Side */}
-      <LocationInputSide bookingRef={bookingRef} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} vehicleRoute={vehicleRoute} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm}/>
-      {
-        // Location Input Top & Xử lí hiện/ẩn khi chưa/đã đặt xe
-        // hadBooking ? (
-        //   <AppBar position='relative' color=''>
-        //     <Stack flexDirection='row' alignItems='center' padding={1}>
-        //       <Typography variant='h6'>
-        //         Tài xế: Hoàng
-        //       </Typography>
-        //       <Button variant='outlined'>Thông tin</Button>
-        //       <Box sx={{ flex: '1 1 auto' }}/>
-        //       <Button variant='outlined'>Nhắn tin</Button>
-        //       <Button variant='outlined' onClick={() => setBookingDetail(true)}>Chi tiết</Button>
-        //     </Stack>
-        //   </AppBar>
-        // ) : (
-        //   <LocationInputTop bookingRef={bookingRef} setStartLocation={setStartLocation} setEndLocation={setEndLocation} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
-        // )
-      }
+      { hadBooking ? (
+        <BookingInfoSide bookingRef={bookingRef} handleBookingCancel={handleBookingCancel}/>
+      ) : (
+        <LocationInputSide bookingRef={bookingRef} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} vehicleRoute={vehicleRoute} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm}/>
+      ) }
       {/* Cửa sổ mở Booking Form */}
       <Dialog open={bookingForm}>
         <DialogTitle sx={{ paddingBottom: 0 }}>ĐẶT XE</DialogTitle>
@@ -92,7 +78,7 @@ const Booking = () => {
           <BookingDetail bookingRef={bookingRef}/>
         </DialogContent>
         <DialogActions>
-          <Button variant='outlined' color='error' onClick={handleCancel}>Hủy đơn</Button>
+          <Button variant='outlined' color='error' onClick={handleBookingCancel}>Hủy đơn</Button>
         </DialogActions>
       </Dialog>
     </div>

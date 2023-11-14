@@ -8,10 +8,9 @@ import RouteIcon from '@mui/icons-material/Route';
 import PaidIcon from '@mui/icons-material/Paid';
 import { debounce } from '@mui/material/utils'
 import { getLocationsByAddress, getCoordinatesByRefid } from '../utils/vietmap_geocode.js';
-import { getLocation } from '../utils/test_geocode_data.js';
 import { useState, useRef, useEffect } from 'react';
 import { getRoute } from '../utils/vietmap_route.js';
-import dayjs from 'dayjs';
+import { metersToString, milisecondsToString } from '../utils/converter.js';
 
 const SearchBox = (props) => {
   const { setLocation, setMapCenterRef, ...tfProps } = props;
@@ -107,7 +106,7 @@ const SearchBox = (props) => {
 export const LocationInputSide = (props) => {
   const { bookingRef, startLocation, setStartLocation, endLocation, setEndLocation, vehicleRoute, setVehicleRoute, setMapCenterRef, setBookingForm } = props;
 
-  const drawerWidth = 320;
+  const drawerWidth = 350;
   // Đóng mở drawer
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
@@ -197,25 +196,25 @@ export const LocationInputSide = (props) => {
             <SearchBox
               id='startLocation'
               name='startLocation'
-              placeholder='Nhập điểm đi'
+              placeholder='Tìm điểm đi'
               setLocation={setStartLocation}
               setMapCenterRef={setMapCenterRef}
             />
             <SearchBox
               id='endLocation'
               name='endLocation'
-              placeholder='Nhập điểm đến'
+              placeholder='Tìm điểm đến'
               setLocation={setEndLocation}
               setMapCenterRef={setMapCenterRef}
             />
+            <Divider />
           </Stack>
-          <Divider />
           {!vehicleSelect ? (
-            <Typography color='gray' align='center' marginTop={1}>
+            <Typography color='gray' align='center'>
               <i>Chọn điểm đi và điểm đến</i>
             </Typography>
           ) : (
-            <Stack minWidth='90%' spacing={1} padding={1} display='flex'>
+            <Stack minWidth='90%' spacing={1} padding={1} paddingTop={0} display='flex'>
               <ToggleButtonGroup
                 orientation='vertical'
                 exclusive
@@ -235,13 +234,13 @@ export const LocationInputSide = (props) => {
                     <Stack flexDirection='row'>
                       <AccessTimeIcon sx={{ marginRight: 1 }}/>
                       <Typography variant='body'>
-                        {dayjs(vehicleRouteRef.current.motorcycle.paths[0].time).format('HH[ tiếng ]mm[ phút ]ss[ giây ]')}
+                        Khoảng {milisecondsToString(vehicleRouteRef.current.motorcycle.paths[0].time)}
                       </Typography>
                     </Stack>
                     <Stack flexDirection='row'>
                       <RouteIcon sx={{ marginRight: 1 }}/>
                       <Typography variant='body'>
-                        {vehicleRouteRef.current.motorcycle.paths[0].distance} mét
+                        {metersToString(vehicleRouteRef.current.motorcycle.paths[0].distance)}
                       </Typography>
                     </Stack>
                     <Stack flexDirection='row'>
@@ -262,13 +261,13 @@ export const LocationInputSide = (props) => {
                     <Stack flexDirection='row'>
                       <AccessTimeIcon sx={{ marginRight: 1 }}/>
                       <Typography variant='body'>
-                        {dayjs(vehicleRouteRef.current.car.paths[0].time).format('HH[ tiếng ]mm[ phút ]ss[ giây ]')}
+                        Khoảng {milisecondsToString(vehicleRouteRef.current.car.paths[0].time)}
                       </Typography>
                     </Stack>
                     <Stack flexDirection='row'>
                       <RouteIcon sx={{ marginRight: 1 }}/>
                       <Typography variant='body'>
-                        {vehicleRouteRef.current.car.paths[0].distance} mét
+                        {metersToString(vehicleRouteRef.current.car.paths[0].distance)}
                       </Typography>
                     </Stack>
                     <Stack flexDirection='row'>
