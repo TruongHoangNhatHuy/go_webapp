@@ -12,7 +12,7 @@ const Booking = () => {
   // Map state
   const [startLocation, setStartLocation] = useState(null);
   const [endLocation, setEndLocation] = useState(null);
-  const [vehicleRoute, setVehicleRoute] = useState('motorcycle'); // Hiện thị tuyến đường
+  const [vehicleRoute, setVehicleRoute] = useState(null); // Hiện thị tuyến đường
   // Function ref
   const setMapCenterRef = useRef({});
   // Thông tin đơn đặt

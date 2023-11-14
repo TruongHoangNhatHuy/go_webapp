@@ -13,7 +13,7 @@ export function getLocationsByAddress(address) {
   req.send(null);
 
   var responseJson = JSON.parse(req.responseText);
-  console.log('getLocationsByAddress', responseJson);
+  // console.log('getLocationsByAddress', responseJson);
   return responseJson
 }
 

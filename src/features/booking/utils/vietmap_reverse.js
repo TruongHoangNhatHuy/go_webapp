@@ -10,6 +10,6 @@ export const getLocationByCoordinates = (lng, lat) => {
   req.send(null);
 
   var responseJson = JSON.parse(req.responseText);
-  console.log("getLocationByCoordinates", responseJson);
+  // console.log("getLocationByCoordinates", responseJson);
   return responseJson
 }

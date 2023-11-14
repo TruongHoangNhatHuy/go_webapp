@@ -1,8 +1,5 @@
 import { useEffect, useRef } from "react";
 import config from 'config.json'
-import { getRoute } from "../utils/vietmap_route";
-import { getLocationByCoordinates } from "../utils/vietmap_reverse";
-import { getLocationsByAddress } from "../utils/vietmap_geocode";
 
 const apiKey = config.vietmap.primaryToken // 1000 req/ngày
 // const apiKey = config.vietmap.secondaryToken // 10 req/phút
@@ -52,7 +49,7 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
   }
   // Marker's popup
   const handleMarkerPopup = (markerRef, info) => {
-    console.log(info)
+    // console.log(info);
     if (info !== null) {
       const html = "<h3 style='margin:0'>"+ info.name +"</h3><h4 style='margin:0; color:gray'>"+ info.address +"</h4>"
       
@@ -134,47 +131,49 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
     }
     else
       handleMarker(endMarkerRef, null);
+  }, [startLocation, endLocation])
 
+  useEffect(() => {
     // Vẽ route từ điểm đi tới điểm đến
     if (startLocation !== null && endLocation !== null) {
       // Nếu có đủ 2 marker điểm đi & điểm đến:
-      // Gọi API
-      var startLatLng = [startLocation.coordinates.lat, startLocation.coordinates.lng].toString();
-      var endLatLng = [endLocation.coordinates.lat, endLocation.coordinates.lng].toString();
-      var route = getRoute(startLatLng, endLatLng, vehicleRoute);
-      // Nếu route cũ đang hiện trên bản đồ, xóa route cũ
-      if (routeRef.current !== null) {
-        mapRef.current.removeLayer("routeLayer");
-        mapRef.current.removeSource("routeSource");
-        // console.log("remove old route");
-      };
-      // Hiện thị route mới trên bản đồ
-      routeRef.current = {};
-      routeRef.current.source = {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          properties: {},
-          geometry: route.paths[0].points,
-        }
-      };
-      routeRef.current.layer = {
-        id: "routeLayer",
-        type: "line",
-        source: "routeSource",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#00b0ff",
-          "line-width": 7,
-          "line-opacity": 0.7
-        }
-      };
-      mapRef.current.addSource("routeSource", routeRef.current.source);
-      mapRef.current.addLayer(routeRef.current.layer);
-      // console.log("display current route");
+      // Lấy thông tin tuyến đường
+      var route = vehicleRoute;
+      if (route !== null) {
+        // Nếu route cũ đang hiện trên bản đồ, xóa route cũ
+        if (routeRef.current !== null) {
+          mapRef.current.removeLayer("routeLayer");
+          mapRef.current.removeSource("routeSource");
+          // console.log("remove old route");
+        };
+        // Hiện thị route mới trên bản đồ
+        routeRef.current = {};
+        routeRef.current.source = {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            properties: {},
+            geometry: route.paths[0].points,
+          }
+        };
+        routeRef.current.layer = {
+          id: "routeLayer",
+          type: "line",
+          source: "routeSource",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#00b0ff",
+            "line-width": 7,
+            "line-opacity": 0.7
+          }
+        };
+        mapRef.current.addSource("routeSource", routeRef.current.source);
+        mapRef.current.addLayer(routeRef.current.layer);
+        // console.log("display current route");
+      }
     }
     else if (routeRef.current !== null) {
       // Nếu không đủ 2 marker điểm đi & điểm đến, xóa route đang có

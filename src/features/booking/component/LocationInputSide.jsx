@@ -3,10 +3,15 @@ import PlaceIcon from '@mui/icons-material/Place';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import RouteIcon from '@mui/icons-material/Route';
+import PaidIcon from '@mui/icons-material/Paid';
 import { debounce } from '@mui/material/utils'
 import { getLocationsByAddress, getCoordinatesByRefid } from '../utils/vietmap_geocode.js';
 import { getLocation } from '../utils/test_geocode_data.js';
 import { useState, useRef, useEffect } from 'react';
+import { getRoute } from '../utils/vietmap_route.js';
+import dayjs from 'dayjs';
 
 const SearchBox = (props) => {
   const { setLocation, setMapCenterRef, ...tfProps } = props;
@@ -31,7 +36,7 @@ const SearchBox = (props) => {
         'location': item,
         'coordinates': locationCoordinates
       }
-      console.log('locationInput', locationRef.current);
+      // console.log('locationInput', locationRef.current);
     }
     else
       locationRef.current = null;
@@ -102,21 +107,48 @@ const SearchBox = (props) => {
 export const LocationInputSide = (props) => {
   const { bookingRef, startLocation, setStartLocation, endLocation, setEndLocation, vehicleRoute, setVehicleRoute, setMapCenterRef, setBookingForm } = props;
 
-  const drawerWidth = 300;
+  const drawerWidth = 320;
   // Đóng mở drawer
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(prev => !prev)
   }
-  // Hiện thị chọn tuyến đường
+
+  // Lưu thông tin các tuyến đường
+  const vehicleRouteRef = useRef(null);
+  // Phượng tiện đã chọn
+  const [vehicle, setVehicle] = useState('motorcycle');
+  // Ẩn hiện bảng chọn tuyến đường
   const [vehicleSelect, setVehicleSelect] = useState(false);
+
   useEffect(() => {
     if (startLocation && endLocation) {
-      setVehicleSelect(true)
+      vehicleRouteRef.current = {};
+      var startLatLng = [startLocation.coordinates.lat, startLocation.coordinates.lng].toString();
+      var endLatLng = [endLocation.coordinates.lat, endLocation.coordinates.lng].toString();
+      vehicleRouteRef.current.motorcycle = getRoute(startLatLng, endLatLng, 'motorcycle');
+      vehicleRouteRef.current.car = getRoute(startLatLng, endLatLng, 'car');
+      setVehicleRoute(vehicleRouteRef.current.motorcycle);
+      setVehicleSelect(true);
     } else {
-      setVehicleSelect(false)
+      vehicleRouteRef.current = null;
+      setVehicleSelect(false);
     }
+    console.log('vehicleRouteRef', vehicleRouteRef.current);
   }, [startLocation, endLocation])
+
+  const handleVehicleChange = (_, value) => {
+    setVehicle(value);
+    if (value === 'motorcycle') {
+      setVehicleRoute(vehicleRouteRef.current.motorcycle)
+    } 
+    else if (value === 'car') {
+      setVehicleRoute(vehicleRouteRef.current.car)
+    }
+    else {
+      setVehicleRoute(null)
+    }
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -188,8 +220,8 @@ export const LocationInputSide = (props) => {
                 orientation='vertical'
                 exclusive
                 color='primary'
-                value={vehicleRoute}
-                onChange={(_, value) => setVehicleRoute(value)}
+                value={vehicle}
+                onChange={handleVehicleChange}
               >
                 <Box component={ToggleButton}
                   value='motorcycle'
@@ -198,11 +230,24 @@ export const LocationInputSide = (props) => {
                   justifyContent='flex-start'
                   sx={{ '&.Mui-selected': { color: 'green' } }}
                 >
-                  <TwoWheelerIcon sx={{ height: 40, width: 40, marginRight: 1 }} />
-                  <Stack alignItems={'flex-start'}>
-                    <Typography variant='body'>Thời gian</Typography>
-                    <Typography variant='body'>Quãng đường</Typography>
-                    <Typography variant='body'>Giá tiền</Typography>
+                  <TwoWheelerIcon sx={{ height: 40, width: 40, marginRight: 1 }}/>
+                  <Stack flexDirection='column' alignItems='flex-start' spacing={1}>
+                    <Stack flexDirection='row'>
+                      <AccessTimeIcon sx={{ marginRight: 1 }}/>
+                      <Typography variant='body'>
+                        {dayjs(vehicleRouteRef.current.motorcycle.paths[0].time).format('HH[ tiếng ]mm[ phút ]ss[ giây ]')}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection='row'>
+                      <RouteIcon sx={{ marginRight: 1 }}/>
+                      <Typography variant='body'>
+                        {vehicleRouteRef.current.motorcycle.paths[0].distance} mét
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection='row'>
+                      <PaidIcon sx={{ marginRight: 1 }}/>
+                      <Typography variant='body'>Giá tiền</Typography>
+                    </Stack>
                   </Stack>
                 </Box>
                 <Box component={ToggleButton}
@@ -213,10 +258,23 @@ export const LocationInputSide = (props) => {
                   sx={{ '&.Mui-selected': { color: 'green' } }}
                 >
                   <DirectionsCarIcon sx={{ height: 40, width: 40, marginRight: 1 }} />
-                  <Stack alignItems={'flex-start'}>
-                    <Typography variant='body'>Thời gian</Typography>
-                    <Typography variant='body'>Quãng đường</Typography>
-                    <Typography variant='body'>Giá tiền</Typography>
+                  <Stack flexDirection='column' alignItems='flex-start' spacing={1}>
+                    <Stack flexDirection='row'>
+                      <AccessTimeIcon sx={{ marginRight: 1 }}/>
+                      <Typography variant='body'>
+                        {dayjs(vehicleRouteRef.current.car.paths[0].time).format('HH[ tiếng ]mm[ phút ]ss[ giây ]')}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection='row'>
+                      <RouteIcon sx={{ marginRight: 1 }}/>
+                      <Typography variant='body'>
+                        {vehicleRouteRef.current.car.paths[0].distance} mét
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection='row'>
+                      <PaidIcon sx={{ marginRight: 1 }}/>
+                      <Typography variant='body'>Giá tiền</Typography>
+                    </Stack>
                   </Stack>
                 </Box>
               </ToggleButtonGroup>
