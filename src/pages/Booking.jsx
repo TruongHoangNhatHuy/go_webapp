@@ -82,7 +82,7 @@ const Booking = () => {
           <BookingDetail bookingRef={bookingRef}/>
         </DialogContent>
         <DialogActions>
-          <Button variant='outlined' color='error' onClick={handleCancel} startIcon={<MdDelete />}>Hủy đơn</Button>
+          <Button variant='outlined' color='error' onClick={handleBookingCancel} startIcon={<MdDelete />}>Hủy đơn</Button>
         </DialogActions>
       </Dialog>
     </div>

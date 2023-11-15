@@ -1,5 +1,8 @@
 import { useEffect, useRef } from "react";
-import config from 'config.json'
+import './Map.css';
+import config from 'config.json';
+import { getLocationByCoordinates } from "../utils/vietmap_reverse";
+import { getLocationsByAddress } from "../utils/vietmap_geocode";
 
 const apiKey = config.vietmap.primaryToken // 1000 req/ngày
 // const apiKey = config.vietmap.secondaryToken // 10 req/phút
@@ -53,7 +56,7 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
     if (info !== null) {
       const html = "<h3 style='margin:0'>"+ info.name +"</h3><h4 style='margin:0; color:gray'>"+ info.address +"</h4>"
       
-      markerRef.current.setPopup(new vietmapgl.Popup({ maxWidth: 'none', closeOnClick: false }).setHTML(html));
+      markerRef.current.setPopup(new vietmapgl.Popup({ className: 'popup-marker', maxWidth: 'none', closeOnClick: false }).setHTML(html));
       markerRef.current.togglePopup();
     }
   }
@@ -106,9 +109,9 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
     mapRef.current.on('click', (e) => {
       // console.log('A click event has occurred at ' + e.lngLat);
       handleMarker(infoMarkerRef, e.lngLat);
-      // var location = getLocationByCoordinates(e.lngLat.lng, e.lngLat.lat);
-      // var info = getLocationsByAddress(location[0].display);
-      // handleMarkerPopup(infoMarkerRef, info[1])
+      var location = getLocationByCoordinates(e.lngLat.lng, e.lngLat.lat);
+      var info = getLocationsByAddress(location[0].display);
+      handleMarkerPopup(infoMarkerRef, info[1])
     });
   }, [])
 

@@ -70,6 +70,7 @@ export const BookingInfoSide = ({ bookingRef, handleBookingCancel }) => {
           <Divider/>
           <Typography variant='h6'>Chi tiết tài xế</Typography>
           <DriverInfo/>
+          <Button variant='outlined' size='small'>Nhắn tin</Button>
           <Divider/>
           <Typography variant='h6'>Chi tiết đặt xe</Typography>
           <BookingDetail bookingRef={bookingRef}/>
