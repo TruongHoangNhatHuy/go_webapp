@@ -1,6 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 import NavMenu from "./NavMenu";
 import { Outlet, useLocation } from "react-router-dom";
+import { Height } from "@mui/icons-material";
 
 // Component ghi path lên màn hình
 const Content = () => {
@@ -16,7 +17,7 @@ const MainLayout = () => {
 	return (
 		<Stack direction={'row'} minHeight='100%' overflow={"hidden"}>
 			<NavMenu/>
-			<Box sx={{ bgcolor: 'lightgreen', padding: 0, margin: 0, width: "100%"}}>
+			<Box sx={{width: "100vw", height : "100vh"}}>
 				<Outlet/>
 			</Box>
 		</Stack>
