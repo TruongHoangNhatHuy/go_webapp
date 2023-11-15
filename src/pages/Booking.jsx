@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Map from '../services/vietmap/Map';
 import { useRef, useState } from 'react';
 import { BookingDetail, BookingForm, LocationInput } from '../features/booking';
+import {MdOutlinePayment,MdDelete } from "react-icons/md";
 
 const Booking = () => {
   // UI state
@@ -52,8 +53,10 @@ const Booking = () => {
         )
       }
       {/* Cửa sổ mở Booking Form */}
-      <Dialog open={bookingForm}>
-        <DialogTitle sx={{ paddingBottom: 0 }}>ĐẶT XE</DialogTitle>
+      <Dialog open={bookingForm} >
+        <DialogTitle 
+        sx={{ paddingBottom: 0, margin: 'auto'}}
+        >ĐẶT XE<IconButton sx={{pointerEvents: 'none'}}><MdOutlinePayment /></IconButton></DialogTitle>
         <IconButton
           aria-label="close"
           onClick={() => setBookingForm(false)}
@@ -70,7 +73,8 @@ const Booking = () => {
       </Dialog>
       {/* Cửa sổ mở Booking Detail */}
       <Dialog open={bookingDetail}>
-        <DialogTitle sx={{ paddingBottom: 0 }}>CHI TIẾT ĐẶT XE</DialogTitle>
+        <DialogTitle sx={{ paddingBottom: 0 , margin: 'auto'}}>CHI TIẾT ĐẶT XE
+        <IconButton sx={{pointerEvents: 'none'}}><MdOutlinePayment /></IconButton></DialogTitle>
         <IconButton
           aria-label="close"
           onClick={() => setBookingDetail(false)}
@@ -85,7 +89,7 @@ const Booking = () => {
           <BookingDetail bookingRef={bookingRef}/>
         </DialogContent>
         <DialogActions>
-          <Button variant='outlined' color='error' onClick={handleCancel}>Hủy đơn</Button>
+          <Button variant='outlined' color='error' onClick={handleCancel} startIcon={<MdDelete />}>Hủy đơn</Button>
         </DialogActions>
       </Dialog>
     </div>

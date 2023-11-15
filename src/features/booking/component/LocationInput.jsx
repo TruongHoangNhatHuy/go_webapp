@@ -4,9 +4,10 @@ import { debounce } from '@mui/material/utils'
 import { getLocationsByAddress, getCoordinatesByRefid } from '../utils/vietmap_geocode.js';
 import { getLocation } from '../utils/test_geocode_data.js';
 import { useState, useRef } from 'react';
+import { MdSend } from "react-icons/md";
 
 const SearchBox = (props) => {
-  const { setLocation, setMapCenterRef, ...tfProps } = props;
+  const { setLocation, setMapCenterRef, ...tfProps } = props; 
   const [options, setOptions] = useState([]);
   // Thông tin địa điểm được chọn
   const locationRef = useRef(null);
@@ -54,7 +55,7 @@ const SearchBox = (props) => {
       noOptionsText="Không có địa điểm gợi ý"
       // filterOptions={(x) => x}
       renderOption={(props, option) => (
-        <li {...props} style={{ paddingLeft: 0, paddingRight: 0 }}>
+        <li {...props} style={{ paddingLeft: 0, paddingRight: 0}}>
           <Box padding={1} paddingLeft={0.75}>
             <PlaceIcon sx={{ color: 'gray' }} />
           </Box>
@@ -71,12 +72,15 @@ const SearchBox = (props) => {
           required
           fullWidth
           size='small'
-          sx={{ bgcolor: 'white' }}
+          sx={{ bgcolor: 'white' , borderRadius:"16px", boxShadow:"2"}}
           InputProps={{
             ...params.InputProps,
+            sx: {
+              borderRadius: '16px', // Giá trị bạn muốn
+            },
             startAdornment:
-              <InputAdornment position='start' sx={{ margin: 0 }}>
-                <IconButton sx={{ padding: 0 }}
+              <InputAdornment position='start' sx={{ margin: 0}}>
+                <IconButton sx={{ padding: 0}}
                   onClick={handleCenterMap}
                 >
                   <PlaceIcon sx={{ color: tfProps.id === "startLocation" ? 'green' : 'red' }} />
@@ -102,7 +106,7 @@ export const LocationInput = (props) => {
   };
 
   return (
-    <AppBar position='static' color='transparent' sx={{ zIndex: 100 }}>
+    <AppBar position='static' color='transparent' sx={{ zIndex: 100}}>
       <Box component='form' id='locationInput' onSubmit={handleSubmit}>
         <Grid container flexDirection='row' alignItems='center' spacing={0.5} padding={1}>
           <Grid item xs={6} lg>
@@ -128,6 +132,7 @@ export const LocationInput = (props) => {
               type='submit'
               fullWidth
               variant='contained'
+              endIcon={<MdSend />}
             >Đặt xe</Button>
           </Grid>
         </Grid>
