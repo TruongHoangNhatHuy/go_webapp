@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import './Map.css';
 import config from 'config.json';
-import { getLocationByCoordinates } from "../utils/vietmap_reverse";
-import { getLocationsByAddress } from "../utils/vietmap_geocode";
+import { getLocationByCoordinates } from "./api_reverse";
+import { getLocationsByAddress } from "./api_geocode";
 
 const apiKey = config.vietmap.primaryToken // 1000 req/ngày
 // const apiKey = config.vietmap.secondaryToken // 10 req/phút

@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { GoogleLogin } from '../services/firebase/Auth';
+import { GoogleLogin } from '@react-oauth/google';
 
 function Copyright(props) {
   return (
@@ -63,7 +63,14 @@ export default function SignInSide() {
               Sign in
             </Typography>
             <Box mt={10}>
-              <GoogleLogin/>
+              <GoogleLogin 
+                onSuccess={credentialResponse => {
+                  console.log(credentialResponse);
+                }}
+                onError={() => {
+                  console.log('Login Failed');
+                }}
+              />
             </Box>
             <Copyright sx={{ mt: 20 }} />
           </Box>
