@@ -33,22 +33,15 @@ const DriverInfo = () => {
             open={open}
             onClose={handleClose}
             sx ={{
-              display:"flex",justifyContent:"center",alignItems:"center"
+              display:"flex",justifyContent:"center",alignItems:"center",width: { xs: "100vw", md: "100%", sm: "100%" },height: { xs: "100vh", md: "100%", sm: "100%" }
             }}
           >
-           <Box sx ={{ width: { xs: "100%", md: "50%", sm: "50%" },height: { xs: "100%", md: "80%", sm: "80%" }, bgcolor:"white",borderRadius:"16px"}}>
-               <Grid container spacing={0} height={"100%"}>
+           <Box sx ={{display:"flex", flexDirection: 'column' ,width: { xs: "100%", md: "50%", sm: "50%" },height: { xs: "100%", md: "80%", sm: "80%" }, bgcolor:"white",borderRadius:"16px"}}>
                 {/* Header Message */}
-                  <Grid xs={12} sm={12} md={12} bgcolor="white" 
+                  <Grid xs={12} sm={12} md={12} 
                   sx={{
                     borderRadius: "16px",
-                     overflowY:"scroll",
-                     msOverflowStyle:'none',
-                     scrollbarWidth:'none',
-                     '&::-webkit-scrollbar':{
-                      display:'none'
-                     },
-                  }} height={"85%"}
+                  }}
                   >
                     <ListItem>
                       <ListItemAvatar>
@@ -60,234 +53,244 @@ const DriverInfo = () => {
                        <MdClose />
                      </IconButton>
                     </ListItem>
-                    <Divider/>
-                    {/* Content conversation and Infomation  */}
-                    <Stack direction = "row" justifyContent={"start"}>
-                    <Box
-                        mt={1.5}
-                        ml={3}
-                      sx={{
-                        width: "max-content",
-                      }}
-                      >
-                    <Typography variant="caption" color={grey[400]}>
-                    11:09pm
-                  </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"start"}>
-                      <Box
-                        p={1.5}
-                        ml={1.5}
-                      sx={{
-                        bgcolor: grey[100],
-                        borderRadius: "16px",
-                        width: "max-content",
-                      }}
-                      >
-                        <Typography variant='body 2'>
-                        Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn
-                        </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"end"}>
-                    <Box
-                        mt={1.5}
-                        mr={3}
-                      sx={{
-                        width: "max-content",
-                      }}
-                      >
-                    <Typography variant="caption" color={grey[400]}>
-                    11:09pm
-                  </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"end"}>
-                      <Box
-                        p={1.5}
-                        mr={1.5}
-                      sx={{
-                        bgcolor: green[100],
-                        borderRadius: "16px",
-                        width: "max-content",
-                      }}
-                      >
-                        <Typography variant='body 2'>
-                        Tôi cần một chuyến ra bến xe gấp
-                        </Typography>
-                      </Box>
-                    </Stack>
-
-                    <Stack direction = "row" justifyContent={"start"}>
-                    <Box
-                        mt={1.5}
-                        ml={3}
-                      sx={{
-                        width: "max-content",
-                      }}
-                      >
-                    <Typography variant="caption" color={grey[400]}>
-                    11:09pm
-                  </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"start"}>
-                      <Box
-                        p={1.5}
-                        ml={1.5}
-                      sx={{
-                        bgcolor: grey[100],
-                        borderRadius: "16px",
-                        width: "max-content",
-                      }}
-                      >
-                        <Typography variant='body 2'>
-                        Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn
-                        </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"end"}>
-                    <Box
-                        mt={1.5}
-                        mr={3}
-                      sx={{
-                        width: "max-content",
-                      }}
-                      >
-                    <Typography variant="caption" color={grey[400]}>
-                    11:09pm
-                  </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"end"}>
-                      <Box
-                        p={1.5}
-                        mr={1.5}
-                      sx={{
-                        bgcolor: green[100],
-                        borderRadius: "16px",
-                        width: "max-content",
-                      }}
-                      >
-                        <Typography variant='body 2'>
-                        Tôi cần một chuyến ra bến xe gấp
-                        </Typography>
-                      </Box>
-                    </Stack><Stack direction = "row" justifyContent={"start"}>
-                    <Box
-                        mt={1.5}
-                        ml={3}
-                      sx={{
-                        width: "max-content",
-                      }}
-                      >
-                    <Typography variant="caption" color={grey[400]}>
-                    11:09pm
-                  </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"start"}>
-                      <Box
-                        p={1.5}
-                        ml={1.5}
-                      sx={{
-                        bgcolor: grey[100],
-                        borderRadius: "16px",
-                        width: "max-content",
-                      }}
-                      >
-                        <Typography variant='body 2'>
-                        Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn
-                        </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"end"}>
-                    <Box
-                        mt={1.5}
-                        mr={3}
-                      sx={{
-                        width: "max-content",
-                      }}
-                      >
-                    <Typography variant="caption" color={grey[400]}>
-                    11:09pm
-                  </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"end"}>
-                      <Box
-                        p={1.5}
-                        mr={1.5}
-                      sx={{
-                        bgcolor: green[100],
-                        borderRadius: "16px",
-                        width: "max-content",
-                      }}
-                      >
-                        <Typography variant='body 2'>
-                        Tôi cần một chuyến ra bến xe gấp
-                        </Typography>
-                      </Box>
-                    </Stack><Stack direction = "row" justifyContent={"start"}>
-                    <Box
-                        mt={1.5}
-                        ml={3}
-                      sx={{
-                        width: "max-content",
-                      }}
-                      >
-                    <Typography variant="caption" color={grey[400]}>
-                    11:09pm
-                  </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"start"}>
-                      <Box
-                        p={1.5}
-                        ml={1.5}
-                      sx={{
-                        bgcolor: grey[100],
-                        borderRadius: "16px",
-                        width: "max-content",
-                      }}
-                      >
-                        <Typography variant='body 2'>
-                        Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn
-                        </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"end"}>
-                    <Box
-                        mt={1.5}
-                        mr={3}
-                      sx={{
-                        width: "max-content",
-                      }}
-                      >
-                    <Typography variant="caption" color={grey[400]}>
-                    11:09pm
-                  </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction = "row" justifyContent={"end"}>
-                      <Box
-                        p={1.5}
-                        mr={1.5}
-                      sx={{
-                        bgcolor: green[100],
-                        borderRadius: "16px",
-                        width: "max-content",
-                      }}
-                      >
-                        <Typography variant='body 2'>
-                        Tôi cần một chuyến ra bến xe gấp
-                        </Typography>
-                      </Box>
-                    </Stack>
-
-
+                    <Divider/>   
                   </Grid >
+                    {/* Content conversation and Infomation  */}
+                  <Grid xs={12} sm={12} md={12} 
+                  sx={{
+                    height:"85%",
+                    overflowY:"scroll",
+                    msOverflowStyle:'none',
+                    scrollbarWidth:'none',
+                    '&::-webkit-scrollbar':{
+                     display:'none'
+                    },
+                    }} >
+                  <Stack direction = "row" justifyContent={"start"}>
+                    <Box
+                        mt={1.5}
+                        ml={3}
+                      sx={{
+                        width: "max-content",
+                      }}
+                      >
+                    <Typography variant="caption" color={grey[400]}>
+                    11:09pm
+                  </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"start"}>
+                      <Box
+                        p={1.5}
+                        ml={1.5}
+                      sx={{
+                        bgcolor: grey[100],
+                        borderRadius: "16px",
+                        width: "max-content",
+                      }}
+                      >
+                        <Typography variant='body 2'>
+                        Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"end"}>
+                    <Box
+                        mt={1.5}
+                        mr={3}
+                      sx={{
+                        width: "max-content",
+                      }}
+                      >
+                    <Typography variant="caption" color={grey[400]}>
+                    11:09pm
+                  </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"end"}>
+                      <Box
+                        p={1.5}
+                        mr={1.5}
+                      sx={{
+                        bgcolor: green[100],
+                        borderRadius: "16px",
+                        width: "max-content",
+                      }}
+                      >
+                        <Typography variant='body 2'>
+                        Tôi cần một chuyến ra bến xe gấp
+                        </Typography>
+                      </Box>
+                    </Stack>
+
+                    <Stack direction = "row" justifyContent={"start"}>
+                    <Box
+                        mt={1.5}
+                        ml={3}
+                      sx={{
+                        width: "max-content",
+                      }}
+                      >
+                    <Typography variant="caption" color={grey[400]}>
+                    11:09pm
+                  </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"start"}>
+                      <Box
+                        p={1.5}
+                        ml={1.5}
+                      sx={{
+                        bgcolor: grey[100],
+                        borderRadius: "16px",
+                        width: "max-content",
+                      }}
+                      >
+                        <Typography variant='body 2'>
+                        Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"end"}>
+                    <Box
+                        mt={1.5}
+                        mr={3}
+                      sx={{
+                        width: "max-content",
+                      }}
+                      >
+                    <Typography variant="caption" color={grey[400]}>
+                    11:09pm
+                  </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"end"}>
+                      <Box
+                        p={1.5}
+                        mr={1.5}
+                      sx={{
+                        bgcolor: green[100],
+                        borderRadius: "16px",
+                        width: "max-content",
+                      }}
+                      >
+                        <Typography variant='body 2'>
+                        Tôi cần một chuyến ra bến xe gấp
+                        </Typography>
+                      </Box>
+                    </Stack><Stack direction = "row" justifyContent={"start"}>
+                    <Box
+                        mt={1.5}
+                        ml={3}
+                      sx={{
+                        width: "max-content",
+                      }}
+                      >
+                    <Typography variant="caption" color={grey[400]}>
+                    11:09pm
+                  </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"start"}>
+                      <Box
+                        p={1.5}
+                        ml={1.5}
+                      sx={{
+                        bgcolor: grey[100],
+                        borderRadius: "16px",
+                        width: "max-content",
+                      }}
+                      >
+                        <Typography variant='body 2'>
+                        Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"end"}>
+                    <Box
+                        mt={1.5}
+                        mr={3}
+                      sx={{
+                        width: "max-content",
+                      }}
+                      >
+                    <Typography variant="caption" color={grey[400]}>
+                    11:09pm
+                  </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"end"}>
+                      <Box
+                        p={1.5}
+                        mr={1.5}
+                      sx={{
+                        bgcolor: green[100],
+                        borderRadius: "16px",
+                        width: "max-content",
+                      }}
+                      >
+                        <Typography variant='body 2'>
+                        Tôi cần một chuyến ra bến xe gấp
+                        </Typography>
+                      </Box>
+                    </Stack><Stack direction = "row" justifyContent={"start"}>
+                    <Box
+                        mt={1.5}
+                        ml={3}
+                      sx={{
+                        width: "max-content",
+                      }}
+                      >
+                    <Typography variant="caption" color={grey[400]}>
+                    11:09pm
+                  </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"start"}>
+                      <Box
+                        p={1.5}
+                        ml={1.5}
+                      sx={{
+                        bgcolor: grey[100],
+                        borderRadius: "16px",
+                        width: "max-content",
+                      }}
+                      >
+                        <Typography variant='body 2'>
+                        Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"end"}>
+                    <Box
+                        mt={1.5}
+                        mr={3}
+                      sx={{
+                        width: "max-content",
+                      }}
+                      >
+                    <Typography variant="caption" color={grey[400]}>
+                    11:09pm
+                  </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction = "row" justifyContent={"end"}>
+                      <Box
+                        p={1.5}
+                        mr={1.5}
+                      sx={{
+                        bgcolor: green[100],
+                        borderRadius: "16px",
+                        width: "max-content",
+                      }}
+                      >
+                        <Typography variant='body 2'>
+                        Tôi cần một chuyến ra bến xe gấp
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Grid>
+                  
                   {/* Footer conversation */}
                   <Grid xs={12} sm={12} md={12} sx={{}} >
                   <Divider/>
@@ -307,7 +310,6 @@ const DriverInfo = () => {
                   </IconButton>
                   </ListItem>
                   </Grid>
-               </Grid>
             </Box>
           </Modal>
       </ListItem>
