@@ -76,7 +76,7 @@ const SearchBox = (props) => {
           InputProps={{
             ...params.InputProps,
             sx: {
-              borderRadius: '16px', // Giá trị bạn muốn
+              borderRadius: '16px', 
             },
             startAdornment:
               <InputAdornment position='start' sx={{ margin: 0}}>

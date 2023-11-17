@@ -122,37 +122,37 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none' , color: green[500],}}><MdLocationOn/></IconButton>
                 Điểm đi</TableCell>
-              <TableCell variant='head' align='right'>{bookingRef.current.startLocation}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingRef.current.startLocation}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none' , color: red[700],}}><MdLocationOn/></IconButton>
                 Điểm đến</TableCell>
-              <TableCell variant='head' align='right'>{bookingRef.current.endLocation}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingRef.current.endLocation}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none'}}><MdCommute/></IconButton>
                 Loại xe</TableCell>
-              <TableCell variant='head' align='right'>{
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{
                 (bookingRef.current.vehicleType === 'MOTORBIKE') ? 'Xe máy' :
                 (bookingRef.current.vehicleType === 'CAR') ? 'Oto' : null
               }</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none', color: blue[700]}}><MdPayment/></IconButton>
               Phương thức thanh toán</TableCell>
-              <TableCell variant='head' align='right'>{bookingRef.current.paymentMethod}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingRef.current.paymentMethod}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell variant='head' component="th" scope="row" >
+              <TableCell variant='head' component="th" scope="row" sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none', color: yellow[700]}}><MdOutlineAttachMoney/></IconButton>
                 Tổng tiền</TableCell>
-              <TableCell variant='head' align='right'>{bookingRef.current.payment}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingRef.current.payment}</TableCell>
             </TableRow>
         </TableBody>
       </Table>
