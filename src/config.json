@@ -1,5 +1,5 @@
 {
-  "be-rootUrl": "https://unaccountable-playground-production.up.railway.app",
+  "be_rootUrl": "https://unaccountable-playground-production.up.railway.app",
   "mapbox": {
     "accessToken": "pk.eyJ1IjoiaHV5MjAwMnRobiIsImEiOiJjbG5qempteHUwZ2oxMmtyejllMHlwaHY2In0.A5QuQitx_LYbunhA-F4xJA"
   },

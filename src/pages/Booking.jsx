@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import Map from '../features/booking/vietmap/Map';
+import Map from '../features/booking/services/vietmap/Map';
 import { useRef, useState } from 'react';
 import { BookingDetail, BookingForm, BookingInfoSide, LocationInputSide } from '../features/booking';
 import {MdOutlinePayment,MdDelete } from "react-icons/md";

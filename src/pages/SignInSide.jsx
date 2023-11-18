@@ -9,6 +9,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleLogin } from '@react-oauth/google';
+import { login } from 'services/be_server/api_login';
+import { useUserContext } from 'contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 function Copyright(props) {
   return (
@@ -28,6 +31,58 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
+  const [, setUser] = useUserContext();
+  const navigate =  useNavigate();
+
+  const handleLogin = (credentialResponse) => {
+    console.log(credentialResponse);
+
+    // use fetch()
+    login(credentialResponse.credential)
+
+    // use XMLHttpRequest
+    // login(credentialResponse.credential).then(
+    //   (resolve) => {
+    //     console.log(resolve);
+    //   },
+    //   (reject) => {
+    //     alert(reject);
+    //   }
+    // );
+
+    const status = 'registered';
+    const role = 'customer';
+    const userSession = { token: credentialResponse.credential, role: role }
+
+    if (status === 'registered') {
+      sessionStorage.setItem('userSession', JSON.stringify(userSession));
+      setUser(userSession);
+      switch (role) {
+        case 'customer':
+          navigate("/customer");
+          break;
+        case 'driver':
+          navigate("/driver");
+          break;
+        case 'admin':
+          navigate("/admin");
+          break;
+        default:
+          console.warn('Handle login failed: Role not existed');
+          break;
+      }
+    }
+    else if (status === 'unregistered') {
+      navigate("/signup");
+    }
+    else if (status === 'blocked') {
+      alert('Tài khoản đã bị khóa.');
+    }
+    else {
+      console.warn('Handle login failed: Status not existed');
+    }
+  }
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
@@ -64,9 +119,7 @@ export default function SignInSide() {
             </Typography>
             <Box mt={10}>
               <GoogleLogin 
-                onSuccess={credentialResponse => {
-                  console.log(credentialResponse);
-                }}
+                onSuccess={handleLogin}
                 onError={() => {
                   console.log('Login Failed');
                 }}

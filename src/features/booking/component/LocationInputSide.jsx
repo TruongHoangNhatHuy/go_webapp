@@ -7,9 +7,9 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import RouteIcon from '@mui/icons-material/Route';
 import PaidIcon from '@mui/icons-material/Paid';
 import { debounce } from '@mui/material/utils'
-import { getLocationsByAddress, getCoordinatesByRefid } from '../vietmap/api_geocode.js';
+import { getLocationsByAddress, getCoordinatesByRefid } from '../services/vietmap/api_geocode.js';
 import { useState, useRef, useEffect } from 'react';
-import { getRoute } from '../vietmap/api_route.js';
+import { getRoute } from '../services/vietmap/api_route.js';
 import { metersToString, milisecondsToString } from '../utils/converter.js';
 
 const SearchBox = (props) => {
@@ -133,7 +133,7 @@ export const LocationInputSide = (props) => {
       vehicleRouteRef.current = null;
       setVehicleSelect(false);
     }
-    console.log('vehicleRouteRef', vehicleRouteRef.current);
+    // console.log('vehicleRouteRef', vehicleRouteRef.current);
   }, [startLocation, endLocation])
 
   const handleVehicleChange = (_, value) => {

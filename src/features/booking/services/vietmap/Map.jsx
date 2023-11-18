@@ -17,7 +17,6 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
   const startMarkerRef = useRef(null);    // marker điểm đi
   const endMarkerRef = useRef(null);      // marker điểm đến
   const routeRef = useRef(null);          // route từ điểm đi tới điểm đến
-  const customerMarkerRef = useRef(null); // marker khách hàng
   const driverMarkerRef = useRef(null);   // marker tài xế
 
   // Tạo custom marker

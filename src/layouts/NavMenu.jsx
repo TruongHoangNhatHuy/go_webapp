@@ -1,11 +1,12 @@
 import { forwardRef, useEffect, useState } from "react";
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Toolbar, IconButton, AppBar } from "@mui/material";
+import { Box, Drawer, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, IconButton } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import CommuteIcon from '@mui/icons-material/Commute';
 import { MdOutlineReceiptLong, MdHistory, MdBookmarkBorder, MdMenu } from "react-icons/md";
 import CssBaseline from "@mui/material/CssBaseline";
 import './NavMenu.css';
+import { useUserContext } from "contexts/UserContext";
 
 // List menu của khách hàng
 const customerMenu = [
@@ -61,16 +62,16 @@ const adminMenu = [
 		menuItem: "Tài khoản",
 	},
 	{
+		to: "analysis",
+		menuItem: "Thống kê",
+	},
+	{
 		to: "customers",
 		menuItem: "Quản lí khách hàng",
 	},
 	{
 		to: "drivers",
 		menuItem: "Quản lí tài xế",
-	},
-	{
-		to: "analysis",
-		menuItem: "Thống kê",
 	},
 ]
 
@@ -88,13 +89,14 @@ const NavMenu = () => {
 		setMobileOpen(!mobileOpen);
 	};
 
+	const [user,] = useUserContext();
+	const menu = 
+		(user.role === 'customer') ? customerMenu : 
+		(user.role === 'driver') ? driverMenu : 
+		(user.role === 'admin') ? adminMenu : null;
 
-	const menu = customerMenu;
 	const [seletedItem, setSelectedItem] = useState('');
-
-
-	// Lấy location hiện tại của url
-	const url = useLocation();
+	const url = useLocation(); // Lấy location hiện tại của url
 	useEffect(() => {
 		// highlight menu item hiện tại
 		setSelectedItem(url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
@@ -103,7 +105,7 @@ const NavMenu = () => {
 	const drawerWidth = 100;
 	const drawer = (
 		menu.map(({ to, menuItem, menuIcon }) => (
-			<ListItem className='list-item' component={Link} to={to} sx={{ alignItems: "center" }}>
+			<ListItem className='list-item' key={to} component={Link} to={to} sx={{ alignItems: "center" }}>
 				<ListItemButton className="list-item-btn" selected={seletedItem === to}>
 					<ListItemIcon sx={{ justifyContent: 'center', fontSize: 25 }}>
 						{menuIcon}
@@ -113,6 +115,7 @@ const NavMenu = () => {
 			</ListItem>
 		))
 	)
+
 	return (
 		<Box sx={{ position: { xs: "absolute", md: "relative", sm: "relative" }, zIndex: { xs: "1" }, right: { xs: "0" }, bottom: { xs: "0" } }}>
 			<CssBaseline />
