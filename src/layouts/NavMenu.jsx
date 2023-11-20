@@ -32,7 +32,7 @@ const customerMenu = [
 	},
 	{
 		to: "favorites",
-		menuItem: "Địa Điểm",
+		menuItem: "Địa điểm",
 		menuIcon: <MdBookmarkBorder />
 	},
 ]
@@ -102,7 +102,7 @@ const NavMenu = () => {
 		setSelectedItem(url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
 	}, [url]);
 
-	const drawerWidth = 100;
+	const drawerWidth = 120;
 	const drawer = (
 		menu.map(({ to, menuItem, menuIcon }) => (
 			<ListItem className='list-item' key={to} component={Link} to={to} sx={{ alignItems: "center" }}>
@@ -110,7 +110,7 @@ const NavMenu = () => {
 					<ListItemIcon sx={{ justifyContent: 'center', fontSize: 25 }}>
 						{menuIcon}
 					</ListItemIcon>
-					<ListItemText primary={menuItem} sx={{ color: "#70757a", whiteSpace: 'nowrap' }} />
+					<ListItemText primary={menuItem} sx={{ color: "#70757a", whiteSpace: 'normal' }} />
 				</ListItemButton>
 			</ListItem>
 		))

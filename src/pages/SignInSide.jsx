@@ -34,25 +34,23 @@ export default function SignInSide() {
   const [, setUser] = useUserContext();
   const navigate =  useNavigate();
 
-  const handleLogin = (credentialResponse) => {
+  const handleLogin = async (credentialResponse) => {
     console.log(credentialResponse);
+    var status, role;
 
-    // use fetch()
-    login(credentialResponse.credential)
+    await login(credentialResponse.credential)
+      .then(result => {
+        console.log('login result', result);
+        status = String(result.data.status).toLowerCase();
+        role = String(result.data.role).toLowerCase();
+      })
+      .catch(error => {
+        alert('Đăng nhập thất bại.');
+        return;
+      });
 
-    // use XMLHttpRequest
-    // login(credentialResponse.credential).then(
-    //   (resolve) => {
-    //     console.log(resolve);
-    //   },
-    //   (reject) => {
-    //     alert(reject);
-    //   }
-    // );
-
-    const status = 'registered';
-    const role = 'customer';
-    const userSession = { token: credentialResponse.credential, role: role }
+    const userSession = { token: credentialResponse.credential, role: role };
+    // console.log('user session', userSession)  
 
     if (status === 'registered') {
       sessionStorage.setItem('userSession', JSON.stringify(userSession));
@@ -68,18 +66,23 @@ export default function SignInSide() {
           navigate("/admin");
           break;
         default:
-          console.warn('Handle login failed: Role not existed');
+          console.warn('Handle login failed: Role "'+ role +'" not existed');
           break;
       }
     }
     else if (status === 'unregistered') {
+      sessionStorage.setItem('userSession', JSON.stringify(userSession));
+      setUser(userSession);
       navigate("/signup");
+    }
+    else if (status === 'uncheck') {
+      alert('Tài khoản tài xế đang chờ xét duyệt. Vui lòng thử lại sau.');
     }
     else if (status === 'blocked') {
       alert('Tài khoản đã bị khóa.');
     }
     else {
-      console.warn('Handle login failed: Status not existed');
+      console.warn('Handle login failed: Status "'+ status +'" not existed');
     }
   }
 
@@ -121,7 +124,7 @@ export default function SignInSide() {
               <GoogleLogin 
                 onSuccess={handleLogin}
                 onError={() => {
-                  console.log('Login Failed');
+                  console.log('GoogleLogin component: failed');
                 }}
               />
             </Box>

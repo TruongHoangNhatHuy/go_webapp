@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Button, CssBaseline, TextField, MenuItem, Link, Grid, Box, Typography, Container, FormControlLabel, Checkbox } from '@mui/material';
+import { Avatar, Button, CssBaseline, TextField, MenuItem, Link, Grid, Box, Typography, Container, FormControlLabel, Checkbox, Stack } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -7,6 +7,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/en-gb';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { registerCustomer, registerDriver } from 'services/be_server/api_register';
+import { useUserContext } from 'contexts/UserContext';
+import { LoadingButton } from '@mui/lab';
+import { login } from 'services/be_server/api_login';
 
 function Copyright(props) {
   return (
@@ -22,26 +26,105 @@ function Copyright(props) {
 }
 
 const SignUpForm = () => {
-  const [form, setForm] = useState('');
+  const [user, setUser] = useUserContext();
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      fullName: data.get('fullName'),
-      gender: data.get('gender'),
-      birthday: data.get('birthday'),
-      phoneNumber: data.get('phoneNumber'),
-      citizenId: data.get('citizenId'),
-      address: data.get('address'),
-      portraitImage: data.get('portraitImage'),
-      licenseImage: data.get('licenseImage'),
-      vehicleType: data.get('vehicleType'),
-    });
+  const [form, setForm] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [phoneInputError, setPhoneInputError] = useState(false);
+  const [idCardInputError, setIdCardInputError] = useState(false);
 
-    if (form === 'customer')
-      navigate('/app/booking');
+  const handlePhoneValidate = (e) => {
+    try {
+      // thử parseInt để kiểm tra kiểu số nguyên
+      if (isNaN(parseInt(e.target.value)) || parseInt(e.target.value) < 0)
+        throw new Error()
+      else {
+        setPhoneInputError(false)
+      }
+    }
+    catch {
+      if (e.target.value === '')
+        setPhoneInputError(false)
+      else
+        setPhoneInputError(true)
+    }
+  }
+  const handleIdCardValidate = (e) => {
+    try {
+      // thử parseInt để kiểm tra kiểu số nguyên
+      if (isNaN(parseInt(e.target.value)) || parseInt(e.target.value) < 0)
+        throw new Error()
+      else {
+        setIdCardInputError(false)
+      }
+    }
+    catch {
+      if (e.target.value === '')
+        setIdCardInputError(false)
+      else
+        setIdCardInputError(true)
+    }
+  }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (phoneInputError) {
+      document.getElementById('phoneNumber').focus();
+      return;
+    } 
+    if (idCardInputError) {
+      document.getElementById('idCard').focus();
+      return;
+    } 
+
+    setIsSending(true);
+    const formData = new FormData(event.currentTarget);  
+    console.log('form data')
+    for(var pair of formData.entries()) {
+      console.log(pair[0]+ ': '+ pair[1]); 
+    }
+
+    if (form === 'customer') {
+      await registerCustomer(user.token, formData)
+        .then(result => {
+          if (result.message === 'Fail')
+            throw new Error(result.error);
+          else if (result.message === 'Success') {
+            console.log('Register customer result: ', result);
+            setIsSending(false);
+            setForm('customer-sended');
+          }
+        })
+        .catch(error => {
+          console.warn('Register customer failed: ', error);
+          alert('Đăng kí thất bại. Vui lòng thử lại sau.');
+          setIsSending(false);
+        })
+    }
+    else if (form === 'driver') {
+      /* testing */
+      // setTimeout(() => {
+      //   setForm('driver-sended')
+      //   setIsSending(false)
+      // }, 5000);
+      // return;
+
+      await registerDriver(user.token, formData)
+        .then(result => {
+          if (result.message === 'Fail')
+            throw new Error(result.error);
+          else if (result.message === 'Success') {
+            console.log('Register driver result: ', result);
+            setIsSending(false);
+            setForm('driver-sended');
+          }
+        })
+        .catch(error => {
+          console.warn('Register driver failed: ', error);
+          alert('Đăng kí thất bại. Vui lòng thử lại sau.');
+          setIsSending(false);
+        })
+      };
   };
 
   if (form === 'driver')
@@ -72,19 +155,20 @@ const SignUpForm = () => {
               name="gender"
               autoComplete='sex'
             >
-              <MenuItem value={'male'}>Nam</MenuItem>
-              <MenuItem value={'female'}>Nữ</MenuItem>
+              <MenuItem value={'true'}>Nam</MenuItem>
+              <MenuItem value={'false'}>Nữ</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={12} sm={6}>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
               <DatePicker label="Ngày sinh" disableFuture
+                format='YYYY-MM-DD'
                 slotProps={{
                   textField: {
                     required: true,
                     fullWidth: true,
-                    id: "birthday",
-                    name: "birthday"
+                    id: "dateOfBirth",
+                    name: "dateOfBirth"
                   },
                   actionBar: {
                     actions: ['clear']
@@ -102,18 +186,24 @@ const SignUpForm = () => {
               label="Số điện thoại"
               name="phoneNumber"
               autoComplete="tel"
+              error={phoneInputError}
+              helperText={phoneInputError ? 'Sai định dạng số điện thoại' : ''}
+              onChange={handlePhoneValidate}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               required
               fullWidth
-              id="citizenId"
+              id="idCard"
               label="Số căn cước công dân"
-              name="citizenId"
+              name="idCard"
+              error={idCardInputError}
+              helperText={idCardInputError ? 'Sai định dạng số CCCD' : ''}
+              onChange={handleIdCardValidate}
             />
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <TextField
               required
               fullWidth
@@ -124,15 +214,15 @@ const SignUpForm = () => {
               name="address"
               autoComplete="address-line1"
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <TextField
               select
               required
               fullWidth
-              id="vehicleType"
+              id="vehicle"
               label="Loại phương tiện"
-              name="vehicleType"
+              name="vehicle"
             >
               <MenuItem value={'MOTOBIKE'}>Xe máy</MenuItem>
               <MenuItem value={'CAR'}>Ôtô</MenuItem>
@@ -144,9 +234,9 @@ const SignUpForm = () => {
               fullWidth
               type='file'
               inputProps={{ accept: 'image/*'}}
-              id="portraitImage"
+              id="avatar"
               label="Ảnh chân dung"
-              name="portraitImage"
+              name="avatar"
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
@@ -156,9 +246,9 @@ const SignUpForm = () => {
               fullWidth
               type='file'
               inputProps={{ accept: 'image/*'}}
-              id="licenseImage"
+              id="licensePlate"
               label="Ảnh mặt trước giấy phép lái xe"
-              name="licenseImage"
+              name="licensePlate"
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
@@ -169,14 +259,15 @@ const SignUpForm = () => {
             />
           </Grid>
         </Grid>
-        <Button
+        <LoadingButton
           type="submit"
           fullWidth
           variant="contained"
+          loading={isSending}
           sx={{ mt: 2, mb: 2 }}
         >
           Đăng kí
-        </Button>
+        </LoadingButton>
         <Button
           type="reset"
           fullWidth
@@ -187,6 +278,17 @@ const SignUpForm = () => {
           Hủy
         </Button>
       </Box>
+    )
+  else if (form === 'driver-sended')
+    return (
+      <Stack maxWidth='70%' margin={2} spacing={2}>
+        <Typography>
+          Hồ sơ tài xế của bạn đã được gửi đi, và sẽ được xét duyệt trong vòng 2-3 ngày làm việc.
+        </Typography>
+        <Button fullWidth variant="outlined" sx={{ mb: 2 }} onClick={() => navigate('/')}>
+          Trở về đăng nhập
+        </Button>
+      </Stack>
     )
   else if (form === 'customer')
     return (
@@ -205,6 +307,9 @@ const SignUpForm = () => {
               name="phoneNumber"
               autoComplete="tel"
               autoFocus
+              error={phoneInputError}
+              helperText={phoneInputError ? 'Sai định dạng số điện thoại' : ''}
+              onChange={handlePhoneValidate}
             />
           </Grid>
           <Grid item xs={12}>
@@ -225,18 +330,19 @@ const SignUpForm = () => {
               name="gender"
               autoComplete='sex'
             >
-              <MenuItem value={'male'}>Nam</MenuItem>
-              <MenuItem value={'female'}>Nữ</MenuItem>
+              <MenuItem value={'true'}>Nam</MenuItem>
+              <MenuItem value={'false'}>Nữ</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={12} sm={6}>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
               <DatePicker label="Ngày sinh" disableFuture
+                format='YYYY-MM-DD'
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    id: "birthday",
-                    name: "birthday"
+                    id: "dateOfBirth",
+                    name: "dateOfBirth"
                   },
                   actionBar: {
                     actions: ['clear']
@@ -252,14 +358,15 @@ const SignUpForm = () => {
             />
           </Grid>
         </Grid>
-        <Button
+        <LoadingButton
           type="submit"
           fullWidth
           variant="contained"
+          loading={isSending}
           sx={{ mt: 2, mb: 2 }}
         >
           Đăng kí
-        </Button>
+        </LoadingButton>
         <Button
           type="reset"
           fullWidth
@@ -271,19 +378,47 @@ const SignUpForm = () => {
         </Button>
       </Box>
     )
+  else if (form === 'customer-sended') {
+    setTimeout(async () => {
+      await login(user.token)
+        .then(result => {
+          console.log('auto login result', result);
+          var status = String(result.data.status).toLowerCase();
+          var role = String(result.data.role).toLowerCase();
+          if (status === 'registered') {
+            const userSession = { token: user.token, role: role };
+            sessionStorage.setItem('userSession', JSON.stringify(userSession));
+            setUser(userSession);
+            navigate('/customer');
+          }
+        })
+        .catch(error => {
+          alert('Đăng nhập thất bại. Trở về trang đăng nhập.');
+          navigate('/');
+        })
+    }, 3000);
+
+    return (
+      <Stack maxWidth='80%' margin={2} spacing={2}>
+        <Typography>
+          Đăng kí khách hàng thành công. Tự động đăng nhập.
+        </Typography>
+      </Stack>
+    )
+  }
   else
     return (
-      <Box sx={{ mt: 2 }}>
-        <Typography sx={{ mb: 2 }}>
+      <Stack maxWidth='80%' margin={2} spacing={2}>
+        <Typography>
           Chào mừng bạn đến với Go. Bạn đăng kí với vai trò gì.
         </Typography>
-        <Button fullWidth variant="outlined" sx={{ mb: 2 }} onClick={() => setForm('customer')}>
+        <Button fullWidth variant="outlined" onClick={() => setForm('customer')}>
           Tôi là khách hàng
         </Button>
-        <Button fullWidth variant="outlined" sx={{ mb: 2 }} onClick={() => setForm('driver')}>
+        <Button fullWidth variant="outlined" onClick={() => setForm('driver')}>
           Tôi là tài xế
         </Button>
-      </Box>
+      </Stack>
     )
 }
 

@@ -39,7 +39,8 @@ const ReactRouter = () => {
         {/* Trang đăng nhập */}
         <Route index element={<SignInSide />} />
         <Route path='*' element={<h1>404 Not Found</h1>} />
-        <Route path='signup' element={<SignUp />} />
+        {/* Chưa đăng kí thì role = null */}
+        <Route path='signup' element={<ProtectedRoute user={user} role={'null'}><SignUp /></ProtectedRoute>} />
         {/* Sau khi đăng nhập */}
         <Route path='/customer' element={<ProtectedRoute user={user} role={'customer'}><MainLayout/></ProtectedRoute>}>
           <Route index element={<Navigate to={'booking'}/>} />
