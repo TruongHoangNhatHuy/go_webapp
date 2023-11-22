@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Divider, Drawer, IconButton, InputAdornment, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, CircularProgress, Divider, Drawer, IconButton, InputAdornment, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import PlaceIcon from '@mui/icons-material/Place';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -11,6 +11,8 @@ import { getLocationsByAddress, getCoordinatesByRefid } from '../services/vietma
 import { useState, useRef, useEffect } from 'react';
 import { getRoute } from '../services/vietmap/api_route.js';
 import { metersToString, milisecondsToString } from '../utils/converter.js';
+import { getAmount } from '../services/be_server/api_booking.js';
+import { async } from 'q';
 
 const SearchBox = (props) => {
   const { setLocation, setMapCenterRef, ...tfProps } = props;
@@ -113,8 +115,9 @@ export const LocationInputSide = (props) => {
     setOpen(prev => !prev)
   }
 
-  // Lưu thông tin các tuyến đường
-  const vehicleRouteRef = useRef(null);
+  const [fetching, setFetching] = useState(false);
+  const vehicleRouteRef = useRef(null);   // Lưu thông tin các tuyến đường
+  const vehicleAmountRef = useRef(null);  // Lưu giá tiền
   // Phượng tiện đã chọn
   const [vehicle, setVehicle] = useState('motorcycle');
   // Ẩn hiện bảng chọn tuyến đường
@@ -122,15 +125,25 @@ export const LocationInputSide = (props) => {
 
   useEffect(() => {
     if (startLocation && endLocation) {
-      vehicleRouteRef.current = {};
       var startLatLng = [startLocation.coordinates.lat, startLocation.coordinates.lng].toString();
       var endLatLng = [endLocation.coordinates.lat, endLocation.coordinates.lng].toString();
-      vehicleRouteRef.current.motorcycle = getRoute(startLatLng, endLatLng, 'motorcycle');
-      vehicleRouteRef.current.car = getRoute(startLatLng, endLatLng, 'car');
-      setVehicleRoute(vehicleRouteRef.current.motorcycle);
-      setVehicleSelect(true);
+      setFetching(true);
+      // chờ lấy dữ liệu
+      setTimeout(async () => {
+        vehicleRouteRef.current = {};
+        vehicleRouteRef.current.motorcycle = getRoute(startLatLng, endLatLng, 'motorcycle');
+        vehicleRouteRef.current.car = getRoute(startLatLng, endLatLng, 'car');
+        await getAmount(startLatLng, endLatLng).then((result) => {
+          vehicleAmountRef.current = result.amounts
+        });
+
+        setVehicleRoute(vehicleRouteRef.current.motorcycle);
+        setVehicleSelect(true);
+        setFetching(false);
+      }, 1000)
     } else {
       vehicleRouteRef.current = null;
+      vehicleAmountRef.current = null;
       setVehicleSelect(false);
     }
     // console.log('vehicleRouteRef', vehicleRouteRef.current);
@@ -213,7 +226,8 @@ export const LocationInputSide = (props) => {
             <Typography color='gray' align='center'>
               <i>Chọn điểm đi và điểm đến</i>
             </Typography>
-          ) : (
+          ) :
+          !fetching ? (
             <Stack minWidth='90%' spacing={1} padding={1} paddingTop={0} display='flex'>
               <ToggleButtonGroup
                 orientation='vertical'
@@ -245,7 +259,13 @@ export const LocationInputSide = (props) => {
                     </Stack>
                     <Stack flexDirection='row'>
                       <PaidIcon sx={{ marginRight: 1 }}/>
-                      <Typography variant='body'>Giá tiền</Typography>
+                      <Typography variant='body'>
+                        {Intl.NumberFormat('vi-VN', {
+                          style: 'currency',
+                          currency: 'VND',
+                          currencyDisplay: 'code'
+                        }).format(vehicleAmountRef.current['1'])}
+                      </Typography>
                     </Stack>
                   </Stack>
                 </Box>
@@ -272,7 +292,13 @@ export const LocationInputSide = (props) => {
                     </Stack>
                     <Stack flexDirection='row'>
                       <PaidIcon sx={{ marginRight: 1 }}/>
-                      <Typography variant='body'>Giá tiền</Typography>
+                      <Typography variant='body'>
+                        {Intl.NumberFormat('vi-VN', {
+                          style: 'currency',
+                          currency: 'VND',
+                          currencyDisplay: 'code'
+                        }).format(vehicleAmountRef.current['2'])}
+                      </Typography>
                     </Stack>
                   </Stack>
                 </Box>
@@ -283,6 +309,10 @@ export const LocationInputSide = (props) => {
                 variant='contained'
                 children='Đặt xe'
               />
+            </Stack>
+          ) : (
+            <Stack minWidth='90%' margin={1} alignItems='center'>
+              <CircularProgress sx={{ color: 'gray' }}/>
             </Stack>
           )}
         </Box>

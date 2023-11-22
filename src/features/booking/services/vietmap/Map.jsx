@@ -4,9 +4,9 @@ import config from 'config.json';
 import { getLocationByCoordinates } from "./api_reverse";
 import { getLocationsByAddress } from "./api_geocode";
 
-const apiKey = config.vietmap.primaryToken // 1000 req/ngày
+// const apiKey = config.vietmap.primaryToken // 1000 req/ngày
 // const apiKey = config.vietmap.secondaryToken // 10 req/phút
-// const apiKey = config.vietmap.thirdToken // 5000 req/ngày
+const apiKey = config.vietmap.thirdToken // 5000 req/ngày
 
 const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
   const vietmapgl = window.vietmapgl;

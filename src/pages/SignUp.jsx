@@ -6,10 +6,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/en-gb';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
-import { registerCustomer, registerDriver } from 'services/be_server/api_register';
-import { useUserContext } from 'contexts/UserContext';
 import { LoadingButton } from '@mui/lab';
+import { useNavigate } from 'react-router-dom';
+import { useUserContext } from 'contexts/UserContext';
+import { registerCustomer, registerDriver } from 'services/be_server/api_register';
 import { login } from 'services/be_server/api_login';
 
 function Copyright(props) {
@@ -87,13 +87,9 @@ const SignUpForm = () => {
     if (form === 'customer') {
       await registerCustomer(user.token, formData)
         .then(result => {
-          if (result.message === 'Fail')
-            throw new Error(result.error);
-          else if (result.message === 'Success') {
-            console.log('Register customer result: ', result);
-            setIsSending(false);
-            setForm('customer-sended');
-          }
+          console.log('Register customer result: ', result);
+          setIsSending(false);
+          setForm('customer-sended');
         })
         .catch(error => {
           console.warn('Register customer failed: ', error);
@@ -103,27 +99,23 @@ const SignUpForm = () => {
     }
     else if (form === 'driver') {
       /* testing */
-      // setTimeout(() => {
-      //   setForm('driver-sended')
-      //   setIsSending(false)
-      // }, 5000);
-      // return;
+      setTimeout(() => {
+        setForm('driver-sended')
+        setIsSending(false)
+      }, 5000);
+      return;
 
-      await registerDriver(user.token, formData)
-        .then(result => {
-          if (result.message === 'Fail')
-            throw new Error(result.error);
-          else if (result.message === 'Success') {
-            console.log('Register driver result: ', result);
-            setIsSending(false);
-            setForm('driver-sended');
-          }
-        })
-        .catch(error => {
-          console.warn('Register driver failed: ', error);
-          alert('Đăng kí thất bại. Vui lòng thử lại sau.');
-          setIsSending(false);
-        })
+      // await registerDriver(user.token, formData)
+      //   .then(result => {
+      //     console.log('Register driver result: ', result);
+      //     setIsSending(false);
+      //     setForm('driver-sended');
+      //   })
+      //   .catch(error => {
+      //     console.warn('Register driver failed: ', error);
+      //     alert('Đăng kí thất bại. Vui lòng thử lại sau.');
+      //     setIsSending(false);
+      //   })
       };
   };
 
@@ -352,6 +344,17 @@ const SignUpForm = () => {
             </LocalizationProvider>
           </Grid>
           <Grid item xs={12}>
+            <TextField
+              fullWidth
+              type='file'
+              inputProps={{ accept: 'image/*'}}
+              id="avatar"
+              label="Ảnh chân dung"
+              name="avatar"
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12}>
             <FormControlLabel
               control={<Checkbox required value="allowExtraEmails" color="primary"/>}
               label="Tôi đã đọc và đồng ý với Chính sách của công ty"
@@ -380,22 +383,27 @@ const SignUpForm = () => {
     )
   else if (form === 'customer-sended') {
     setTimeout(async () => {
-      await login(user.token)
-        .then(result => {
-          console.log('auto login result', result);
-          var status = String(result.data.status).toLowerCase();
-          var role = String(result.data.role).toLowerCase();
-          if (status === 'registered') {
-            const userSession = { token: user.token, role: role };
-            sessionStorage.setItem('userSession', JSON.stringify(userSession));
-            setUser(userSession);
-            navigate('/customer');
-          }
-        })
-        .catch(error => {
-          alert('Đăng nhập thất bại. Trở về trang đăng nhập.');
-          navigate('/');
-        })
+      const userSession = { token: user.token, role: 'customer' };
+      sessionStorage.setItem('userSession', JSON.stringify(userSession));
+      setUser(userSession);
+      navigate('/customer');
+
+    //   await login(user.token)
+    //     .then(result => {
+    //       console.log('auto login result', result);
+    //       var status = String(result.data.status).toLowerCase();
+    //       var role = String(result.data.role).toLowerCase();
+    //       if (status === 'registered') {
+    //         const userSession = { token: user.token, role: role };
+    //         sessionStorage.setItem('userSession', JSON.stringify(userSession));
+    //         setUser(userSession);
+    //         navigate('/customer');
+    //       }
+    //     })
+    //     .catch(error => {
+    //       alert('Đăng nhập thất bại. Trở về trang đăng nhập.');
+    //       navigate('/');
+    //     })
     }, 3000);
 
     return (

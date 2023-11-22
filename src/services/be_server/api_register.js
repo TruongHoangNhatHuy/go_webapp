@@ -3,14 +3,13 @@ import config from 'config.json';
 const serverUrl = config.be_rootUrl;
 
 export const registerCustomer = async (token, formData) => {
-  var urlString = serverUrl + "/account/register-customer";
+  var urlString = serverUrl + "/account/customer";
   var authToken = "Bearer " + token;
 
   return await fetch(urlString, {
     method: "POST",
     mode: "cors",
     cache: "no-cache",
-    credentials: "omit",
     headers: {
       "Authorization": authToken,
     },
@@ -35,14 +34,13 @@ export const registerCustomer = async (token, formData) => {
 }
 
 export const registerDriver = async (token, formData) => {
-  var urlString = serverUrl + "/account/register-driver";
+  var urlString = serverUrl + "/account/driver";
   var authToken = "Bearer " + token;
 
   return await fetch(urlString, {
     method: "POST",
     mode: "cors",
     cache: "no-cache",
-    credentials: "omit",
     headers: {
       "Authorization": authToken,
     },

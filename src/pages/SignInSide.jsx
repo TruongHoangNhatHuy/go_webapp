@@ -35,7 +35,7 @@ export default function SignInSide() {
   const navigate =  useNavigate();
 
   const handleLogin = async (credentialResponse) => {
-    console.log(credentialResponse);
+    console.log('GG login', credentialResponse);
     var status, role;
 
     await login(credentialResponse.credential)
