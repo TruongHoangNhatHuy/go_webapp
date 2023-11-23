@@ -2,13 +2,12 @@ import { useEffect, useRef } from "react";
 import './Map.css';
 import config from 'config.json';
 import { getLocationByCoordinates } from "./api_reverse";
-import { getLocationsByAddress } from "./api_geocode";
 
 // const apiKey = config.vietmap.primaryToken // 1000 req/ngày
 // const apiKey = config.vietmap.secondaryToken // 10 req/phút
 const apiKey = config.vietmap.thirdToken // 5000 req/ngày
 
-const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
+const Map = ({ startLocation, endLocation, vehicleRoute, setUserPosition, setMapCenterRef }) => {
   const vietmapgl = window.vietmapgl;
 
   const mapRef = useRef(null);
@@ -99,7 +98,8 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
       mapControlRef.current.geolocateControl.on('geolocate', (e) => {
         var lng = e.coords.longitude;
         var lat = e.coords.latitude;
-        var position = [lng, lat];
+        var position = [lat, lng];
+        setUserPosition(position);
         // console.log('user position', position);
       });
     }
@@ -109,8 +109,8 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
       // console.log('A click event has occurred at ' + e.lngLat);
       handleMarker(infoMarkerRef, e.lngLat);
       var location = getLocationByCoordinates(e.lngLat.lng, e.lngLat.lat);
-      var info = getLocationsByAddress(location[0].display);
-      handleMarkerPopup(infoMarkerRef, info[1])
+      console.log('marker location ', location);
+      handleMarkerPopup(infoMarkerRef, location[0])
     });
   }, [])
 

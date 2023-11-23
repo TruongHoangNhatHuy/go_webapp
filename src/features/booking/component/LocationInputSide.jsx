@@ -1,5 +1,7 @@
+import { useState, useRef, useEffect } from 'react';
 import { Autocomplete, Box, Button, CircularProgress, Divider, Drawer, IconButton, InputAdornment, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import PlaceIcon from '@mui/icons-material/Place';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
@@ -7,34 +9,47 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import RouteIcon from '@mui/icons-material/Route';
 import PaidIcon from '@mui/icons-material/Paid';
 import { debounce } from '@mui/material/utils'
-import { getLocationsByAddress, getCoordinatesByRefid } from '../services/vietmap/api_geocode.js';
-import { useState, useRef, useEffect } from 'react';
-import { getRoute } from '../services/vietmap/api_route.js';
 import { metersToString, milisecondsToString } from '../utils/converter.js';
+import { getLocationsByAddress, getCoordinatesByRefid } from '../services/vietmap/api_geocode.js';
+import { getLocationByCoordinates } from '../services/vietmap/api_reverse.js';
+import { getLocationsAutocomplete } from '../services/vietmap/api_autocomplete.js';
+import { getRoute } from '../services/vietmap/api_route.js';
 import { getAmount } from '../services/be_server/api_booking.js';
 
 const SearchBox = (props) => {
-  const { setLocation, setMapCenterRef, ...tfProps } = props;
-  const [options, setOptions] = useState([]);
+  const { userPosition, setLocation, setMapCenterRef, ...tfProps } = props;
+  const [options, setOptions] = useState([{ "name": "Vị trí người dùng" }]);
   // Thông tin địa điểm được chọn
   const locationRef = useRef(null);
 
   // Request API lấy danh sách địa chỉ gợi ý
   // chỉ thực hiện sau khi người dùng ngừng nhập 1s
   const queryOptions = debounce((_, value) => {
-    // setOptions(getLocation(value.trim())) // dùng test function để thử nghiệm, không gọi vietmap API
-    setOptions(getLocationsByAddress(value.trim())) // Gọi vietmap API
+    if (value === null || value === "" || value === "Vị trí người dùng" ) {
+      setOptions([{ "name": "Vị trí người dùng" }])
+    } else {
+      // setOptions(getLocationsByAddress(value.trim()));
+      const userLatLng = userPosition.toString();
+      setOptions(getLocationsAutocomplete(value.trim(), userLatLng));
+    }
   }, 1000);
 
   // Khi chọn 1 địa điểm:
   const handleChange = (_, item) => {
     // console.log('item', item)
     if (item !== null) {
-      // lấy tọa độ
-      const locationCoordinates = getCoordinatesByRefid(item.ref_id);
-      locationRef.current = {
-        'location': item,
-        'coordinates': locationCoordinates
+      if (item.name === 'Vị trí người dùng') {
+        const [lat, lng] = userPosition;
+        const userLocation = getLocationByCoordinates(lng, lat)[0];
+        handleChange(_, userLocation);
+      }
+      else {
+        // lấy tọa độ
+        const locationCoordinates = getCoordinatesByRefid(item.ref_id);
+        locationRef.current = {
+          'location': item,
+          'coordinates': locationCoordinates
+        };
       }
       // console.log('locationInput', locationRef.current);
     }
@@ -64,7 +79,7 @@ const SearchBox = (props) => {
       renderOption={(props, option) => (
         <li {...props} style={{ paddingLeft: 0, paddingRight: 0 }}>
           <Box padding={1} paddingLeft={0.75}>
-            <PlaceIcon sx={{ color: 'gray' }} />
+            {option.name === 'Vị trí người dùng' ? (<MyLocationIcon sx={{ color: '#1da1f2' }}/>) : (<PlaceIcon sx={{ color: 'gray' }}/>)}
           </Box>
           <Box>
             <Typography variant='body1'>{option.name}</Typography>
@@ -105,7 +120,7 @@ const SearchBox = (props) => {
 }
 
 export const LocationInputSide = (props) => {
-  const { hidden, bookingRef, startLocation, setStartLocation, endLocation, setEndLocation, setVehicleRoute, setMapCenterRef, setBookingForm } = props;
+  const { hidden, bookingRef, userPosition, startLocation, setStartLocation, endLocation, setEndLocation, setVehicleRoute, setMapCenterRef, setBookingForm } = props;
 
   const drawerWidth = 350;
   // Đóng mở drawer
@@ -211,6 +226,7 @@ export const LocationInputSide = (props) => {
               id='startLocation'
               name='startLocation'
               placeholder='Tìm điểm đi'
+              userPosition={userPosition}
               setLocation={setStartLocation}
               setMapCenterRef={setMapCenterRef}
             />
@@ -218,6 +234,7 @@ export const LocationInputSide = (props) => {
               id='endLocation'
               name='endLocation'
               placeholder='Tìm điểm đến'
+              userPosition={userPosition}
               setLocation={setEndLocation}
               setMapCenterRef={setMapCenterRef}
             />

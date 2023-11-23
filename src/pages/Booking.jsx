@@ -10,6 +10,7 @@ const Booking = () => {
   const [bookingForm, setBookingForm] = useState(false);
   const [hadBooking, setHadBooking] = useState(false);
   // Map state
+  const [userPosition, setUserPosition] = useState(null);
   const [startLocation, setStartLocation] = useState(null);
   const [endLocation, setEndLocation] = useState(null);
   const [vehicleRoute, setVehicleRoute] = useState(null); // Hiện thị tuyến đường
@@ -36,9 +37,9 @@ const Booking = () => {
   return (
     <div>
       {/* props của Map: để hiển thị marker điểm đi & điểm đến */}
-      <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setMapCenterRef={setMapCenterRef}/>
+      <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setUserPosition={setUserPosition} setMapCenterRef={setMapCenterRef}/>
       {/* Side Drawer */}
-      <LocationInputSide hidden={hadBooking} bookingRef={bookingRef} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
+      <LocationInputSide hidden={hadBooking} bookingRef={bookingRef} userPosition={userPosition} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
       {hadBooking ? <BookingInfoSide bookingRef={bookingRef} handleBookingCancel={handleBookingCancel}/> : <div/>}
       {/* Cửa sổ mở Booking Form */}
       <Dialog open={bookingForm} >
