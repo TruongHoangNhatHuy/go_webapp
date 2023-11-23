@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Drawer, IconButton, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Drawer, IconButton, Paper, Stack, Typography } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { BookingDetail } from '..';
 import { useState } from 'react';
@@ -25,11 +25,9 @@ export const BookingInfoSide = ({ bookingRef, handleBookingCancel }) => {
     setOpen(prev => !prev)
   }
 
+  const[cancelling, setCancelling] = useState(false);
   const handleCancel = () => {
-    if (window.confirm('Xác nhận hủy đặt xe?')) {
-      setOpen(false)
-      handleBookingCancel()
-    }
+    handleBookingCancel()
   }
 
   return (
@@ -75,9 +73,23 @@ export const BookingInfoSide = ({ bookingRef, handleBookingCancel }) => {
           <Typography variant='h6'>Chi tiết đặt xe</Typography>
           <BookingDetail bookingRef={bookingRef}/>
           <Divider/>
-          <Button variant='outlined' size='small' color='error' onClick={handleCancel}>Hủy đơn</Button>
+          <Button variant='outlined' size='small' color='error' onClick={() => setCancelling(true)}>Hủy đơn</Button>
         </Stack>
       </Drawer>
+      <Dialog open={cancelling}>
+        <DialogTitle sx={{ margin: 'auto' }}>
+          <b>HỦY ĐẶT XE</b>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ minWidth: '250px' }}>
+            <Typography variant='body1'>Xác nhận hủy đặt xe?</Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='outlined' color='error' onClick={handleCancel}>Hủy</Button>
+          <Button variant='outlined' color='info' onClick={() => setCancelling(false)}>Không</Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   )
 }

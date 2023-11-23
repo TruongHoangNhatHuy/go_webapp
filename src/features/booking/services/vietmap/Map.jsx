@@ -117,19 +117,19 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setMapCenterRef }) => {
   useEffect(()=> {
     // Gắn marker cho điểm đi
     if (startLocation !== null) {
-      var lngLat = [startLocation.coordinates.lng, startLocation.coordinates.lat];
-      handleMarker(startMarkerRef, lngLat, { color: "green" });
+      var startLngLat = [startLocation.coordinates.lng, startLocation.coordinates.lat];
+      handleMarker(startMarkerRef, startLngLat, { color: "green" });
       handleMarkerPopup(startMarkerRef, startLocation.location);
-      setMapCenter(lngLat);
+      setMapCenter(startLngLat);
     }
     else 
       handleMarker(startMarkerRef, null);
     // Gắn marker cho điểm đến
     if (endLocation !== null) {
-      var lngLat = [endLocation.coordinates.lng, endLocation.coordinates.lat];
-      handleMarker(endMarkerRef, lngLat, { color: "red" });
+      var endLngLat = [endLocation.coordinates.lng, endLocation.coordinates.lat];
+      handleMarker(endMarkerRef, endLngLat, { color: "red" });
       handleMarkerPopup(endMarkerRef, endLocation.location);
-      setMapCenter(lngLat);
+      setMapCenter(endLngLat);
     }
     else
       handleMarker(endMarkerRef, null);

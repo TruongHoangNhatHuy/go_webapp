@@ -20,26 +20,26 @@ export const BookingDetail = ({ bookingRef }) => {
             <TableCell component="th" scope="row">
             <IconButton sx={{pointerEvents: 'none', color: blue[700]}}><MdOutlineAccessTime/></IconButton>
               Thời gian đặt</TableCell>
-            <TableCell variant='head' align='right'>{data.timeSubmit.$d.toString()}</TableCell>
+            <TableCell variant='head' align='right'>{data.timeSubmit.format('DD/MM/YYYY[, ]HH:mm[ ]A')}</TableCell>
           </TableRow>
           <TableRow>
               <TableCell component="th" scope="row">
               <IconButton sx={{pointerEvents: 'none' , color: green[500],}}><MdLocationOn/></IconButton>
                 Điểm đi</TableCell>
-              <TableCell variant='head' align='right'>{bookingRef.current.startLocation}</TableCell>
+              <TableCell variant='head' align='right'>{data.startLocation.location.name}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" scope="row">
               <IconButton sx={{pointerEvents: 'none' , color: red[700],}}><MdLocationOn/></IconButton>
                 Điểm đến</TableCell>
-              <TableCell variant='head' align='right'>{data.endLocation}</TableCell>
+              <TableCell variant='head' align='right'>{data.endLocation.location.name}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" scope="row">
               <IconButton sx={{pointerEvents: 'none'}}><MdCommute/></IconButton>
                 Loại xe</TableCell>
               <TableCell variant='head' align='right'>{
-                (data.vehicleType === 'MOTORBIKE') ? 'Xe máy' :
+                (data.vehicleType === 'MOTOBIKE') ? 'Xe máy' :
                 (data.vehicleType === 'CAR') ? 'Oto' : null
               }</TableCell>
             </TableRow>
@@ -53,7 +53,12 @@ export const BookingDetail = ({ bookingRef }) => {
               <TableCell variant='head' component="th" scope="row" >
               <IconButton sx={{pointerEvents: 'none', color: yellow[700]}}><MdOutlineAttachMoney/></IconButton>
                 Tổng tiền</TableCell>
-              <TableCell variant='head' align='right'>{data.payment}</TableCell>
+              <TableCell variant='head' align='right'>
+                {Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                  currencyDisplay: 'code'
+                }).format(bookingRef.current.paymentAmounts)}</TableCell>
             </TableRow>
         </TableBody>
       </Table>
