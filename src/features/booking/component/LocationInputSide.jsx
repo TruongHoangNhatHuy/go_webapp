@@ -101,11 +101,14 @@ const SearchBox = (props) => {
           required
           fullWidth
           size='small'
-          sx={{ bgcolor: 'white' }}
+          sx={{ bgcolor: 'white'}}
           InputProps={{
             ...params.InputProps,
+            sx: {
+              borderRadius: '16px' // Giá trị bạn muốn
+            },
             startAdornment:
-              <InputAdornment position='start' sx={{ margin: 0 }}>
+              <InputAdornment position='start' sx={{ margin: 0}}>
                 <IconButton sx={{ padding: 0 }}
                   onClick={handleCenterMap}
                 >
@@ -200,10 +203,10 @@ export const LocationInputSide = (props) => {
       <Drawer
         open={open}
         sx={{
-          width: drawerWidth,
+          width: { xs: "100vw", md: drawerWidth, sm: drawerWidth },
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: drawerWidth,
+            width: { xs: "100vw", md: drawerWidth, sm: drawerWidth },
             boxSizing: 'border-box',
           },
         }}

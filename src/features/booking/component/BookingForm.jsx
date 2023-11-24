@@ -1,8 +1,8 @@
-import { Box,IconButton, Button, MenuItem, Stack, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
+import { Box, IconButton, Button, MenuItem, Stack, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
-import { MdArrowBack,MdArrowForward,MdLocationOn,MdCommute,MdPayment,MdOutlineAttachMoney } from "react-icons/md";
+import { MdArrowBack, MdArrowForward, MdLocationOn, MdCommute, MdPayment, MdOutlineAttachMoney } from "react-icons/md";
 import dayjs from 'dayjs';
-import { green, red,blue,yellow } from '@mui/material/colors'
+import { green, red, blue, yellow } from '@mui/material/colors'
 
 // Form đặt xe
 export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
@@ -21,7 +21,7 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
     const amounts = bookingRef.current.paymentAmounts;
     switch (activeStep) {
       case 0: {
-        if (paymentMethod === null)  {
+        if (paymentMethod === null) {
           setPaymentError('Chọn phương thức thanh toán.');
           setErrorStep(0);
           return;
@@ -56,11 +56,11 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
   };
 
   return (
-    <Box  component='form' onSubmit={handleSubmit}>
+    <Box component='form' onSubmit={handleSubmit}>
       <Stepper activeStep={activeStep}>
         <Step index={0}>
-          <StepLabel error={errorStep === 0} 
-            optional={<Typography variant="caption" fontWeight='bold' color="error" children={paymentError}/>}
+          <StepLabel error={errorStep === 0}
+            optional={<Typography variant="caption" fontWeight='bold' color="error" children={paymentError} />}
           >Thanh toán
           </StepLabel>
         </Step>
@@ -85,7 +85,7 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
         <Typography variant='body1'>Phương tiện:
           {
             (bookingRef.current.vehicleType === 'MOTOBIKE') ? ' Xe máy' :
-            (bookingRef.current.vehicleType === 'CAR') ? ' Oto' : null
+              (bookingRef.current.vehicleType === 'CAR') ? ' Oto' : null
           }
         </Typography>
         <TextField
@@ -114,37 +114,37 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell component="th" scope="row">
-              <IconButton sx={{pointerEvents: 'none' , color: green[500],}}><MdLocationOn/></IconButton>
+              <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
+                <IconButton sx={{ pointerEvents: 'none', color: green[500], }}><MdLocationOn /></IconButton>
                 Điểm đi</TableCell>
-              <TableCell variant='head' align='right'>{bookingRef.current.startLocation.location.name}</TableCell>
+              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{bookingRef.current.startLocation.location.name}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
-              <IconButton sx={{pointerEvents: 'none' , color: red[700],}}><MdLocationOn/></IconButton>
+              <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
+                <IconButton sx={{ pointerEvents: 'none', color: red[700], }}><MdLocationOn /></IconButton>
                 Điểm đến</TableCell>
-              <TableCell variant='head' align='right'>{bookingRef.current.endLocation.location.name}</TableCell>
+              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{bookingRef.current.endLocation.location.name}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
-              <IconButton sx={{pointerEvents: 'none'}}><MdCommute/></IconButton>
+              <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
+                <IconButton sx={{ pointerEvents: 'none' }}><MdCommute /></IconButton>
                 Loại xe</TableCell>
-              <TableCell variant='head' align='right'>{
+              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{
                 (bookingRef.current.vehicleType === 'MOTOBIKE') ? 'Xe máy' :
-                (bookingRef.current.vehicleType === 'CAR') ? 'Oto' : null
+                  (bookingRef.current.vehicleType === 'CAR') ? 'Oto' : null
               }</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
-              <IconButton sx={{pointerEvents: 'none', color: blue[700]}}><MdPayment/></IconButton>
-              Phương thức thanh toán</TableCell>
-              <TableCell variant='head' align='right'>{bookingRef.current.paymentMethod}</TableCell>
+              <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
+                <IconButton sx={{ pointerEvents: 'none', color: blue[700] }}><MdPayment /></IconButton>
+                Phương thức thanh toán</TableCell>
+              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{bookingRef.current.paymentMethod}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell variant='head' component="th" scope="row" >
-              <IconButton sx={{pointerEvents: 'none', color: yellow[700]}}><MdOutlineAttachMoney/></IconButton>
+              <TableCell variant='head' component="th" scope="row" sx={{ padding: "16px 0px" }}>
+                <IconButton sx={{ pointerEvents: 'none', color: yellow[700] }}><MdOutlineAttachMoney /></IconButton>
                 Tổng tiền</TableCell>
-              <TableCell variant='head' align='right'>
+              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>
                 {Intl.NumberFormat('vi-VN', {
                   style: 'currency',
                   currency: 'VND',
@@ -152,8 +152,8 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
                 }).format(bookingRef.current.paymentAmounts)}
               </TableCell>
             </TableRow>
-        </TableBody>
-      </Table>
+          </TableBody>
+        </Table>
       </Stack>
 
       <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
@@ -162,14 +162,14 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
           disabled={activeStep === 0}
           onClick={handleBack}
           sx={{ mr: 1 }}
-          startIcon={<MdArrowBack/>}
+          startIcon={<MdArrowBack />}
         >
           Trở lại
         </Button>
-        <Box sx={{ flex: '1 1 auto'}} />
+        <Box sx={{ flex: '1 1 auto' }} />
         <Button disabled={activeStep === 1}
-                onClick={handleNext}
-                endIcon={<MdArrowForward/>}>Tiếp</Button>
+          onClick={handleNext}
+          endIcon={<MdArrowForward />}>Tiếp</Button>
         <Button disabled={activeStep !== 1} type='submit' variant='contained'>Đặt xe</Button>
       </Box>
     </Box>

@@ -11,49 +11,49 @@ export const BookingDetail = ({ bookingRef }) => {
       <Table size='small'>
         <TableBody>
           <TableRow>
-            <TableCell component="th" scope="row">
+            <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
             <IconButton sx={{pointerEvents: 'none'}}><MdInfo/></IconButton>
               Trạng thái đơn đặt</TableCell>
-            <TableCell variant='head' align='right'>{data.status}</TableCell>
+            <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{data.status}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell component="th" scope="row">
+            <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
             <IconButton sx={{pointerEvents: 'none', color: blue[700]}}><MdOutlineAccessTime/></IconButton>
               Thời gian đặt</TableCell>
-            <TableCell variant='head' align='right'>{data.timeSubmit.format('DD/MM/YYYY[, ]HH:mm[ ]A')}</TableCell>
+            <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{data.timeSubmit.format('DD/MM/YYYY[, ]HH:mm[ ]A')}</TableCell>
           </TableRow>
           <TableRow>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row"sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none' , color: green[500],}}><MdLocationOn/></IconButton>
                 Điểm đi</TableCell>
-              <TableCell variant='head' align='right'>{data.startLocation.location.name}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{data.startLocation.location.name}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row"sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none' , color: red[700],}}><MdLocationOn/></IconButton>
                 Điểm đến</TableCell>
-              <TableCell variant='head' align='right'>{data.endLocation.location.name}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{data.endLocation.location.name}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row"sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none'}}><MdCommute/></IconButton>
                 Loại xe</TableCell>
-              <TableCell variant='head' align='right'>{
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{
                 (data.vehicleType === 'MOTOBIKE') ? 'Xe máy' :
                 (data.vehicleType === 'CAR') ? 'Oto' : null
               }</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row"sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none', color: blue[700]}}><MdPayment/></IconButton>
               Phương thức thanh toán</TableCell>
-              <TableCell variant='head' align='right'>{data.paymentMethod}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{data.paymentMethod}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell variant='head' component="th" scope="row" >
+              <TableCell variant='head' component="th" scope="row" sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none', color: yellow[700]}}><MdOutlineAttachMoney/></IconButton>
                 Tổng tiền</TableCell>
-              <TableCell variant='head' align='right'>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>
                 {Intl.NumberFormat('vi-VN', {
                   style: 'currency',
                   currency: 'VND',

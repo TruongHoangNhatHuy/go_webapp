@@ -54,7 +54,7 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setUserPosition, setMap
     if (info !== null) {
       const html = "<h3 style='margin:0'>"+ info.name +"</h3><h4 style='margin:0; color:gray'>"+ info.address +"</h4>"
       
-      markerRef.current.setPopup(new vietmapgl.Popup({ className: 'popup-marker', maxWidth: 'none', closeOnClick: false }).setHTML(html));
+      markerRef.current.setPopup(new vietmapgl.Popup({ maxWidth: 'none', closeOnClick: false }).setHTML(html));
       markerRef.current.togglePopup();
     }
   }
