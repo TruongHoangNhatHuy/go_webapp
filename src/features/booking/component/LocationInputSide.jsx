@@ -157,7 +157,7 @@ export const LocationInputSide = (props) => {
         setVehicleRoute(vehicleRouteRef.current.motorcycle);
         setVehicleSelect(true);
         setFetching(false);
-      }, 1000)
+      }, 500)
     } else {
       vehicleRouteRef.current = null;
       vehicleAmountRef.current = null;
@@ -243,15 +243,15 @@ export const LocationInputSide = (props) => {
             />
             <Divider />
           </Stack>
-          {!vehicleSelect ? (
-            <Typography color='gray' align='center'>
-              <i>Chọn điểm đi và điểm đến</i>
-            </Typography>
-          ) :
-          fetching ? (
+          {fetching ? (
             <Stack minWidth='90%' margin={1} alignItems='center'>
               <CircularProgress sx={{ color: 'gray' }}/>
             </Stack>
+          ) :
+          !vehicleSelect ? (
+            <Typography color='gray' align='center'>
+              <i>Chọn điểm đi và điểm đến</i>
+            </Typography>
           ) : (
             <Stack minWidth='90%' spacing={1} padding={1} paddingTop={0} display='flex'>
               <ToggleButtonGroup

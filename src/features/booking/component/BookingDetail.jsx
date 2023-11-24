@@ -13,7 +13,7 @@ export const BookingDetail = ({ bookingRef }) => {
           <TableRow>
             <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
             <IconButton sx={{pointerEvents: 'none'}}><MdInfo/></IconButton>
-              Trạng thái đơn đặt</TableCell>
+              Trạng thái đơn</TableCell>
             <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{data.status}</TableCell>
           </TableRow>
           <TableRow>
