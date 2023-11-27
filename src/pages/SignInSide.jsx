@@ -53,7 +53,6 @@ export default function SignInSide() {
     // console.log('user session', userSession)  
 
     if (status === 'registered') {
-      sessionStorage.setItem('userSession', JSON.stringify(userSession));
       setUser(userSession);
       switch (role) {
         case 'customer':
@@ -71,7 +70,6 @@ export default function SignInSide() {
       }
     }
     else if (status === 'unregistered') {
-      sessionStorage.setItem('userSession', JSON.stringify(userSession));
       setUser(userSession);
       navigate("/signup");
     }

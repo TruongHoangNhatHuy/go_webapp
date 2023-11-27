@@ -1,5 +1,5 @@
-export { BookingDetail } from './component/BookingDetail';
-export { BookingForm } from './component/BookingForm';
-export { BookingInfoSide } from './component/BookingInfoSide'
+export { BookingDetail } from './components/BookingDetail';
+export { BookingForm } from './components/BookingForm';
+export { BookingInfoSide } from './components/BookingInfoSide'
 // export { LocationInputTop } from './component/LocationInputTop';
-export { LocationInputSide } from './component/LocationInputSide';
+export { LocationInputSide } from './components/LocationInputSide';

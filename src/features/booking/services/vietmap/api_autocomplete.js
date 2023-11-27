@@ -13,6 +13,6 @@ export function getLocationsAutocomplete(address, userLatLng) {
   req.send(null);
 
   var responseJson = JSON.parse(req.responseText);
-  console.log('getLocationsAutocomplete', responseJson);
+  // console.log('getLocationsAutocomplete', responseJson);
   return responseJson
 }

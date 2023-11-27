@@ -3,22 +3,23 @@ import { useState } from 'react';
 import { MdArrowBack, MdArrowForward, MdLocationOn, MdCommute, MdPayment, MdOutlineAttachMoney } from "react-icons/md";
 import dayjs from 'dayjs';
 import { green, red, blue, yellow } from '@mui/material/colors'
+import { RedirectVNPay } from 'services/vnpay/api_payment';
+import { useBookingContext } from 'contexts/BookingContext';
 
 // Form đặt xe
-export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
+export const BookingForm = ({ setBookingForm, setHadBooking }) => {
+  const [bookingInfo, setBookingInfo] = useBookingContext();
+  var updatedBookingInfo = bookingInfo;
+
   const [activeStep, setActiveStep] = useState(0);
   const [errorStep, setErrorStep] = useState(-1);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
 
-  const wallet = 12345; // test kiểm tra số dư
-
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
   const handleNext = () => {
-    // Kiểm tra chọn phương thức thanh toán
-    const amounts = bookingRef.current.paymentAmounts;
     switch (activeStep) {
       case 0: {
         if (paymentMethod === null) {
@@ -26,15 +27,10 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
           setErrorStep(0);
           return;
         }
-        else if (wallet < amounts) {
-          setPaymentError('Không đủ số dư.');
-          setErrorStep(0);
-          return;
-        }
         else {
           setPaymentError(null);
           setErrorStep(-1);
-          bookingRef.current.paymentMethod = paymentMethod;
+          updatedBookingInfo.paymentMethod = paymentMethod;
         }
         break;
       }
@@ -45,14 +41,22 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setErrorStep(-1);
   };
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     // const data = new FormData(event.currentTarget);
-    bookingRef.current.timeSubmit = dayjs(); // return current time, as dayjs object
-    bookingRef.current.status = 'Đang tìm tài xế';
-    // console.log('bookingForm', bookingRef.current);
+    updatedBookingInfo.timeSubmit = dayjs().format('DD/MM/YYYY[, ]HH:mm[ ]A');
+    updatedBookingInfo.status = 'payment_uncheck';
+    setBookingForm(updatedBookingInfo);
     setBookingForm(false);
     setHadBooking(true);
+
+    sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
+    if (updatedBookingInfo.paymentMethod === 'VNPay') {
+      await RedirectVNPay(updatedBookingInfo.paymentAmounts)
+        .then(url => {
+          window.location.assign(url);
+        })
+    }
   };
 
   return (
@@ -80,12 +84,12 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
             style: 'currency',
             currency: 'VND',
             currencyDisplay: 'code'
-          }).format(bookingRef.current.paymentAmounts)}
+          }).format(updatedBookingInfo.paymentAmounts)}
         </b></Typography>
         <Typography variant='body1'>Phương tiện:
           {
-            (bookingRef.current.vehicleType === 'MOTOBIKE') ? ' Xe máy' :
-              (bookingRef.current.vehicleType === 'CAR') ? ' Oto' : null
+            (updatedBookingInfo.vehicleType === 'motorcycle') ? ' Xe máy' :
+              (updatedBookingInfo.vehicleType === 'car') ? ' Oto' : null
           }
         </Typography>
         <TextField
@@ -96,13 +100,6 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
           <MenuItem value='Momo'>Momo</MenuItem>
           <MenuItem value='VNPay'>VNPay</MenuItem>
         </TextField>
-        <Typography variant='body1' display={paymentMethod ? 'flex' : 'none'}>Số dư: {
-          Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            currencyDisplay: 'code'
-          }).format(wallet)}
-        </Typography>
       </Stack>
 
       {/* index 2 */}
@@ -117,28 +114,28 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
               <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
                 <IconButton sx={{ pointerEvents: 'none', color: green[500], }}><MdLocationOn /></IconButton>
                 Điểm đi</TableCell>
-              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{bookingRef.current.startLocation.location.name}</TableCell>
+              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{updatedBookingInfo.startLocation.location.name}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
                 <IconButton sx={{ pointerEvents: 'none', color: red[700], }}><MdLocationOn /></IconButton>
                 Điểm đến</TableCell>
-              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{bookingRef.current.endLocation.location.name}</TableCell>
+              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{updatedBookingInfo.endLocation.location.name}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
                 <IconButton sx={{ pointerEvents: 'none' }}><MdCommute /></IconButton>
                 Loại xe</TableCell>
               <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{
-                (bookingRef.current.vehicleType === 'MOTOBIKE') ? 'Xe máy' :
-                  (bookingRef.current.vehicleType === 'CAR') ? 'Oto' : null
+                (updatedBookingInfo.vehicleType === 'motorcycle') ? 'Xe máy' :
+                  (updatedBookingInfo.vehicleType === 'car') ? 'Oto' : null
               }</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
                 <IconButton sx={{ pointerEvents: 'none', color: blue[700] }}><MdPayment /></IconButton>
                 Phương thức thanh toán</TableCell>
-              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{bookingRef.current.paymentMethod}</TableCell>
+              <TableCell variant='head' align='right' sx={{ padding: "16px 0px" }}>{updatedBookingInfo.paymentMethod}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell variant='head' component="th" scope="row" sx={{ padding: "16px 0px" }}>
@@ -149,7 +146,7 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
                   style: 'currency',
                   currency: 'VND',
                   currencyDisplay: 'code'
-                }).format(bookingRef.current.paymentAmounts)}
+                }).format(updatedBookingInfo.paymentAmounts)}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -170,7 +167,7 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
         <Button disabled={activeStep === 1}
           onClick={handleNext}
           endIcon={<MdArrowForward />}>Tiếp</Button>
-        <Button disabled={activeStep !== 1} type='submit' variant='contained'>Đặt xe</Button>
+        <Button disabled={activeStep !== 1} type='submit' variant='contained'>Thanh toán</Button>
       </Box>
     </Box>
   )

@@ -10,7 +10,6 @@ import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 import { useUserContext } from 'contexts/UserContext';
 import { registerCustomer, registerDriver } from 'services/be_server/api_register';
-import { login } from 'services/be_server/api_login';
 
 function Copyright(props) {
   return (
@@ -99,23 +98,30 @@ const SignUpForm = () => {
     }
     else if (form === 'driver') {
       /* testing */
-      setTimeout(() => {
-        setForm('driver-sended')
-        setIsSending(false)
-      }, 5000);
-      return;
+      // setTimeout(() => {
+      //   setForm('driver-sended')
+      //   setIsSending(false)
+      // }, 5000);
+      // return;
 
-      // await registerDriver(user.token, formData)
-      //   .then(result => {
-      //     console.log('Register driver result: ', result);
-      //     setIsSending(false);
-      //     setForm('driver-sended');
-      //   })
-      //   .catch(error => {
-      //     console.warn('Register driver failed: ', error);
-      //     alert('Đăng kí thất bại. Vui lòng thử lại sau.');
-      //     setIsSending(false);
-      //   })
+      const idCardImg2 = formData.get('idCardImg2');
+      formData.append('idCardImg', idCardImg2);
+      formData.delete('idCardImg2');
+      const drivingLicenseImg2 = formData.get('drivingLicenseImg2');
+      formData.append('drivingLicenseImg', drivingLicenseImg2);
+      formData.delete('drivingLicenseImg2');
+      
+      await registerDriver(user.token, formData)
+        .then(result => {
+          console.log('Register driver result: ', result);
+          setIsSending(false);
+          setForm('driver-sended');
+        })
+        .catch(error => {
+          console.warn('Register driver failed: ', error);
+          alert('Đăng kí thất bại. Vui lòng thử lại sau.');
+          setIsSending(false);
+        })
       };
   };
 
@@ -142,9 +148,9 @@ const SignUpForm = () => {
               select
               required
               fullWidth
-              id="gender"
+              id="isMale"
               label="Giới tính"
-              name="gender"
+              name="isMale"
               autoComplete='sex'
             >
               <MenuItem value={'true'}>Nam</MenuItem>
@@ -195,30 +201,36 @@ const SignUpForm = () => {
               onChange={handleIdCardValidate}
             />
           </Grid>
-          {/* <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              multiline
-              rows={2}
-              id="address"
-              label="Địa chỉ"
-              name="address"
-              autoComplete="address-line1"
-            />
-          </Grid> */}
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               select
               required
               fullWidth
-              id="vehicle"
+              id="vehicleType"
               label="Loại phương tiện"
-              name="vehicle"
-            >
-              <MenuItem value={'MOTOBIKE'}>Xe máy</MenuItem>
+              name="vehicleType"
+              >
+              <MenuItem value={'MOTORCYCLE'}>Xe máy</MenuItem>
               <MenuItem value={'CAR'}>Ôtô</MenuItem>
             </TextField>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              id="licensePlate"
+              label="Số biển kiểm soát"
+              name="licensePlate"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              id="drivingLicense"
+              label="Số giấy phép lái xe"
+              name="drivingLicense"
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -232,15 +244,51 @@ const SignUpForm = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               required
               fullWidth
               type='file'
               inputProps={{ accept: 'image/*'}}
-              id="licensePlate"
+              id="idCardImg"
+              label="Ảnh mặt trước CCCD"
+              name="idCardImg"
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              type='file'
+              inputProps={{ accept: 'image/*'}}
+              id="idCardImg2"
+              label="Ảnh mặt sau CCCD"
+              name="idCardImg2"
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              type='file'
+              inputProps={{ accept: 'image/*'}}
+              id="drivingLicenseImg"
               label="Ảnh mặt trước giấy phép lái xe"
-              name="licensePlate"
+              name="drivingLicenseImg"
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              type='file'
+              inputProps={{ accept: 'image/*'}}
+              id="drivingLicenseImg2"
+              label="Ảnh mặt sau giấy phép lái xe"
+              name="drivingLicenseImg2"
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
@@ -317,9 +365,9 @@ const SignUpForm = () => {
             <TextField
               select
               fullWidth
-              id="gender"
+              id="isMale"
               label="Giới tính"
-              name="gender"
+              name="isMale"
               autoComplete='sex'
             >
               <MenuItem value={'true'}>Nam</MenuItem>
@@ -384,26 +432,8 @@ const SignUpForm = () => {
   else if (form === 'customer-sended') {
     setTimeout(async () => {
       const userSession = { token: user.token, role: 'customer' };
-      sessionStorage.setItem('userSession', JSON.stringify(userSession));
       setUser(userSession);
       navigate('/customer');
-
-    //   await login(user.token)
-    //     .then(result => {
-    //       console.log('auto login result', result);
-    //       var status = String(result.data.status).toLowerCase();
-    //       var role = String(result.data.role).toLowerCase();
-    //       if (status === 'registered') {
-    //         const userSession = { token: user.token, role: role };
-    //         sessionStorage.setItem('userSession', JSON.stringify(userSession));
-    //         setUser(userSession);
-    //         navigate('/customer');
-    //       }
-    //     })
-    //     .catch(error => {
-    //       alert('Đăng nhập thất bại. Trở về trang đăng nhập.');
-    //       navigate('/');
-    //     })
     }, 3000);
 
     return (

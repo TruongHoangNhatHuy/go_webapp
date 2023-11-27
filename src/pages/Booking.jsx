@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Map from '../features/booking/services/vietmap/Map';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BookingForm, BookingInfoSide, LocationInputSide } from '../features/booking';
 import { MdOutlinePayment,MdDelete } from "react-icons/md";
+import { useBookingContext } from 'contexts/BookingContext';
 
 const Booking = () => {
   // UI state
@@ -16,21 +17,23 @@ const Booking = () => {
   const [vehicleRoute, setVehicleRoute] = useState(null); // Hiện thị tuyến đường
   // Function ref
   const setMapCenterRef = useRef({});
-  // Thông tin đơn đặt
-  const emptyBooking = {
-    status: 'none',
-    startLocation: '1',
-    endLocation: '2',
-    vehicleType: '3',
-    paymentMethod: '4',
-    paymentAmounts: '5',
-    timeSubmit: '6'
-  };
-  const bookingRef = useRef(emptyBooking);
+  // Thông tin đặt xe
+  const [bookingInfo,] = useBookingContext();
+
+  useEffect(() => {
+    // khôi phục thông tin đặt xe nếu có
+    if (bookingInfo.status !== null) {
+      setHadBooking(true)
+      setStartLocation(bookingInfo.startLocation)
+      setEndLocation(bookingInfo.endLocation)
+    }
+  }, []);
   
   // Xử lý hủy đơn
   const handleBookingCancel = () => {
-    bookingRef.current = emptyBooking;
+    // setStartLocation(null);
+    // setEndLocation(null);
+    // setVehicleRoute(null);
     setHadBooking(false);
   };
 
@@ -39,8 +42,8 @@ const Booking = () => {
       {/* props của Map: để hiển thị marker điểm đi & điểm đến */}
       <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setUserPosition={setUserPosition} setMapCenterRef={setMapCenterRef}/>
       {/* Side Drawer */}
-      <LocationInputSide hidden={hadBooking} bookingRef={bookingRef} userPosition={userPosition} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
-      {hadBooking ? <BookingInfoSide bookingRef={bookingRef} handleBookingCancel={handleBookingCancel}/> : <div/>}
+      <LocationInputSide hidden={hadBooking} userPosition={userPosition} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
+      {hadBooking ? <BookingInfoSide handleBookingCancel={handleBookingCancel}/> : <div/>}
       {/* Cửa sổ mở Booking Form */}
       <Dialog open={bookingForm} >
         <DialogTitle 
@@ -57,7 +60,7 @@ const Booking = () => {
           <CloseIcon />
         </IconButton>
         <DialogContent>
-          <BookingForm bookingRef={bookingRef} setBookingForm={setBookingForm} setHadBooking={setHadBooking} />
+          <BookingForm setBookingForm={setBookingForm} setHadBooking={setHadBooking} />
         </DialogContent>
       </Dialog>
     </div>

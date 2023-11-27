@@ -1,0 +1,1 @@
+export { PaymentVerify } from './components/PaymentVerify'

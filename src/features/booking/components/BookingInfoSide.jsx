@@ -4,6 +4,8 @@ import { BookingDetail } from '..';
 import { blue, grey, green, yellow, pink } from '@mui/material/colors'
 import { useState } from 'react';
 import { MdDeleteOutline, MdOutlineMessage, MdPersonSearch, MdClose, MdSend, MdTransgender, MdOutlineCake, MdOutlineHome, MdOutlinePhone, MdOutlineStarBorder, MdOutlinePortrait, MdOutlineLoyalty, MdCommute } from "react-icons/md";
+import { emptyBooking, useBookingContext } from 'contexts/BookingContext';
+import { RedirectVNPay } from 'services/vnpay/api_payment';
 
 const DriverInfo = () => {
   const [open, setOpen] = useState(false);
@@ -432,22 +434,28 @@ const DriverInfoDetail = () => {
   )
 }
 
-
-
-
-
-export const BookingInfoSide = ({ bookingRef, handleBookingCancel }) => {
+export const BookingInfoSide = ({ handleBookingCancel }) => {
 
   const drawerWidth = 350;
   // Đóng mở drawer
   const [open, setOpen] = useState(true);
-
-  const [cancelling, setCancelling] = useState(false);
-  const handleCancel = () => {
-    handleBookingCancel()
-  }
   const handleOpen = () => {
     setOpen(prev => !prev)
+  }
+
+  const [bookingInfo, setBookingInfo] = useBookingContext();
+  const [cancelling, setCancelling] = useState(false);
+  const handleCancel = () => {
+    setBookingInfo(emptyBooking);
+    handleBookingCancel()
+  }
+  const handlePaymentRedirect = async () => {
+    if (bookingInfo.paymentMethod === 'VNPay') {
+      await RedirectVNPay(bookingInfo.paymentAmounts)
+        .then(url => {
+          window.location.assign(url);
+        })
+    }
   }
 
   return (
@@ -490,7 +498,13 @@ export const BookingInfoSide = ({ bookingRef, handleBookingCancel }) => {
           <DriverInfo />
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Chi Tiết Đặt Xe</Typography>
-          <BookingDetail bookingRef={bookingRef} />
+          {bookingInfo.status !== 'payment_uncheck' ? <div/> : (
+            <>
+              <Typography color='red'>Đơn đặt xe chưa được thanh toán!</Typography>
+              <Button variant='outlined' onClick={handlePaymentRedirect}>Đến trang thanh toán</Button>
+            </>
+          )}
+          <BookingDetail />
           <Divider />
           <Button variant='outlined' size='small' color='error' onClick={() => setCancelling(true)} startIcon={<MdDeleteOutline />}>Hủy đơn</Button>
         </Stack>

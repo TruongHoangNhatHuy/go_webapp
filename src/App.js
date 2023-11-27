@@ -7,6 +7,8 @@ import SignUp from './pages/SignUp';
 import Account from './pages/Account';
 import { UserContextProvider, useUserContext } from 'contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { BookingContextProvider } from 'contexts/BookingContext';
+import Payment from 'pages/Payment';
 
 // Google Cloud OAuth2 ID
 const clientId = "650109837523-vcpbjogn6rgu2g4k1gojsfc5rtm5i7iq.apps.googleusercontent.com"
@@ -45,11 +47,12 @@ const ReactRouter = () => {
         <Route path='/customer' element={<ProtectedRoute user={user} role={'customer'}><MainLayout/></ProtectedRoute>}>
           <Route index element={<Navigate to={'booking'}/>} />
           <Route path='account' element={<Account />} />
-          <Route path='booking' element={<Booking />} />
+          <Route path='booking' element={<BookingContextProvider><Booking/></BookingContextProvider>} />
           <Route path='orders' element={<text>Đơn đặt</text>} />
           <Route path='bills' element={<text>Lịch sử thanh toán</text>} />
           <Route path='favorites' element={<text>Địa điểm yêu thích</text>} />
         </Route>
+        <Route path='/payment-verify' element={<Payment/>}></Route>
         <Route path='/driver' element={<ProtectedRoute user={user} role={'driver'}><MainLayout/></ProtectedRoute>}>
           <Route index element={<Navigate to={'orders'}/>} />
           <Route path='account' element={<Account />} />

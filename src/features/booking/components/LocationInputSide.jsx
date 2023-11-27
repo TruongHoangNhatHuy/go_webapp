@@ -15,9 +15,10 @@ import { getLocationByCoordinates } from '../services/vietmap/api_reverse.js';
 import { getLocationsAutocomplete } from '../services/vietmap/api_autocomplete.js';
 import { getRoute } from '../services/vietmap/api_route.js';
 import { getAmount } from '../services/be_server/api_booking.js';
+import { useBookingContext } from 'contexts/BookingContext.jsx';
 
 const SearchBox = (props) => {
-  const { userPosition, setLocation, setMapCenterRef, ...tfProps } = props;
+  const { userPosition, location, setLocation, setMapCenterRef, ...tfProps } = props;
   const [options, setOptions] = useState([{ "name": "Vị trí người dùng" }]);
   // Thông tin địa điểm được chọn
   const locationRef = useRef(null);
@@ -123,7 +124,8 @@ const SearchBox = (props) => {
 }
 
 export const LocationInputSide = (props) => {
-  const { hidden, bookingRef, userPosition, startLocation, setStartLocation, endLocation, setEndLocation, setVehicleRoute, setMapCenterRef, setBookingForm } = props;
+  const { hidden, userPosition, startLocation, setStartLocation, endLocation, setEndLocation, setVehicleRoute, setMapCenterRef, setBookingForm } = props;
+  const [bookingInfo, setBookingInfo] = useBookingContext();
 
   const drawerWidth = 350;
   // Đóng mở drawer
@@ -182,10 +184,12 @@ export const LocationInputSide = (props) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // const data = new FormData(event.currentTarget);
-    bookingRef.current.startLocation = startLocation;
-    bookingRef.current.endLocation = endLocation;
-    bookingRef.current.vehicleType = (vehicle === 'motorcycle' ? 'MOTOBIKE' : 'CAR');
-    bookingRef.current.paymentAmounts = (vehicle === 'motorcycle' ? vehicleAmountRef.current['1'] : vehicleAmountRef.current['2'])
+    var updatedBookingInfo = bookingInfo;
+    updatedBookingInfo.startLocation = startLocation;
+    updatedBookingInfo.endLocation = endLocation;
+    updatedBookingInfo.vehicleType = vehicle;
+    updatedBookingInfo.paymentAmounts = (vehicle === 'motorcycle' ? vehicleAmountRef.current['1'] : vehicleAmountRef.current['2']);
+    setBookingInfo(updatedBookingInfo);
     setBookingForm(true);
   };
 
@@ -230,6 +234,7 @@ export const LocationInputSide = (props) => {
               name='startLocation'
               placeholder='Tìm điểm đi'
               userPosition={userPosition}
+              location={startLocation}
               setLocation={setStartLocation}
               setMapCenterRef={setMapCenterRef}
             />
@@ -238,6 +243,7 @@ export const LocationInputSide = (props) => {
               name='endLocation'
               placeholder='Tìm điểm đến'
               userPosition={userPosition}
+              location={endLocation}
               setLocation={setEndLocation}
               setMapCenterRef={setMapCenterRef}
             />
