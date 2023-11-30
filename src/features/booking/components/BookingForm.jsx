@@ -1,16 +1,21 @@
 import { Box, IconButton, Button, MenuItem, Stack, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { useState } from 'react';
 import { MdArrowBack, MdArrowForward, MdLocationOn, MdCommute, MdPayment, MdOutlineAttachMoney } from "react-icons/md";
 import dayjs from 'dayjs';
 import { green, red, blue, yellow } from '@mui/material/colors'
 import { RedirectVNPay } from 'services/vnpay/api_payment';
 import { useBookingContext } from 'contexts/BookingContext';
+import { useUserContext } from 'contexts/UserContext';
+import { createBooking } from '../services/be_server/api_booking';
 
 // Form đặt xe
 export const BookingForm = ({ setBookingForm, setHadBooking }) => {
+  const [user,] = useUserContext();
   const [bookingInfo, setBookingInfo] = useBookingContext();
   var updatedBookingInfo = bookingInfo;
 
+  const [fetching, setFetching] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [errorStep, setErrorStep] = useState(-1);
   const [paymentMethod, setPaymentMethod] = useState(null);
@@ -43,20 +48,47 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // const data = new FormData(event.currentTarget);
-    updatedBookingInfo.timeSubmit = dayjs().format('DD/MM/YYYY[, ]HH:mm[ ]A');
-    updatedBookingInfo.status = 'payment_uncheck';
-    setBookingForm(updatedBookingInfo);
-    setBookingForm(false);
-    setHadBooking(true);
+    setFetching(true)
+    // Gọi api tạo booking
+    const pickUp = [updatedBookingInfo.startLocation.coordinates.lat, updatedBookingInfo.startLocation.coordinates.lng].toString();
+    const dropOff = [updatedBookingInfo.endLocation.coordinates.lat, updatedBookingInfo.endLocation.coordinates.lng].toString();
+    const vehicle = updatedBookingInfo.vehicleType.toUpperCase();
+    const json = {
+      pickUpLocation: pickUp,
+      dropOffLocation: dropOff,
+      vehicleType: vehicle
+    };
+    console.log('body', json)
+    await createBooking(user.token, json)
+      .then(result => {
+        console.log('Create booking result', result);
+        // Kiểm tra result
+        if (result.pickupLocation !== pickUp || result.dropOffLocation !== dropOff || result.vehicleType !== vehicle) {
+          throw new Error('Server trả về kết quả không khớp');
+        }
+        // Update bookingInfo
+        updatedBookingInfo.id = result.id;
+        updatedBookingInfo.status = result.status;
+        updatedBookingInfo.timeSubmit = dayjs(result.createAt).format('DD/MM/YYYY[, ]HH:mm[ ]A');
+        setBookingInfo(updatedBookingInfo);
+        sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
+      })
+      .catch(error => {
+        console.warn('Create booking failed', error);
+        alert('Đặt xe thất bại');
+        setFetching(false);
+        return;
+      })
 
-    sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
-    if (updatedBookingInfo.paymentMethod === 'VNPay') {
-      await RedirectVNPay(updatedBookingInfo.paymentAmounts)
+      if (updatedBookingInfo.paymentMethod === 'VNPay') {
+        await RedirectVNPay(updatedBookingInfo.paymentAmounts)
         .then(url => {
           window.location.assign(url);
         })
-    }
+      }
+      setFetching(false);
+      setBookingForm(false);
+      setHadBooking(true);
   };
 
   return (
@@ -167,7 +199,12 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         <Button disabled={activeStep === 1}
           onClick={handleNext}
           endIcon={<MdArrowForward />}>Tiếp</Button>
-        <Button disabled={activeStep !== 1} type='submit' variant='contained'>Thanh toán</Button>
+        <LoadingButton type='submit' variant='contained'
+          disabled={activeStep !== 1}
+          loading={fetching}
+        >
+          Thanh toán
+        </LoadingButton>
       </Box>
     </Box>
   )

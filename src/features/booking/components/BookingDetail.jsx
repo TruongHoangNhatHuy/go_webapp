@@ -15,7 +15,18 @@ export const BookingDetail = () => {
             <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
             <IconButton sx={{pointerEvents: 'none'}}><MdInfo/></IconButton>
               Trạng thái đơn</TableCell>
-            <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingInfo.status}</TableCell>
+            <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>
+              { bookingInfo.status === 'COMPLETE' ? 'Đã hoàn thành' :
+                bookingInfo.status === 'CANCELLED' ? 'Đã hủy' :
+                bookingInfo.status === 'ON_RIDE' ? 'Đang thực hiện' : 
+                bookingInfo.status === 'WAITING' ? 'Chưa thanh toán' : 
+                bookingInfo.status === 'PAID' ? 'Đã thanh toán' : 
+                bookingInfo.status === 'REFUNDED' ? 'Đã hoàn tiền' : 
+                bookingInfo.status === 'WAITING_REFUND' ? 'Chờ hoàn tiền' : 
+                bookingInfo.status === 'FINDED' ? 'Đã tìm thấy tài xế' : 
+                bookingInfo.status.toString()
+              }
+            </TableCell>
           </TableRow>
           <TableRow>
             <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>

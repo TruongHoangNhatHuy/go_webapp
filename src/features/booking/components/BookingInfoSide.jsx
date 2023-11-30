@@ -498,7 +498,7 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
           <DriverInfo />
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Chi Tiết Đặt Xe</Typography>
-          {bookingInfo.status !== 'payment_uncheck' ? <div/> : (
+          {bookingInfo.status !== 'WAITING' ? <div/> : (
             <>
               <Typography color='red'>Đơn đặt xe chưa được thanh toán!</Typography>
               <Button variant='outlined' onClick={handlePaymentRedirect}>Đến trang thanh toán</Button>

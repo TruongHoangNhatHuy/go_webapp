@@ -3,7 +3,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const BookingContext = createContext(null);
 
 export const emptyBooking = {
-  status: null, // = null|'payment_uncheck'|'payment_checked'|'doing'
+  status: null, /* = null|'COMPLETE'|'CANCELLED'|'ON_RIDE'|'WAITING'|'PAID'|'REFUNDED'|'WAITING_REFUND'|'FINDED' */
+  id: null,
   startLocation: null, /* = {
       location: { ..., name, address, display }
       coordinates: { ..., lat, lng }
@@ -13,8 +14,8 @@ export const emptyBooking = {
       coordinates: { ..., lat, lng }
     } */
   vehicleType: null, // 'motorcycle'|'car'
-  paymentMethod: null, // 'Momo'|'VNPay'
   paymentAmounts: null,
+  paymentMethod: null, // 'Momo'|'VNPay'
   timeSubmit: null
 };
 

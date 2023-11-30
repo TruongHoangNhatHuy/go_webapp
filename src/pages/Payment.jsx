@@ -1,5 +1,4 @@
-import { Avatar, CssBaseline, Link, Box, Typography, Container } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { CssBaseline, Link, Box, Typography, Container } from '@mui/material';
 import GoLogo from 'assets/1200px-Go_Logo_Green.png';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { PaymentVerify } from 'features/payment';

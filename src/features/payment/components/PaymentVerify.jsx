@@ -31,7 +31,7 @@ export const PaymentVerify = () => {
     // update booking status nếu thanh toán thành công
     if (result['vnp_ResponseCode'] === '00') {
       var updatedBookingInfo = bookingInfo;
-      updatedBookingInfo.status = 'payment_checked';
+      updatedBookingInfo.status = 'payment_checked'; // 'PAID'
       setBookingInfo(updatedBookingInfo);
     }
     console.log('VNP result', result);
