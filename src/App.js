@@ -9,6 +9,7 @@ import { UserContextProvider, useUserContext } from 'contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BookingContextProvider } from 'contexts/BookingContext';
 import Payment from 'pages/Payment';
+import PaymentHistory from 'pages/PaymentHistory';
 
 // Google Cloud OAuth2 ID
 const clientId = "650109837523-vcpbjogn6rgu2g4k1gojsfc5rtm5i7iq.apps.googleusercontent.com"
@@ -49,7 +50,7 @@ const ReactRouter = () => {
           <Route path='account' element={<Account />} />
           <Route path='booking' element={<BookingContextProvider><Booking/></BookingContextProvider>} />
           <Route path='orders' element={<text>Đơn đặt</text>} />
-          <Route path='bills' element={<text>Lịch sử thanh toán</text>} />
+          <Route path='bills' element={<PaymentHistory/>} />
           <Route path='favorites' element={<text>Địa điểm yêu thích</text>} />
         </Route>
         <Route path='/payment-verify' element={<Payment/>}></Route>

@@ -27,7 +27,7 @@ const customerMenu = [
 	},
 	{
 		to: "bills",
-		menuItem: "Lịch sử",
+		menuItem: "Lịch sử thanh toán",
 		menuIcon: <MdHistory />
 	},
 	{
