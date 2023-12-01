@@ -1,7 +1,7 @@
 import { CssBaseline, Link, Box, Typography, Container } from '@mui/material';
 import GoLogo from 'assets/1200px-Go_Logo_Green.png';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { PaymentVerify } from 'features/payment';
+import { VerifyForm } from 'features/payment';
 import { BookingContextProvider } from 'contexts/BookingContext';
 
 function Copyright(props) {
@@ -43,7 +43,7 @@ export default function Payment() {
             Xác minh thanh toán
           </Typography>
           <BookingContextProvider>
-            <PaymentVerify/>
+            <VerifyForm/>
           </BookingContextProvider>
         </Box>
         <Copyright sx={{ mt: 5, mb: 2 }} />

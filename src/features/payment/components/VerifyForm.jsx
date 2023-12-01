@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBookingContext } from "contexts/BookingContext";
 import { RedirectVNPay } from "services/vnpay/api_payment";
 
-export const PaymentVerify = () => {
+export const VerifyForm = () => {
   // UI state
   const [fetching, setFetching] = useState(true);
   const [paymentResult, setPaymentResult] = useState(null); //'success'|'fail'

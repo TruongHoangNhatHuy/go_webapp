@@ -8,7 +8,7 @@ import Account from './pages/Account';
 import { UserContextProvider, useUserContext } from 'contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BookingContextProvider } from 'contexts/BookingContext';
-import Payment from 'pages/Payment';
+import PaymentVerify from 'pages/PaymentVerify';
 import PaymentHistory from 'pages/PaymentHistory';
 
 // Google Cloud OAuth2 ID
@@ -53,7 +53,7 @@ const ReactRouter = () => {
           <Route path='bills' element={<PaymentHistory/>} />
           <Route path='favorites' element={<text>Địa điểm yêu thích</text>} />
         </Route>
-        <Route path='/payment-verify' element={<Payment/>}></Route>
+        <Route path='/payment-verify' element={<PaymentVerify/>}></Route>
         <Route path='/driver' element={<ProtectedRoute user={user} role={'driver'}><MainLayout/></ProtectedRoute>}>
           <Route index element={<Navigate to={'orders'}/>} />
           <Route path='account' element={<Account />} />
