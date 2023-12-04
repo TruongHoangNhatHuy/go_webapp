@@ -9,13 +9,14 @@ const SortableTableHead = (props) => {
   };
 
   return (
-    <TableRow sx={{ backgroundColor: 'lightgray' }}>
+    <TableRow>
       {tableHeadData.map((headCell) => (
         <TableCell
           key={headCell.id}
-          align={headCell.id === 'id' ? 'center' : 'left'}
-          padding={headCell.disablePadding ? 'none' : 'normal'}
+          align={'left'}
+          padding={'normal'}
           sortDirection={orderBy === headCell.id ? order : false}
+          width={headCell.id === 'id' && 50}
         >
           <TableSortLabel
             active={orderBy === headCell.id}
@@ -91,8 +92,8 @@ export const PaymentDataTable = ({ tableBodyData, tableHeadData }) => {
   };
 
   return (
-    <TableContainer component={Paper} elevation={5} sx={{ marginY: '2%', minHeight: '85%' }}>
-      <Table sx={{ minHeight: '100%' }}>
+    <TableContainer component={Paper} elevation={5} sx={{ marginY: '2%', height: '80vh' }}>
+      <Table stickyHeader sx={{ minHeight: '100%' }}>
         <TableHead>
           <TableRow>
             <TablePagination
@@ -135,7 +136,7 @@ export const PaymentDataTable = ({ tableBodyData, tableHeadData }) => {
             );
           })}
           {emptyRows > 0 && (
-            <TableRow sx={{ height: 69.4 * emptyRows }}>
+            <TableRow sx={{ height: 75 * emptyRows }}>
               <TableCell />
             </TableRow>
           )}

@@ -12,6 +12,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { login } from 'services/be_server/api_login';
 import { useUserContext } from 'contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -83,6 +84,12 @@ export default function SignInSide() {
       console.warn('Handle login failed: Status "'+ status +'" not existed');
     }
   }
+  // Admin login, will remove later
+  const handleAdminLogin = () => {
+    const adminSession = { token: '', role: 'admin' };
+    setUser(adminSession);
+    navigate("/admin");
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -125,6 +132,8 @@ export default function SignInSide() {
                   console.log('GoogleLogin component: failed');
                 }}
               />
+              {/* will remove later */}
+              <Button onClick={handleAdminLogin}>Admin sign in</Button>
             </Box>
             <Copyright sx={{ mt: 20 }} />
           </Box>

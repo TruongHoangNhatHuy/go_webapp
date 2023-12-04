@@ -66,7 +66,7 @@ const tableHeadCells = [
 
 const PaymentHistory = () => {
   return (
-    <Stack sx={{ display: 'flex', justifyContent: 'flex-start', height: '100%', padding: '3%', bgcolor: 'whitesmoke' }}>
+    <Stack display='flex' justifyContent='flex-start' height='100%' padding='3%' paddingBottom={0} bgcolor='whitesmoke'>
       <Typography variant="h4" fontWeight='bold' sx={{ color: 'green' }}>
         LỊCH SỬ THANH TOÁN
       </Typography>

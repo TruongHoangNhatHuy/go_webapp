@@ -62,16 +62,16 @@ const adminMenu = [
 		menuItem: "Tài khoản",
 	},
 	{
-		to: "analysis",
-		menuItem: "Thống kê",
+		to: "drivers",
+		menuItem: "Quản lí tài xế",
 	},
 	{
 		to: "customers",
 		menuItem: "Quản lí khách hàng",
 	},
 	{
-		to: "drivers",
-		menuItem: "Quản lí tài xế",
+		to: "analysis",
+		menuItem: "Thống kê",
 	},
 ]
 
@@ -96,11 +96,12 @@ const NavMenu = () => {
 		(user.role === 'admin') ? adminMenu : null;
 
 	const [seletedItem, setSelectedItem] = useState('');
-	const url = useLocation(); // Lấy location hiện tại của url
+	const location = useLocation(); // Lấy location hiện tại của url
+	const current = location.pathname.split('/')[2];
 	useEffect(() => {
 		// highlight menu item hiện tại
-		setSelectedItem(url.pathname.substring(url.pathname.lastIndexOf('/') + 1));
-	}, [url]);
+		setSelectedItem(current);
+	}, [current]);
 
 	const drawerWidth = 120;
 	const drawer = (

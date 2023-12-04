@@ -10,6 +10,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BookingContextProvider } from 'contexts/BookingContext';
 import PaymentVerify from 'pages/PaymentVerify';
 import PaymentHistory from 'pages/PaymentHistory';
+import { DriverManage } from 'pages/DriversManage';
+import { DriverInterviewForm, DriverManageForm } from 'features/account';
 
 // Google Cloud OAuth2 ID
 const clientId = "650109837523-vcpbjogn6rgu2g4k1gojsfc5rtm5i7iq.apps.googleusercontent.com"
@@ -62,11 +64,14 @@ const ReactRouter = () => {
           <Route path='analysis' element={<text>Thống kê</text>} />
         </Route>
         <Route path='/admin' element={<ProtectedRoute user={user} role={'admin'}><MainLayout/></ProtectedRoute>}>
-          <Route index element={<Navigate to={'analysis'}/>} />
+          <Route index element={<Navigate to={'drivers'}/>} />
           <Route path='account' element={<Account />} />
-          <Route path='analysis' element={<text>Thống kê</text>} />
+          <Route path='drivers' element={<DriverManage/>}>
+            <Route path='interview' element={<DriverInterviewForm/>} />
+            <Route path='manage' element={<DriverManageForm/>} />
+          </Route>
           <Route path='customers' element={<text>Quản lí khách hàng</text>} />
-          <Route path='drivers' element={<text>Quản lí tài xế</text>} />
+          <Route path='analysis' element={<text>Thống kê</text>} />
         </Route>
       </Routes>
     </BrowserRouter>
