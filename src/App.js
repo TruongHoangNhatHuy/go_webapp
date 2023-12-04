@@ -4,6 +4,7 @@ import MainLayout from './layouts/MainLayout';
 import SignInSide from './pages/SignInSide';
 import Booking from './pages/Booking';
 import SignUp from './pages/SignUp';
+import Orders from 'pages/Orders';
 import Account from './pages/Account';
 import { UserContextProvider, useUserContext } from 'contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
