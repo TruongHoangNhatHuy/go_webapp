@@ -52,7 +52,7 @@ const ReactRouter = () => {
           <Route index element={<Navigate to={'booking'}/>} />
           <Route path='account' element={<Account />} />
           <Route path='booking' element={<BookingContextProvider><Booking/></BookingContextProvider>} />
-          <Route path='orders' element={<text>Đơn đặt</text>} />
+          <Route path='orders' element={<Orders/>} />
           <Route path='bills' element={<PaymentHistory/>} />
           <Route path='favorites' element={<text>Địa điểm yêu thích</text>} />
         </Route>
