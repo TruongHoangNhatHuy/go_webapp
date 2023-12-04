@@ -8,6 +8,8 @@ import { RedirectVNPay } from 'services/vnpay/api_payment';
 import { useBookingContext } from 'contexts/BookingContext';
 import { useUserContext } from 'contexts/UserContext';
 import { createBooking } from '../services/be_server/api_booking';
+import SockJS from "sockjs-client/dist/sockjs"
+import {over} from "stompjs"
 
 // Form đặt xe
 export const BookingForm = ({ setBookingForm, setHadBooking }) => {
@@ -20,6 +22,26 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
   const [errorStep, setErrorStep] = useState(-1);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
+
+  // const [stompClient,setStompClient] = useState();
+  // const [isConnect,setIsConnect] = useState(false);
+  var authorizationParam = "ya29.a0AfB_byC4x52zt792zkZekYWTKlYZ2q87ECU6WI36idjNEzAbp3kvXP72PSumxmm-LF_biTg8XwXokdGnb8uU7wirSB3dahg2SKjQLkgZeVIS_scij9gS9Lnekj_U66NLFV5YnpiEJOHJ8ZVPkuA8XakGDdVE36U9a3t5aCgYKASUSARESFQHGX2MiSwIP8VpdiTJEK4oUdBnifQ0171"
+  var socket = new SockJS(`https://goapi-production-9e3a.up.railway.app/ws?Authorization=${authorizationParam}`, {transports: ['websocket', 'polling', 'flashsocket']});
+  const temp = over(socket)
+  temp.connect({},function (frame) {
+    console.log(frame);
+    temp.subscribe('/user/message_receive', function (result) {
+      console.log(result.body)
+    });
+  })
+  function sendPrivateMessage() {
+    var text = "hieu"
+    var id_conservation = 2002
+    var id_receiver = 23
+    var id_sender = 8
+    temp.send("/app/message_send", {},
+      JSON.stringify({'content': text, 'id_receiver': id_receiver, 'id_conservation': id_conservation, 'id_sender': id_sender}));
+  }
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -205,6 +227,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         >
           Thanh toán
         </LoadingButton>
+        <Button disabled={activeStep !== 1} onClick = {sendPrivateMessage} variant='contained'>Test Websocket</Button>
       </Box>
     </Box>
   )
