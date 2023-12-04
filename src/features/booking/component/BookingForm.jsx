@@ -5,13 +5,36 @@ import { useState } from 'react';
 import { MdArrowBack,MdArrowForward,MdLocationOn,MdCommute,MdPayment,MdOutlineAttachMoney } from "react-icons/md";
 import dayjs from 'dayjs';
 import { green, red,blue,yellow } from '@mui/material/colors'
+import SockJS from "sockjs-client/dist/sockjs"
+import {over} from "stompjs"
 
 // Form đặt xe
 export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
+
   const [activeStep, setActiveStep] = useState(0);
   const [errorStep, setErrorStep] = useState(-1);
   const [vehicleType, setVehicleType] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
+  // const [stompClient,setStompClient] = useState();
+  // const [isConnect,setIsConnect] = useState(false);
+
+    var authorizationParam = "ya29.a0AfB_byC4x52zt792zkZekYWTKlYZ2q87ECU6WI36idjNEzAbp3kvXP72PSumxmm-LF_biTg8XwXokdGnb8uU7wirSB3dahg2SKjQLkgZeVIS_scij9gS9Lnekj_U66NLFV5YnpiEJOHJ8ZVPkuA8XakGDdVE36U9a3t5aCgYKASUSARESFQHGX2MiSwIP8VpdiTJEK4oUdBnifQ0171"
+    var socket = new SockJS(`https://goapi-production-9e3a.up.railway.app/ws?Authorization=${authorizationParam}`, {transports: ['websocket', 'polling', 'flashsocket']});
+    const temp = over(socket)
+    temp.connect({},function (frame) {
+      console.log(frame);
+			temp.subscribe('/user/message_receive', function (result) {
+				console.log(result.body)
+			});
+    })
+		function sendPrivateMessage() {
+			var text = "hieu"
+			var id_conservation = 2002
+			var id_receiver = 23
+			var id_sender = 8
+			temp.send("/app/message_send", {},
+				JSON.stringify({'content': text, 'id_receiver': id_receiver, 'id_conservation': id_conservation, 'id_sender': id_sender}));
+		}
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -172,7 +195,7 @@ export const BookingForm = ({ bookingRef, setBookingForm, setHadBooking }) => {
         <Button disabled={activeStep === 2}
                 onClick={handleNext}
                 endIcon={<MdArrowForward/>}>Tiếp</Button>
-        <Button disabled={activeStep !== 2} type='submit' variant='contained'>Đặt xe</Button>
+        <Button disabled={activeStep !== 2} type='submit' onClick = {sendPrivateMessage} variant='contained'>Đặt xe</Button>
       </Box>
     </Box>
   )

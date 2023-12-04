@@ -4,6 +4,7 @@ import MainLayout from './layouts/MainLayout';
 import SignInSide from './pages/SignInSide';
 import Booking from './pages/Booking';
 import SignUp from './pages/SignUp';
+import Orders from 'pages/Orders';
 import Account from './pages/Account';
 import { RoleContextProvider } from 'contexts/RoleContext';
 
@@ -20,7 +21,7 @@ function App() {
           <Route path='app' element={<MainLayout/>}>
             <Route path='account' element={<Account/>}/>
             <Route path='booking' element={<Booking/>}/>
-            <Route path='orders' element={<text>Đơn đặt</text>}/>
+            <Route path='orders' element={<Orders/>}/>
             <Route path='bills' element={<text>Lịch sử thanh toán</text>}/>
             <Route path='favorites' element={<text>Địa điểm yêu thích</text>}/>
             <Route path='ratings' element={<text>Đánh giá</text>}/>
