@@ -25,8 +25,8 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
 
   // const [stompClient,setStompClient] = useState();
   // const [isConnect,setIsConnect] = useState(false);
-  var authorizationParam = "ya29.a0AfB_byC4x52zt792zkZekYWTKlYZ2q87ECU6WI36idjNEzAbp3kvXP72PSumxmm-LF_biTg8XwXokdGnb8uU7wirSB3dahg2SKjQLkgZeVIS_scij9gS9Lnekj_U66NLFV5YnpiEJOHJ8ZVPkuA8XakGDdVE36U9a3t5aCgYKASUSARESFQHGX2MiSwIP8VpdiTJEK4oUdBnifQ0171"
-  var socket = new SockJS(`https://goapi-production-9e3a.up.railway.app/ws?Authorization=${authorizationParam}`, {transports: ['websocket', 'polling', 'flashsocket']});
+  var authorizationParam = "Bearer "+ user.token;
+  var socket = new SockJS(`https://goapi-production-9e3a.up.railway.app/ws?Authorization=${authorizationParam}`);
   const temp = over(socket)
   temp.connect({},function (frame) {
     console.log(frame);
