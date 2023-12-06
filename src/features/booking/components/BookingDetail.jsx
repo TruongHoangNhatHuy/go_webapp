@@ -23,8 +23,8 @@ export const BookingDetail = () => {
                 bookingInfo.status === 'PAID' ? 'Đã thanh toán' : 
                 bookingInfo.status === 'REFUNDED' ? 'Đã hoàn tiền' : 
                 bookingInfo.status === 'WAITING_REFUND' ? 'Chờ hoàn tiền' : 
-                bookingInfo.status === 'FINDED' ? 'Đã tìm thấy tài xế' : 
-                bookingInfo.status.toString()
+                bookingInfo.status === 'FOUND' ? 'Đã tìm thấy tài xế' : 
+                bookingInfo.status
               }
             </TableCell>
           </TableRow>

@@ -17,7 +17,7 @@ export const RedirectVNPay = async (bookingId, paymentAmounts) => {
   var returnUrl = config.vnp_ReturnUrl;   //URL thông báo kết quả giao dịch khi Khách hàng kết thúc thanh toán.
 
   var createDate = parseInt(date.format('YYYYMMDDHHmmss')); //Là thời gian phát sinh giao dịch định dạng yyyyMMddHHmmss
-  var orderId = bookingId;            //Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày.
+  var orderId = date.format('YYYYMMDDHHmmss')+bookingId;    //Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày.
   var amount = paymentAmounts*100;                //Số tiền thanh toán. Cần nhân thêm 100 lần
   var bankCode = '';                              //(optional) Mã Ngân hàng thanh toán
 
@@ -51,6 +51,6 @@ export const RedirectVNPay = async (bookingId, paymentAmounts) => {
 
   // console.log(vnp_Params);
   vnpUrl += '?'+ new URLSearchParams(vnp_Params).toString();
-  // console.log('VNPay url', vnpUrl);
+  console.log('VNPay url', vnpUrl);
   return vnpUrl
 }

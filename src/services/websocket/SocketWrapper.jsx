@@ -1,10 +1,11 @@
-import { Stomp } from "@stomp/stompjs";
+import { ActivationState, Stomp } from "@stomp/stompjs";
 import { useUserContext } from "contexts/UserContext";
 import SockJS from "sockjs-client"
 
 var client = null;  // Singleton
+const subscribedEndpoint = []; // chứa các endpoint đã subscribe
 
-// Socket Wrapper, khởi tạo kết nối đến server
+// Socket Wrapper Component, khởi tạo kết nối đến server
 export const SocketWrapper = ({ children }) => {
   const [user,] = useUserContext();
   const authToken = "Bearer "+ user.token;
@@ -26,12 +27,42 @@ export const SocketWrapper = ({ children }) => {
   return (children)
 }
 
+// Function, not Component!!!
 // Lắng nghe 1 endpoint, cần 1 hàm callback xử lý nhận gói tin
 export const SocketSubscriber = (endpoint, callback=(result)=>{}) => {
-  return client.subscribe(endpoint, (data) => callback(data.body));
+  if (client.connected) {
+    // Nếu đã kết nối, thực hiện lắng nghe
+    if (subscribedEndpoint.includes(endpoint)) {
+      console.log('WS endpoint subscribed. List of endpoint subscribed', subscribedEndpoint);
+      // throw Error('WS endpoint subscribed');
+    }
+    else {
+      subscribedEndpoint.push(endpoint);
+      client.subscribe(endpoint, (data) => callback(data.body));
+    }
+  }
+  else {
+    // Nếu không, chờ kết nối rồi thực hiện lắng nghe
+    client.onConnect = () => {
+      if (subscribedEndpoint.includes(endpoint)) {
+        console.log('WS endpoint subscribed. List of endpoint subscribed', subscribedEndpoint);
+        // throw Error('WS endpoint subscribed');
+      }
+      else {
+        subscribedEndpoint.push(endpoint);
+        client.subscribe(endpoint, (data) => callback(data.body));
+      }
+    }
+  }
 }
 
+// Function, not Component!!!
 // Gửi message đến 1 endpoint
 export const SocketSender = (endpoint, messageString, header = {}) => {
-  client.send(endpoint, header, messageString);
+  if (client.connected) {
+    client.send(endpoint, header, messageString);
+  }
+  else {
+    client.onConnect = () => client.send(endpoint, header, messageString);
+  }
 }

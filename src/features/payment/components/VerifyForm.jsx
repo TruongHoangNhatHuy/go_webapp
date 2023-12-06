@@ -29,7 +29,7 @@ export const VerifyForm = () => {
     urlSearchParams.forEach((value, key) => {
       if (key === 'vnp_SecureHash') {
         secureHash = value;
-        console.log(secureHash);
+        // console.log(secureHash);
       }
       else {
         result[key] = value;

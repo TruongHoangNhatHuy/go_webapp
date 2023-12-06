@@ -1,6 +1,6 @@
 import { Box, IconButton, Button, MenuItem, Stack, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MdArrowBack, MdArrowForward, MdLocationOn, MdCommute, MdPayment, MdOutlineAttachMoney } from "react-icons/md";
 import dayjs from 'dayjs';
 import { green, red, blue, yellow } from '@mui/material/colors'
@@ -8,7 +8,6 @@ import { RedirectVNPay } from 'features/payment';
 import { useBookingContext } from 'contexts/BookingContext';
 import { useUserContext } from 'contexts/UserContext';
 import { createBooking } from '../services/be_server/api_booking';
-import { SocketSubscriber } from 'services/websocket/SocketWrapper';
 
 // Form đặt xe
 export const BookingForm = ({ setBookingForm, setHadBooking }) => {
@@ -21,19 +20,6 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
   const [errorStep, setErrorStep] = useState(-1);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
-
-  // WS subscribe, nên gọi trong useEffect
-  useEffect(() => {
-    const socketEndpoint = '/user/booking_status'
-    const socketSub = SocketSubscriber(socketEndpoint, (result) => {
-      const data = JSON.parse(result)
-      console.log('Payment result from ', socketEndpoint, data);
-      // Update status
-      const updatedBookingInfo = bookingInfo;
-      updatedBookingInfo.status = data.bookingStatus;
-      setBookingInfo(updatedBookingInfo);
-    })  
-  }, [])
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -72,7 +58,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
       dropOffLocation: dropOff,
       vehicleType: vehicle
     };
-    console.log('body', json)
+    // console.log('body', json)
     await createBooking(user.token, json)
       .then(result => {
         console.log('Create booking result', result);
@@ -157,7 +143,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
       <Stack sx={{
         display: activeStep === 1 ? 'flex' : 'none',
         flexDirection: 'column',
-        paddingTop: 3
+        paddingTop: 0.5
       }}>
         <Table>
           <TableBody>

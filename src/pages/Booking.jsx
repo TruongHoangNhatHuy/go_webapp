@@ -3,8 +3,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import Map from '../features/booking/services/vietmap/Map';
 import { useEffect, useRef, useState } from 'react';
 import { BookingForm, BookingInfoSide, LocationInputSide } from '../features/booking';
-import { MdOutlinePayment,MdDelete } from "react-icons/md";
+import { MdOutlinePayment } from "react-icons/md";
 import { useBookingContext } from 'contexts/BookingContext';
+import { SocketSubscriber } from 'services/websocket/SocketWrapper';
 
 const Booking = () => {
   // UI state
@@ -18,7 +19,7 @@ const Booking = () => {
   // Function ref
   const setMapCenterRef = useRef({});
   // Thông tin đặt xe
-  const [bookingInfo,] = useBookingContext();
+  const [bookingInfo, setBookingInfo] = useBookingContext();
 
   useEffect(() => {
     // khôi phục thông tin đặt xe nếu có
@@ -28,6 +29,22 @@ const Booking = () => {
       setEndLocation(bookingInfo.endLocation)
     }
   }, []);
+
+  // WS subscribe, nên gọi trong useEffect
+  useEffect(() => {
+    // Nếu có booking, bắt đầu lắng nghe WS
+    if (hadBooking) {
+      const socketEndpoint = '/user/booking_status'
+      SocketSubscriber(socketEndpoint, (result) => {
+        const data = JSON.parse(result)
+        console.log('Payment result from ', socketEndpoint, data);
+        // Update status
+        const updatedBookingInfo = bookingInfo;
+        updatedBookingInfo.status = data.status;
+        setBookingInfo(updatedBookingInfo);
+      })  
+    }
+  }, [hadBooking])
   
   // Xử lý hủy đơn
   const handleBookingCancel = () => {
