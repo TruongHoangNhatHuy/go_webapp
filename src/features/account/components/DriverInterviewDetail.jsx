@@ -70,7 +70,7 @@ export const DriverInterviewDetail = ({ driverRef, open, setOpen, handleCheckOrC
       driverData['id'] = driverRef.current.id;
       driverData['fullName'] = driverRef.current.name;
       driverData['status'] = driverRef.current.status;
-      setTimeout(() => setDriverDetail(testDetailData), 1000);
+      setDriverDetail(testDetailData);
     }
   }, [open])
 

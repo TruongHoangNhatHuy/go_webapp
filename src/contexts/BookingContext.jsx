@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const BookingContext = createContext(null);
 
 export const emptyBooking = {
-  status: null, /* = null|'COMPLETE'|'CANCELLED'|'ON_RIDE'|'WAITING'|'PAID'|'REFUNDED'|'WAITING_REFUND'|'FINDED' */
+  status: null, /* = null|'COMPLETE'|'CANCELLED'|'ON_RIDE'|'WAITING'|'PAID'|'REFUNDED'|'WAITING_REFUND'|'FOUND' */
   id: null,
   startLocation: null, /* = {
       location: { ..., name, address, display }

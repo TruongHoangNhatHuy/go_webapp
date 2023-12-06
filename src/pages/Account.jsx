@@ -1,18 +1,15 @@
 import { useState } from "react"
-import { Button, Grid, Box, TextField, Typography, MenuItem, Avatar,Divider,ListItemAvatar,ImageList,ImageListItem } from "@mui/material"
+import { Button, Grid, Box, TextField, Typography, MenuItem, Avatar,Divider,ListItemAvatar } from "@mui/material"
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { grey,red } from '@mui/material/colors'
 import dayjs from "dayjs";
 import { MdCloudUpload,MdChangeCircle } from "react-icons/md"
 import 'dayjs/locale/en-gb';
 
-
 const AccountInfo = () => {
   return (
-    <Grid container flexDirection={"column"} borderRadius={4} border={"1px solid"}  borderColor={"grey.300"} height={"100%"} minWidth={"100%"}
-    >
+    <Grid container flexDirection={"column"} borderRadius={4} border={"1px solid"}  borderColor={"grey.300"} height={"100%"} minWidth={"100%"}>
           <Grid item xs={2} sm={1} minWidth={"100%"} >
             <Box 
             sx={{

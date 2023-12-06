@@ -1,15 +1,14 @@
 import { Box, IconButton, Button, MenuItem, Stack, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdArrowBack, MdArrowForward, MdLocationOn, MdCommute, MdPayment, MdOutlineAttachMoney } from "react-icons/md";
 import dayjs from 'dayjs';
 import { green, red, blue, yellow } from '@mui/material/colors'
-import { RedirectVNPay } from 'services/vnpay/api_payment';
+import { RedirectVNPay } from 'features/payment';
 import { useBookingContext } from 'contexts/BookingContext';
 import { useUserContext } from 'contexts/UserContext';
 import { createBooking } from '../services/be_server/api_booking';
-import SockJS from "sockjs-client/dist/sockjs"
-import {over} from "stompjs"
+import { SocketSubscriber } from 'services/websocket/SocketWrapper';
 
 // Form đặt xe
 export const BookingForm = ({ setBookingForm, setHadBooking }) => {
@@ -23,25 +22,18 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
 
-  // const [stompClient,setStompClient] = useState();
-  // const [isConnect,setIsConnect] = useState(false);
-  var authorizationParam = "Bearer "+ user.token;
-  var socket = new SockJS(`https://goapi-production-9e3a.up.railway.app/ws?Authorization=${authorizationParam}`);
-  const temp = over(socket)
-  temp.connect({},function (frame) {
-    console.log(frame);
-    temp.subscribe('/user/message_receive', function (result) {
-      console.log(result.body)
-    });
-  })
-  function sendPrivateMessage() {
-    var text = "hieu"
-    var id_conservation = 2002
-    var id_receiver = 23
-    var id_sender = 8
-    temp.send("/app/message_send", {},
-      JSON.stringify({'content': text, 'id_receiver': id_receiver, 'id_conservation': id_conservation, 'id_sender': id_sender}));
-  }
+  // WS subscribe, nên gọi trong useEffect
+  useEffect(() => {
+    const socketEndpoint = '/user/booking_status'
+    const socketSub = SocketSubscriber(socketEndpoint, (result) => {
+      const data = JSON.parse(result)
+      console.log('Payment result from ', socketEndpoint, data);
+      // Update status
+      const updatedBookingInfo = bookingInfo;
+      updatedBookingInfo.status = data.bookingStatus;
+      setBookingInfo(updatedBookingInfo);
+    })  
+  }, [])
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -102,15 +94,20 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         return;
       })
 
-      if (updatedBookingInfo.paymentMethod === 'VNPay') {
-        await RedirectVNPay(updatedBookingInfo.paymentAmounts)
+    // Thực hiện thanh toán
+    if (updatedBookingInfo.paymentMethod === 'VNPay') {
+      await RedirectVNPay(updatedBookingInfo.id, updatedBookingInfo.paymentAmounts)
         .then(url => {
-          window.location.assign(url);
+          // console.log(url);
+          localStorage.setItem('GoWebapp_PaymentUrl', url); // Lưu link thanh toán trong localStorage, dùng lại khi thanh toán thất bại
+          // window.location.assign(url); // open VNPay in current tab
+          window.open(url, '_blank') // open VNPay in new tab
         })
-      }
-      setFetching(false);
-      setBookingForm(false);
-      setHadBooking(true);
+    }
+
+    setFetching(false);
+    setBookingForm(false);
+    setHadBooking(true);
   };
 
   return (
@@ -156,7 +153,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         </TextField>
       </Stack>
 
-      {/* index 2 */}
+      {/* index 1 */}
       <Stack sx={{
         display: activeStep === 1 ? 'flex' : 'none',
         flexDirection: 'column',
@@ -227,7 +224,6 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         >
           Thanh toán
         </LoadingButton>
-        <Button disabled={activeStep !== 1} onClick = {sendPrivateMessage} variant='contained'>Test Websocket</Button>
       </Box>
     </Box>
   )

@@ -1,40 +1,49 @@
 import { Button, CircularProgress, Stack, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useBookingContext } from "contexts/BookingContext";
-import { RedirectVNPay } from "services/vnpay/api_payment";
+import config from 'features/payment/services/vnpay/vnp_config.json';
+import CryptoJS from 'crypto-js';
 
 export const VerifyForm = () => {
   // UI state
   const [fetching, setFetching] = useState(true);
   const [paymentResult, setPaymentResult] = useState(null); //'success'|'fail'
-
-  const navigate = useNavigate();
-  const [redirectTo, setRedirectTo] = useState(null);
-  const [bookingInfo, setBookingInfo] = useBookingContext();
   const [urlSearchParams,] = useSearchParams();
+  const [bookingInfo,] = useBookingContext();
 
-  const handlePaymentRedirect = async () => {
+  // Trở lại trang thanh toán
+  const handlePaymentRedirect = () => {
     if (bookingInfo.paymentMethod === 'VNPay') {
-      await RedirectVNPay(bookingInfo.paymentAmounts)
-        .then(url => {
-          window.location.assign(url);
-        })
+      const url = localStorage.getItem('GoWebapp_PaymentUrl');
+      if (url !== null || url !== '') {
+        window.location.assign(url);
+      }
     }
   }
   // Kết quả thanh toán VNPay trả về, lấy từ url params (nếu có)
   const getVnpResult = () => {
-    var result = {}
-    urlSearchParams.forEach((value, key, parent) => {
-      result[key] = value
+    const result = {};
+    var secureHash;
+    // lấy kết quả từ url params
+    urlSearchParams.forEach((value, key) => {
+      if (key === 'vnp_SecureHash') {
+        secureHash = value;
+        console.log(secureHash);
+      }
+      else {
+        result[key] = value;
+      }
     });
-    // update booking status nếu thanh toán thành công
-    if (result['vnp_ResponseCode'] === '00') {
-      var updatedBookingInfo = bookingInfo;
-      updatedBookingInfo.status = 'payment_checked'; // 'PAID'
-      setBookingInfo(updatedBookingInfo);
-    }
     console.log('VNP result', result);
+    // validate result
+    var signData = new URLSearchParams(result).toString();
+    var hmac = CryptoJS.HmacSHA512(signData, config.vnp_HashSecret);
+    var signed = hmac.toString();
+    if (secureHash !== signed) {
+      console.log('vnp_SecureHash !== signed')
+      return null;
+    }
     return result;
   }
 
@@ -45,7 +54,7 @@ export const VerifyForm = () => {
       // to do: xác minh kết quả
       setTimeout(() => {
         setFetching(false)
-        if (result.vnp_ResponseCode === '00') {
+        if (result !== null && result.vnp_ResponseCode === '00') {
           setPaymentResult('success');
         }
         else {
@@ -59,12 +68,6 @@ export const VerifyForm = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (redirectTo !== null) {
-     navigate(redirectTo) 
-    }
-  }, [redirectTo])
-
   if (fetching) {
     return (
       <Stack alignItems='center' spacing={2} margin={3}>
@@ -77,12 +80,8 @@ export const VerifyForm = () => {
     return (
       <Stack alignItems='center' spacing={2} margin={3}>
         <Typography>
-          Thanh toán thành công.<br/> 
-          Điều hướng về giao diện chính trong chốc lát.
+          Thanh toán thành công.
         </Typography>
-        <Button variant="outlined" onClick={() => setRedirectTo('/customer')}>
-          Về trang đặt xe
-        </Button>
       </Stack>
     )
   }
@@ -95,9 +94,6 @@ export const VerifyForm = () => {
         <Stack spacing={1}>
           <Button variant='outlined' onClick={handlePaymentRedirect}>
             Đến trang thanh toán
-          </Button>
-          <Button variant="outlined" onClick={() => setRedirectTo('/customer')}>
-            Về trang đặt xe
           </Button>
         </Stack>
       </Stack>
