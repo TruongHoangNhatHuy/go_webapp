@@ -3,7 +3,7 @@ import config from './vnp_config.json';
 import dayjs from 'dayjs';
 import CryptoJS from 'crypto-js';
 
-export const RedirectVNPay = async (paymentAmounts) => {
+export const RedirectVNPay = async (bookingId, paymentAmounts) => {
   var date = dayjs();
   var ipAddr; //Địa chỉ IP của khách hàng thực hiện giao dịch.
   await getIpAddress().then(result => {
@@ -17,7 +17,7 @@ export const RedirectVNPay = async (paymentAmounts) => {
   var returnUrl = config.vnp_ReturnUrl;   //URL thông báo kết quả giao dịch khi Khách hàng kết thúc thanh toán.
 
   var createDate = parseInt(date.format('YYYYMMDDHHmmss')); //Là thời gian phát sinh giao dịch định dạng yyyyMMddHHmmss
-  var orderId = date.format('HHmmss');            //Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày.
+  var orderId = date.format('YYYYMMDDHHmmss')+bookingId;    //Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày.
   var amount = paymentAmounts*100;                //Số tiền thanh toán. Cần nhân thêm 100 lần
   var bankCode = '';                              //(optional) Mã Ngân hàng thanh toán
 
@@ -44,13 +44,13 @@ export const RedirectVNPay = async (paymentAmounts) => {
   };
   
   var signData = new URLSearchParams(vnp_Params).toString();
-  console.log(signData);
+  // console.log(signData);
   var hmac = CryptoJS.HmacSHA512(signData, secretKey);
   var signed = hmac.toString();
   vnp_Params['vnp_SecureHash'] = signed;
 
-  console.log(vnp_Params);
+  // console.log(vnp_Params);
   vnpUrl += '?'+ new URLSearchParams(vnp_Params).toString();
-  console.log(vnpUrl);
+  console.log('VNPay url', vnpUrl);
   return vnpUrl
 }

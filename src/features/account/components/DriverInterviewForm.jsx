@@ -1,10 +1,12 @@
 import { Box, Button, Chip, Grid, IconButton, InputAdornment, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import InfoIcon from '@mui/icons-material/Info';
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import BlockIcon from '@mui/icons-material/Block';
+import CloseIcon from '@mui/icons-material/Close';
 import { visuallyHidden } from '@mui/utils';
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { DriverInterviewDetail } from "./DriverInterviewDetail";
 
 const tableHeadCells = [
   {
@@ -25,8 +27,8 @@ const tableHeadCells = [
   }
 ]
 
-const createData = (id, name, timestamp, result = 'waiting') => {
-  return { id, name, timestamp, result }
+const createData = (id, name, timestamp, status = 'waiting') => {
+  return { id, name, timestamp, status }
 }
 const testData = [
   createData(1, 'Lê Văn Tám', '2023-11-30 11:42 am'),
@@ -126,11 +128,14 @@ export const DriverInterviewForm = () => {
   const [order, setOrder] = useState('asc'); //'desc'|'asc'
   const [orderBy, setOrderBy] = useState('STT');
 
+  const [openDetail, setOpenDetail] = useState(false);
+  const driverDetailRef = useRef(null);
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tableData.length) : 0;
   const filtedData = useMemo(() =>
     tableData.filter(data => 
       data.name.toLowerCase().includes(search.toLowerCase()) &&
-      data.result.includes(statusFilter === 'all' ? '' : statusFilter)
+      data.status.includes(statusFilter === 'all' ? '' : statusFilter)
     )
   ,[tableData, statusFilter, search])
   const sortedRows = useMemo(() => 
@@ -165,17 +170,22 @@ export const DriverInterviewForm = () => {
     setStatusFilter(e.target.value);
     setPage(0);
   };
-  const handleCheckOrCancel = (id, result) => {
+  const handleOpenDetail = (driver) => {
+    driverDetailRef.current = driver;
+    setOpenDetail(true);
+  }
+  const handleCheckOrCancel = (id, status) => {
     var updatedTableData = [...tableData];
     const data = updatedTableData.filter(x => x.id === id)[0];   // get data
     // updatedTableData = updatedTableData.filter(x => x !== data); // remove data from tableData
-    data['result'] = result;
+    data['status'] = status;
     console.log(data);
     setTableData(updatedTableData);
   };
 
   return (
     <Grid container spacing={1} padding={2} maxWidth='100%'  sx={{ bgcolor: 'white' }}>
+      <DriverInterviewDetail driverRef={driverDetailRef} open={openDetail} setOpen={setOpenDetail} handleCheckOrCancel={handleCheckOrCancel}/>
       <Grid item xs={9}>
         <TextField 
           fullWidth
@@ -186,20 +196,20 @@ export const DriverInterviewForm = () => {
           InputProps={{
             endAdornment: 
               <InputAdornment position="end">
-                <IconButton onClick={handleSearchReset} sx={{ p: 0 }}><ClearIcon/></IconButton>
+                <IconButton onClick={handleSearchReset} sx={{ p: 0 }}><CloseIcon/></IconButton>
               </InputAdornment>,
           }}
         />
       </Grid>
-      <Grid item xs={1}>
+      <Grid item xs={1.5}>
         <Button fullWidth variant="contained" onClick={handleSearch}><SearchIcon/></Button>
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={1.5}>
         <TextField select 
           fullWidth 
           size="small" 
           id='status-filter'
-          label="Lọc theo tình trạng"
+          // label="Lọc theo tình trạng"
           defaultValue={statusFilter}
           onChange={handleStatusFilter}
         >
@@ -243,18 +253,18 @@ export const DriverInterviewForm = () => {
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.timestamp}</TableCell>
                     <TableCell>
-                      {row.result === 'waiting' ? <Chip label='Đang chờ' color="info"/> :
-                        row.result === 'checked' ? <Chip label='Đã duyệt' color="success"/> :
-                        row.result === 'cancelled' && <Chip label='Đã từ chối' color='error'/>
+                      {row.status === 'waiting' ? <Chip label='Đang chờ' color="info"/> :
+                        row.status === 'checked' ? <Chip label='Đã duyệt' color="success"/> :
+                        row.status === 'cancelled' && <Chip label='Đã từ chối' color='error'/>
                       }
                     </TableCell>
                     <TableCell sx={{ p: 1 }}>
                       <Stack direction='row' spacing={0.5}>
-                        <IconButton><InfoIcon sx={{ color: 'deepskyblue' }}/></IconButton>
-                        {row.result === 'waiting' &&
+                        <IconButton onClick={() => handleOpenDetail(row)}><InfoIcon sx={{ color: 'deepskyblue' }}/></IconButton>
+                        {row.status === 'waiting' &&
                           <Stack direction='row' spacing={0.5}>
-                            <IconButton onClick={() => handleCheckOrCancel(row.id, 'checked')}><CheckIcon sx={{ color: 'green' }}/></IconButton>
-                            <IconButton onClick={() => handleCheckOrCancel(row.id, 'cancelled')}><ClearIcon sx={{ color: 'red' }}/></IconButton>
+                            <IconButton onClick={() => handleCheckOrCancel(row.id, 'checked')}><CheckCircleOutlineIcon sx={{ color: 'green' }}/></IconButton>
+                            <IconButton onClick={() => handleCheckOrCancel(row.id, 'cancelled')}><BlockIcon sx={{ color: 'red' }}/></IconButton>
                           </Stack>
                         }
                       </Stack>

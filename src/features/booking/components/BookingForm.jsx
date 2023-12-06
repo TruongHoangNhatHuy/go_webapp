@@ -4,12 +4,10 @@ import { useState } from 'react';
 import { MdArrowBack, MdArrowForward, MdLocationOn, MdCommute, MdPayment, MdOutlineAttachMoney } from "react-icons/md";
 import dayjs from 'dayjs';
 import { green, red, blue, yellow } from '@mui/material/colors'
-import { RedirectVNPay } from 'services/vnpay/api_payment';
+import { RedirectVNPay } from 'features/payment';
 import { useBookingContext } from 'contexts/BookingContext';
 import { useUserContext } from 'contexts/UserContext';
 import { createBooking } from '../services/be_server/api_booking';
-import SockJS from "sockjs-client/dist/sockjs"
-import {over} from "stompjs"
 
 // Form đặt xe
 export const BookingForm = ({ setBookingForm, setHadBooking }) => {
@@ -22,30 +20,6 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
   const [errorStep, setErrorStep] = useState(-1);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
-  // const [stompClient,setStompClient] = useState();
-  // const [isConnect,setIsConnect] = useState(false);
-  var authorizationParam = "Bearer " + user.token
-  var socket = new SockJS(`https://goapi-production-9e3a.up.railway.app/ws?Authorization=${authorizationParam}`, {transports: ['websocket', 'polling', 'flashsocket']});
-  const client = over(socket)
-  client.connect({}, 
-    (frame) => {
-      console.log('Stomp connected', frame);
-      client.subscribe('/user/message_receive', (result) => {
-        console.log('/user/message_receive', JSON.parse(result.body));
-      });
-    },
-    (error) => {
-      console.warn('Stomp error', error);
-    }
-  );
-  const send = () =>{
-    client.send('/app/message_send', {}, JSON.stringify({
-      id_conversation: 10,
-      id_sender: 6,
-      id_receiver: 2,
-      content: 'hieu test 2'
-    }))
-  }
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
@@ -83,7 +57,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
       dropOffLocation: dropOff,
       vehicleType: vehicle
     };
-    console.log('body', json)
+    // console.log('body', json)
     await createBooking(user.token, json)
       .then(result => {
         console.log('Create booking result', result);
@@ -105,15 +79,20 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         return;
       })
 
-      if (updatedBookingInfo.paymentMethod === 'VNPay') {
-        await RedirectVNPay(updatedBookingInfo.paymentAmounts)
+    // Thực hiện thanh toán
+    if (updatedBookingInfo.paymentMethod === 'VNPay') {
+      await RedirectVNPay(updatedBookingInfo.id, updatedBookingInfo.paymentAmounts)
         .then(url => {
-          window.location.assign(url);
+          // console.log(url);
+          localStorage.setItem('GoWebapp_PaymentUrl', url); // Lưu link thanh toán trong localStorage, dùng lại khi thanh toán thất bại
+          // window.location.assign(url); // open VNPay in current tab
+          window.open(url, '_blank') // open VNPay in new tab
         })
-      }
-      setFetching(false);
-      setBookingForm(false);
-      setHadBooking(true);
+    }
+
+    setFetching(false);
+    setBookingForm(false);
+    setHadBooking(true);
   };
 
   return (
@@ -159,11 +138,11 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         </TextField>
       </Stack>
 
-      {/* index 2 */}
+      {/* index 1 */}
       <Stack sx={{
         display: activeStep === 1 ? 'flex' : 'none',
         flexDirection: 'column',
-        paddingTop: 3
+        paddingTop: 0.5
       }}>
         <Table>
           <TableBody>

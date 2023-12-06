@@ -3,7 +3,6 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 import { useState } from 'react';
 import { MdDeleteOutline } from "react-icons/md";
 import { emptyBooking, useBookingContext } from 'contexts/BookingContext';
-import { RedirectVNPay } from 'services/vnpay/api_payment';
 import { BookingDetail } from './BookingDetail';
 import { DriverInfo } from './DriverInfo';
 
@@ -21,12 +20,12 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
     setBookingInfo(emptyBooking);
     handleBookingCancel()
   }
-  const handlePaymentRedirect = async () => {
+  const handlePaymentRedirect = () => {
     if (bookingInfo.paymentMethod === 'VNPay') {
-      await RedirectVNPay(bookingInfo.paymentAmounts)
-        .then(url => {
-          window.location.assign(url);
-        })
+      const url = localStorage.getItem('GoWebapp_PaymentUrl');
+      if (url !== null || url !== '') {
+        window.open(url, '_blank');
+      }
     }
   }
 
