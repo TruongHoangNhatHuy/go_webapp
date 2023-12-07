@@ -1,12 +1,15 @@
 import { Rating, Grid, Modal, Badge, Box, Button, Divider, IconButton, Stack, Typography, ListItem, ListItemAvatar, Avatar, ListItemText, TextField, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { blue, grey, green, yellow, pink } from '@mui/material/colors'
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { MdOutlineMessage, MdPersonSearch, MdClose, MdSend, MdTransgender, MdOutlineCake, MdOutlineHome, MdOutlinePhone, MdOutlineStarBorder, MdOutlinePortrait, MdOutlineLoyalty, MdCommute } from "react-icons/md";
-
+import { SocketSender } from 'services/websocket/SocketWrapper';
 /* myMessage=true thì sẽ ở bên phải, không thì ở bên trái */
 const messagesData = [
   {
-    myMessage: false,
+    // myMessage: false,
+    id_conversation: 10,
+    idSender: 2,
+    idReceiver: 4,
     time: '11:09pm',
     message: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
   },
@@ -48,6 +51,47 @@ const messagesData = [
 ]
 
 const MessageForm = ({ open, setOpenMessage }) => {
+
+
+  const [contentMessage,setContentMessage] = useState("")
+  const [currentChat,setCurrentChat] = useState(messagesData)
+
+  useEffect(() => {
+    // Nếu có chat mới, bắt đầu lắng nghe WS
+    console.log("log 1");
+      const socketEndpoint = '/user/message_receive'
+      SocketSender(socketEndpoint,{},{
+        // const data = JSON.parse(result)
+        // console.log('Payment result from ', socketEndpoint, data);
+        // // Update status
+        // const updatedBookingInfo = bookingInfo;
+        // updatedBookingInfo.status = data.status;
+        // setBookingInfo(updatedBookingInfo);
+      })  
+  }, [currentChat])
+
+  const handleCurrentChat = () =>{
+    const socketEndpoint = '/user/booking_status'
+    // Socket
+  }
+
+  const handleCreateMessage = () =>{
+  }
+    // useEffect(() => {
+  //   // Nếu có booking, bắt đầu lắng nghe WS
+  //   if (hadBooking) {
+  //     const socketEndpoint = '/user/booking_status'
+  //     SocketSubscriber(socketEndpoint, (result) => {
+  //       const data = JSON.parse(result)
+  //       console.log('Payment result from ', socketEndpoint, data);
+  //       // Update status
+  //       const updatedBookingInfo = bookingInfo;
+  //       updatedBookingInfo.status = data.status;
+  //       setBookingInfo(updatedBookingInfo);
+  //     })  
+  //   }
+  // }, [hadBooking])
+
   const handleCloseMessage = () => {
     setOpenMessage(false);
   };
@@ -113,7 +157,7 @@ const MessageForm = ({ open, setOpenMessage }) => {
           }
         }}>
           {/* render message textbox theo điều kiện myMessage */}
-          {messagesData.map(({myMessage, time, message}) => 
+          {currentChat.map(({myMessage, time, message}) => 
             <Box>
               <Stack direction="row" justifyContent={myMessage ? "end" : 'start'}>
                 <Box mt={1.5} ml={3} mr={3} sx={{
@@ -142,13 +186,28 @@ const MessageForm = ({ open, setOpenMessage }) => {
         <Grid xs={12} sm={12} md={12} sx={{}}>
           <Divider />
           <ListItem>
-            <TextField fullWidth placeholder='Nhập tin nhắn' InputProps={{
+            <TextField fullWidth placeholder='Nhập tin nhắn' 
+            onChange={(e) => setContentMessage(e.target.value)}
+            value={contentMessage}
+            onKeyDown={(e) =>{
+              if(e.key == 'Enter'){
+                  handleCreateMessage()
+                  console.log(contentMessage)
+                  setContentMessage("")
+              }
+            }}
+             InputProps={{
               sx: {
                 borderRadius: '16px'
               }
             }}>
             </TextField>
-            <IconButton sx={{
+            <IconButton 
+            onClick={(e) =>{
+              console.log(contentMessage)
+              setContentMessage("")
+            }}
+            sx={{
               color: blue[400]
             }}>
               <MdSend />
@@ -275,7 +334,7 @@ const DriverInfoDetail = () => {
 export const DriverInfo = () => {
   const [openMessage, setOpenMessage] = useState(false);
   const handleOpenMessage = () => {
-    setOpenMessage(true);
+    setOpenMessage(true)
   };
   return (
     <Stack spacing={1} padding={1}>

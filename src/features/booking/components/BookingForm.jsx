@@ -206,7 +206,6 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         <LoadingButton type='submit' variant='contained'
           disabled={activeStep !== 1}
           loading={fetching}
-          onClick = {send}
         >
           Thanh toán
         </LoadingButton>
