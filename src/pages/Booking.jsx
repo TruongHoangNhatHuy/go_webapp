@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BookingForm, BookingInfoSide, LocationInputSide } from '../features/booking';
 import { MdOutlinePayment } from "react-icons/md";
 import { useBookingContext } from 'contexts/BookingContext';
-import { SocketSubscriber } from 'services/websocket/SocketWrapper';
+import { SocketSubscriber, SocketUnsubscribe } from 'services/websocket/SocketWrapper';
 
 const Booking = () => {
   // UI state
@@ -30,20 +30,32 @@ const Booking = () => {
     }
   }, []);
 
-  // WS subscribe, nên gọi trong useEffect
-  useEffect(() => {
+  const handleSubscribeBookingStatus = () =>{
+    const socketEndpoint = '/user/booking_status';
     // Nếu có booking, bắt đầu lắng nghe WS
     if (hadBooking) {
-      const socketEndpoint = '/user/booking_status'
       SocketSubscriber(socketEndpoint, (result) => {
         const data = JSON.parse(result)
         console.log('Payment result from ', socketEndpoint, data);
         // Update status
-        const updatedBookingInfo = bookingInfo;
-        updatedBookingInfo.status = data.status;
-        setBookingInfo(updatedBookingInfo);
+        if (data.bookingId === bookingInfo.id) {
+          const updatedBookingInfo = bookingInfo;
+          updatedBookingInfo.status = data.status;
+          setBookingInfo(updatedBookingInfo);
+          sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
+        }
+        else {
+          console.log('Booking id not match, ignore result');
+        }
       })  
     }
+    else {
+      SocketUnsubscribe(socketEndpoint);
+    }
+  }
+  // WS subscribe, nên gọi trong useEffect
+  useEffect(() => {
+    handleSubscribeBookingStatus();
   }, [hadBooking])
   
   // Xử lý hủy đơn
