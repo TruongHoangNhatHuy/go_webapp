@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BookingForm, BookingInfoSide, LocationInputSide } from '../features/booking';
 import { MdOutlinePayment } from "react-icons/md";
 import { useBookingContext } from 'contexts/BookingContext';
-import { SocketSubscriber, SocketUnsubscribe } from 'services/websocket/SocketWrapper';
+import { SocketSubscriber, SocketUnsubscribe, useSocketClient } from 'services/websocket/StompOverSockJS';
 
 const Booking = () => {
   // UI state
@@ -30,32 +30,30 @@ const Booking = () => {
     }
   }, []);
 
-  const handleSubscribeBookingStatus = () =>{
-    const socketEndpoint = '/user/booking_status';
-    // Nếu có booking, bắt đầu lắng nghe WS
-    if (hadBooking) {
-      SocketSubscriber(socketEndpoint, (result) => {
-        const data = JSON.parse(result)
-        console.log('Payment result from ', socketEndpoint, data);
-        // Update status
-        if (data.bookingId === bookingInfo.id) {
-          const updatedBookingInfo = bookingInfo;
-          updatedBookingInfo.status = data.status;
-          setBookingInfo(updatedBookingInfo);
-          sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
-        }
-        else {
-          console.log('Booking id not match, ignore result');
-        }
-      })  
+  const socketClient = useSocketClient()
+  const bookingStatusCallback = (result) => {
+    console.log(result);
+    const data = JSON.parse(result);
+    console.log('Payment result ', data);
+    // Update status
+    if (data['bookingId'] === bookingInfo.id) {
+      const updatedBookingInfo = bookingInfo;
+      updatedBookingInfo.status = data.status;
+      setBookingInfo(updatedBookingInfo);
+      sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
     }
     else {
-      SocketUnsubscribe(socketEndpoint);
+      console.log('Booking id not match, ignore result:', data['bookingId'], '!=', bookingInfo.id);
     }
   }
-  // WS subscribe, nên gọi trong useEffect
   useEffect(() => {
-    handleSubscribeBookingStatus();
+    if (hadBooking) {
+      SocketSubscriber(socketClient, '/user/booking_status', bookingStatusCallback);
+      SocketSubscriber(socketClient, '/user/customer_driver_info', (result) => console.log(JSON.parse(result)));
+    } else {
+      SocketUnsubscribe(socketClient, '/user/booking_status');
+      SocketUnsubscribe(socketClient, '/user/customer_driver_info');
+    }
   }, [hadBooking])
   
   // Xử lý hủy đơn
