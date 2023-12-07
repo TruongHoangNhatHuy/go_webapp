@@ -18,6 +18,7 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
   const [cancelling, setCancelling] = useState(false);
   const handleCancel = () => {
     setBookingInfo(emptyBooking);
+    sessionStorage.setItem('bookingSession', JSON.stringify(emptyBooking));
     handleBookingCancel()
   }
   const handlePaymentRedirect = () => {

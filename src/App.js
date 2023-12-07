@@ -13,7 +13,7 @@ import PaymentVerify from 'pages/PaymentVerify';
 import PaymentHistory from 'pages/PaymentHistory';
 import { DriverManage } from 'pages/DriversManage';
 import { DriverInterviewForm, DriverManageForm } from 'features/account';
-import { SocketWrapper } from 'services/websocket/SocketWrapper';
+import { SocketProvider } from 'services/websocket/StompOverSockJS';
 
 // Google Cloud OAuth2 ID
 const clientId = "650109837523-vcpbjogn6rgu2g4k1gojsfc5rtm5i7iq.apps.googleusercontent.com"
@@ -51,9 +51,9 @@ const ReactRouter = () => {
         {/* Sau khi đăng nhập */}
         <Route path='/customer' element={
           <ProtectedRoute user={user} role={'customer'}>
-            <SocketWrapper>
+            <SocketProvider>
               <MainLayout/>
-            </SocketWrapper>
+            </SocketProvider>
           </ProtectedRoute>
         }>
           <Route index element={<Navigate to={'booking'}/>} />

@@ -1,6 +1,10 @@
-import { ActivationState, Stomp } from "@stomp/stompjs";
+import { Stomp } from "@stomp/stompjs";
 import { useUserContext } from "contexts/UserContext";
 import SockJS from "sockjs-client"
+
+/* Code này không tối ưu, sẽ bị thay thế sau. 
+  Chỉ dùng với mục đích thử nghiệm. 
+*/
 
 var client = null;  // Singleton
 const subscribedEndpoint = []; // chứa các endpoint đã subscribe
@@ -14,7 +18,7 @@ export const SocketWrapper = ({ children }) => {
   const socket = new SockJS(url);
   client = Stomp.over(socket);
   
-  // client.reconnectDelay = 3000;
+  client.reconnect_delay = 3000;
   client.connect({}, 
     (frame) => {
       console.log('Stomp connected', frame);
@@ -27,42 +31,56 @@ export const SocketWrapper = ({ children }) => {
   return (children)
 }
 
+const handleSubscribe = (endpoint, callback) => {
+  if (subscribedEndpoint.includes(endpoint)) {
+    console.log('WS endpoint already subscribed: ', endpoint);
+    // throw Error('WS endpoint subscribed');
+  }
+  else {
+    subscribedEndpoint.push(endpoint);
+    client.subscribe(endpoint, (data) => callback(data.body), {id: subscribedEndpoint.length});
+  }
+  console.log('WS List of endpoint subscribed: ', subscribedEndpoint);
+}
 // Function, not Component!!!
 // Lắng nghe 1 endpoint, cần 1 hàm callback xử lý nhận gói tin
 export const SocketSubscriber = (endpoint, callback=(result)=>{}) => {
   if (client.connected) {
     // Nếu đã kết nối, thực hiện lắng nghe
-    if (subscribedEndpoint.includes(endpoint)) {
-      console.log('WS endpoint subscribed. List of endpoint subscribed', subscribedEndpoint);
-      // throw Error('WS endpoint subscribed');
-    }
-    else {
-      subscribedEndpoint.push(endpoint);
-      client.subscribe(endpoint, (data) => callback(data.body));
-    }
+    handleSubscribe(endpoint, callback);
   }
   else {
     // Nếu không, chờ kết nối rồi thực hiện lắng nghe
-    client.onConnect = () => {
-      if (subscribedEndpoint.includes(endpoint)) {
-        console.log('WS endpoint subscribed. List of endpoint subscribed', subscribedEndpoint);
-        // throw Error('WS endpoint subscribed');
-      }
-      else {
-        subscribedEndpoint.push(endpoint);
-        client.subscribe(endpoint, (data) => callback(data.body));
-      }
+    client.onConnect = () => handleSubscribe(endpoint, callback);
+  }
+}
+
+// Function, not Component!!!
+// Huỷ lắng nghe 1 endpoint
+export const SocketUnsubscribe = (endpoint) => {
+  if (client.connected) {
+    const index = subscribedEndpoint.indexOf(endpoint);
+    if (index !== -1) {
+      subscribedEndpoint.splice(index, 1);
+      client.unsubscribe(index);
+      console.log('WS unsubscribed: ', endpoint);
     }
+    else {
+      console.log('This endpoint may have not been subscribed yet! Endpoint: ', endpoint);
+    }
+    console.log('WS List of endpoint subscribed: ', subscribedEndpoint);
   }
 }
 
 // Function, not Component!!!
 // Gửi message đến 1 endpoint
-export const SocketSender = (endpoint, messageString, header = {}) => {
+export const SocketSender = (endpoint, body, header = {}) => {
   if (client.connected) {
-    client.send(endpoint, header, messageString);
+    // Nếu đã kết nối, thực hiện gửi gói tin
+    client.send(endpoint, header, body);
   }
   else {
-    client.onConnect = () => client.send(endpoint, header, messageString);
+    // Nếu không, chờ kết nối rồi thực hiện gửi gói tin
+    client.onConnect = () => client.send(endpoint, header, body);
   }
 }

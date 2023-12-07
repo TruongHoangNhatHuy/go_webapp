@@ -17,6 +17,10 @@ import { getRoute } from '../services/vietmap/api_route.js';
 import { getAmount } from '../services/be_server/api_booking.js';
 import { useBookingContext } from 'contexts/BookingContext.jsx';
 
+/* bug: Location search box dùng getLocationsAutocomplete, cần xác định vị trí người dùng. 
+Khi chưa xác định thì ném lỗi "Convert Null toString" khi dùng search box */
+/* fixed: không xác định được vị trí người dùng, thì dùng getLocationsByAddress. */
+
 const SearchBox = (props) => {
   const { userPosition, location, setLocation, setMapCenterRef, ...tfProps } = props;
   const [options, setOptions] = useState([{ "name": "Vị trí người dùng" }]);
@@ -29,9 +33,12 @@ const SearchBox = (props) => {
     if (value === null || value === "" || value === "Vị trí người dùng" ) {
       setOptions([{ "name": "Vị trí người dùng" }])
     } else {
-      // setOptions(getLocationsByAddress(value.trim()));
-      const userLatLng = userPosition.toString();
-      setOptions(getLocationsAutocomplete(value.trim(), userLatLng));
+      try {
+        const userLatLng = userPosition.toString();
+        setOptions(getLocationsAutocomplete(value.trim(), userLatLng));
+      } catch (error) {
+        setOptions(getLocationsByAddress(value.trim()));
+      }
     }
   }, 1000);
 
@@ -256,7 +263,10 @@ export const LocationInputSide = (props) => {
           ) :
           !vehicleSelect ? (
             <Typography color='gray' align='center'>
-              <i>Chọn điểm đi và điểm đến</i>
+              <i>
+                Chọn điểm đi và điểm đến.<br/>
+                Bật định vị để tìm kiếm các địa điểm lân cận.
+              </i>
             </Typography>
           ) : (
             <Stack minWidth='90%' spacing={1} padding={1} paddingTop={0} display='flex'>
