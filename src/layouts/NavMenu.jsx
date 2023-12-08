@@ -43,6 +43,11 @@ const driverMenu = [
 		menuItem: "Tài khoản",
 	},
 	{
+		to: "booking",
+		menuItem: "Đặt xe",
+		menuIcon: <CommuteIcon />
+	},
+	{
 		to: "orders",
 		menuItem: "Đơn đặt",
 	},
