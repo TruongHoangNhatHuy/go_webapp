@@ -1,53 +1,17 @@
 import { Rating, Grid, Modal, Badge, Box, Button, Divider, IconButton, Stack, Typography, ListItem, ListItemAvatar, Avatar, ListItemText, TextField, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { blue, grey, green, yellow, pink } from '@mui/material/colors'
-import { useState } from 'react';
+import { GridBody } from '@mui/x-data-grid';
+import dayjs from 'dayjs';
+import { useState,useEffect } from 'react';
 import { MdOutlineMessage, MdPersonSearch, MdClose, MdSend, MdTransgender, MdOutlineCake, MdOutlineHome, MdOutlinePhone, MdOutlineStarBorder, MdOutlinePortrait, MdOutlineLoyalty, MdCommute } from "react-icons/md";
+import { SocketSubscriber, SocketUnsubscribe, useSocketClient,SocketPublish } from 'services/websocket/StompOverSockJS';
 
-/* myMessage=true thì sẽ ở bên phải, không thì ở bên trái */
-const messagesData = [
-  {
-    myMessage: false,
-    time: '11:09pm',
-    message: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
-  },
-  {
-    myMessage: true,
-    time: '11:09pm',
-    message: 'Tôi cần đi đến bến xe gấp'
-  },
-  {
-    myMessage: false,
-    time: '11:09pm',
-    message: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
-  },
-  {
-    myMessage: true,
-    time: '11:09pm',
-    message: 'Tôi cần đi đến bến xe gấp'
-  },
-  {
-    myMessage: false,
-    time: '11:09pm',
-    message: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
-  },
-  {
-    myMessage: true,
-    time: '11:09pm',
-    message: 'Tôi cần đi đến bến xe gấp'
-  },
-  {
-    myMessage: false,
-    time: '11:09pm',
-    message: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
-  },
-  {
-    myMessage: true,
-    time: '11:09pm',
-    message: 'Tôi cần đi đến bến xe gấp'
-  },
-]
-
-const MessageForm = ({ open, setOpenMessage }) => {
+const MessageForm = ({ open, setOpenMessage,setConversation,conversation }) => {
+  const [contentMessage,setContentMessage] = useState("")
+  const socketClient = useSocketClient()
+  const handleCreateMessage = (body) =>{
+      SocketPublish(socketClient, '/app/message_send',body);
+  }
   const handleCloseMessage = () => {
     setOpenMessage(false);
   };
@@ -113,9 +77,9 @@ const MessageForm = ({ open, setOpenMessage }) => {
           }
         }}>
           {/* render message textbox theo điều kiện myMessage */}
-          {messagesData.map(({myMessage, time, message}) => 
+          {conversation[0].messagesData.map(({time, content,id_sender,id_receiver}) => 
             <Box>
-              <Stack direction="row" justifyContent={myMessage ? "end" : 'start'}>
+              <Stack direction="row" justifyContent={(id_sender === 4)? "end" : 'start'}>
                 <Box mt={1.5} ml={3} mr={3} sx={{
                   width: "max-content"
                 }}>
@@ -124,14 +88,14 @@ const MessageForm = ({ open, setOpenMessage }) => {
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="row" justifyContent={myMessage ? "end" : 'start'}>
+              <Stack direction="row" justifyContent={(id_sender === 4) ? "end" : 'start'}>
                 <Box p={1.5} ml={1.5} mr={1.5} sx={{
-                  bgcolor: (myMessage ? green[100] : grey[100]),
+                  bgcolor: ((id_sender === 4) ? green[100] : grey[100]),
                   borderRadius: "16px",
                   width: "max-content"
                 }}>
                   <Typography variant='body 2'>
-                    {message}
+                    {content}
                   </Typography>
                 </Box>
               </Stack>
@@ -142,13 +106,30 @@ const MessageForm = ({ open, setOpenMessage }) => {
         <Grid xs={12} sm={12} md={12} sx={{}}>
           <Divider />
           <ListItem>
-            <TextField fullWidth placeholder='Nhập tin nhắn' InputProps={{
+            <TextField fullWidth placeholder='Nhập tin nhắn' 
+            onChange={(e) => setContentMessage(e.target.value)}
+            value={contentMessage}
+            onKeyDown={(e) =>{
+              if(e.key == 'Enter'){
+                const id_sender = 4
+                const id_receiver = 6
+                  handleCreateMessage({id_conversation:conversation[0].id_conversation,id_receiver:id_receiver,id_sender:id_sender,content:contentMessage})
+                  console.log(contentMessage)
+                  setContentMessage("")
+              }
+            }}
+             InputProps={{
               sx: {
                 borderRadius: '16px'
               }
             }}>
             </TextField>
-            <IconButton sx={{
+            <IconButton 
+            onClick={(e) =>{
+              console.log(contentMessage)
+              setContentMessage("")
+            }}
+            sx={{
               color: blue[400]
             }}>
               <MdSend />
@@ -273,9 +254,68 @@ const DriverInfoDetail = () => {
 }
 
 export const DriverInfo = () => {
+  const conversationData=[
+    {
+      id_conversation: 10,
+      id_booking:1,
+      messagesData:[{
+          id:1,
+          id_sender: 4,
+          id_receiver: 6,
+          time: '11:09pm',
+          content: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
+        },
+        {
+          id:2,
+          id_sender: 6,
+          id_receiver: 4,
+          time: '11:09pm',
+          content: 'Tôi cần đi bến xe ngay bây giờ'
+        },
+        {
+          id:3,
+          id_sender: 4,
+          id_receiver: 6,
+          time: '11:09pm',
+          content: 'Tôi cần đi bến xe ngay bây giờ'
+        },
+        {
+          id:4,
+          id_sender: 6,
+          id_receiver: 4,
+          time: '11:09pm',
+          content: 'Hello đây là đoạn văn mẫu'
+        }]
+    }
+  ]
   const [openMessage, setOpenMessage] = useState(false);
+  const [conversation,setConversation] = useState(conversationData)
+  const [updated,setUpdated] = useState("") // Trigger rerender
+  const socketClient = useSocketClient()
+  useEffect(() => {
+    SocketSubscriber(socketClient,'/user/message_receive',SendMesssageCallback)
+  },[])
+
+    const SendMesssageCallback = (result) => {
+      const data = JSON.parse(result);
+      console.log("du lieu nhan ve", data);
+      const dataConfig = {
+        ...data,
+        id: conversation[0].messagesData.length + 1    
+      }
+      console.log("du lieu config", dataConfig);
+      const tempMessageData = conversation
+      tempMessageData[0].messagesData.push(dataConfig) 
+      setConversation(tempMessageData);
+      setUpdated(dayjs().toString());
+    }
+  const handleCurrentChat = () =>{
+    // const socketEndpoint = '/user/booking_status'
+    // Socket
+  }
   const handleOpenMessage = () => {
-    setOpenMessage(true);
+    setConversation(conversation)
+    setOpenMessage(true)
   };
   return (
     <Stack spacing={1} padding={1}>
@@ -288,12 +328,13 @@ export const DriverInfo = () => {
 
         {/* ở dưới là button tin nhắn */}
         <IconButton onClick={handleOpenMessage}>
-          <Badge badgeContent={10} color="error">
+        {/* badgeContent={10} */}
+          <Badge  color="error">
             <MdOutlineMessage />
           </Badge>
         </IconButton>
         {/* MessageConversation Form */}
-        <MessageForm open={openMessage} setOpenMessage={setOpenMessage} />
+        <MessageForm open={openMessage} setOpenMessage={setOpenMessage} setConversation={setConversation} conversation={conversation}/>
       </ListItem>
       <DriverInfoDetail />
     </Stack>

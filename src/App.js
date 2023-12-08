@@ -64,10 +64,14 @@ const ReactRouter = () => {
           <Route path='favorites' element={<text>Địa điểm yêu thích</text>} />
         </Route>
         <Route path='/payment-verify' element={<PaymentVerify/>}></Route>
-        <Route path='/driver' element={<ProtectedRoute user={user} role={'driver'}><MainLayout/></ProtectedRoute>}>
+        <Route path='/driver' element={<ProtectedRoute user={user} role={'driver'}>
+           <SocketProvider>
+              <MainLayout/>
+            </SocketProvider></ProtectedRoute>}>
           <Route index element={<Navigate to={'orders'}/>} />
           <Route path='account' element={<Account />} />
-          <Route path='orders' element={<text>Đơn đặt</text>} />
+          <Route path='booking' element={<BookingContextProvider><Booking/></BookingContextProvider>} />
+          <Route path='orders' element={<Orders/>} />
           <Route path='ratings' element={<text>Đánh giá</text>} />
           <Route path='analysis' element={<text>Thống kê</text>} />
         </Route>

@@ -20,7 +20,6 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
   const [errorStep, setErrorStep] = useState(-1);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
-
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
