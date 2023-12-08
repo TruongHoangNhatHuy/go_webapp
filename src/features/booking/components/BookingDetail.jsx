@@ -38,13 +38,13 @@ export const BookingDetail = () => {
               <TableCell component="th" scope="row"sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none' , color: green[500],}}><MdLocationOn/></IconButton>
                 Điểm đi</TableCell>
-              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingInfo.startLocation.location.name}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingInfo.startLocation ? bookingInfo.startLocation.location.name : 'null'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" scope="row"sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none' , color: red[700],}}><MdLocationOn/></IconButton>
                 Điểm đến</TableCell>
-              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingInfo.endLocation.location.name}</TableCell>
+              <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingInfo.endLocation ? bookingInfo.endLocation.location.name : 'null'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" scope="row"sx={{padding:"16px 0px"}}>

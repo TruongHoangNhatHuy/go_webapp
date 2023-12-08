@@ -13,10 +13,12 @@ export const emptyBooking = {
       location: { ..., name, address, display }
       coordinates: { ..., lat, lng }
     } */
-  vehicleType: null, // 'motorcycle'|'car'
-  paymentAmounts: null,
-  paymentMethod: null, // 'Momo'|'VNPay'
-  timeSubmit: null
+  vehicleType: null,      // 'motorcycle'|'car'
+  paymentAmounts: null,   // integer
+  paymentMethod: null,    // 'Momo'|'VNPay'
+  timeSubmit: null,       // integer
+  driverId: null,         // integer
+  driverInfo: null        // json driver info
 };
 
 // Context.Provider

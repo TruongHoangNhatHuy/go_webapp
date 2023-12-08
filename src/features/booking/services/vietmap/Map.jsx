@@ -2,12 +2,14 @@ import { useEffect, useRef } from "react";
 import './Map.css';
 import config from 'config.json';
 import { getLocationByCoordinates } from "./api_reverse";
+import DriverMarkerIcon from 'assets/driver-marker-icon.png';
 
 // const apiKey = config.vietmap.primaryToken // 1000 req/ngày
 // const apiKey = config.vietmap.secondaryToken // 10 req/phút
 const apiKey = config.vietmap.thirdToken // 5000 req/ngày
 
-const Map = ({ startLocation, endLocation, vehicleRoute, setUserPosition, setMapCenterRef }) => {
+const Map = (props) => {
+  const { startLocation, endLocation, vehicleRoute, setUserPosition, setMapCenterRef, driverPosition } = props;
   const vietmapgl = window.vietmapgl;
 
   const mapRef = useRef(null);
@@ -72,7 +74,7 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setUserPosition, setMap
         style: "https://maps.vietmap.vn/mt/tm/style.json?apikey="+ apiKey,
         center: [108.15, 16.075], // starting position [lng, lat]
         zoom: 15, // starting zoom
-        pitch: 90,
+        // pitch: 90,
       })
     }
     // Thêm các control cho map
@@ -109,11 +111,12 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setUserPosition, setMap
       // console.log('A click event has occurred at ' + e.lngLat);
       handleMarker(infoMarkerRef, e.lngLat);
       var location = getLocationByCoordinates(e.lngLat.lng, e.lngLat.lat);
-      console.log('marker location ', location);
+      // console.log('marker location ', location);
       handleMarkerPopup(infoMarkerRef, location[0])
     });
   }, [])
 
+  // Gắn marker điểm đi & đến
   useEffect(()=> {
     // Gắn marker cho điểm đi
     if (startLocation !== null) {
@@ -122,8 +125,7 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setUserPosition, setMap
       handleMarkerPopup(startMarkerRef, startLocation.location);
       setMapCenter(startLngLat);
     }
-    else 
-      handleMarker(startMarkerRef, null);
+    else handleMarker(startMarkerRef, null);
     // Gắn marker cho điểm đến
     if (endLocation !== null) {
       var endLngLat = [endLocation.coordinates.lng, endLocation.coordinates.lat];
@@ -131,12 +133,11 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setUserPosition, setMap
       handleMarkerPopup(endMarkerRef, endLocation.location);
       setMapCenter(endLngLat);
     }
-    else
-      handleMarker(endMarkerRef, null);
+    else handleMarker(endMarkerRef, null);
   }, [startLocation, endLocation])
 
+  // Vẽ route từ điểm đi tới điểm đến
   useEffect(() => {
-    // Vẽ route từ điểm đi tới điểm đến
     if (startLocation !== null && endLocation !== null) {
       // Nếu có đủ 2 marker điểm đi & điểm đến:
       // Lấy thông tin tuyến đường
@@ -185,6 +186,15 @@ const Map = ({ startLocation, endLocation, vehicleRoute, setUserPosition, setMap
       // console.log("remove current route");
     };
   }, [startLocation, endLocation, vehicleRoute])
+
+  // Gắn marker vị trí driver
+  useEffect(() => {
+    if (driverPosition !== null) {
+      var driverLngLat = [driverPosition.lng, driverPosition.lat];
+      handleMarker(driverMarkerRef, driverLngLat, createCustomMarkerElement(DriverMarkerIcon));
+    }
+    else handleMarker(driverMarkerRef, null);
+  }, [driverPosition])
 
   return (
     <div id="map-container" style={{ position: 'fixed', width: "100vw", height: "100vh", zIndex: 0 }}/>

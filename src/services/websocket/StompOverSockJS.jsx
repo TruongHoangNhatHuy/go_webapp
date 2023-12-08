@@ -26,9 +26,13 @@ export const SocketProvider = ({ children }) => {
       // Giải quyết hàng đợi subscribe
       while (waittingSubscribe.length !== 0) {
         const newSubscribe = waittingSubscribe.pop();
-        client.subscribe(newSubscribe.endpoint, (receive) =>  newSubscribe.callback(receive.body), {id: subscribedEndpoint.length});
-        console.log('Endpoint subscribed with id', subscribedEndpoint.length, ':', newSubscribe.endpoint);
-        subscribedEndpoint.push(newSubscribe.endpoint);
+        if (subscribedEndpoint.includes(newSubscribe.endpoint)) {
+          console.log('Endpoint already subscribed: ', newSubscribe.endpoint);
+        } else {
+          client.subscribe(newSubscribe.endpoint, (receive) =>  newSubscribe.callback(receive.body), {id: subscribedEndpoint.length});
+          console.log('Endpoint subscribed with id', subscribedEndpoint.length, ':', newSubscribe.endpoint);
+          subscribedEndpoint.push(newSubscribe.endpoint);
+        }
       }
       console.log('List of endpoint subscribed: ', subscribedEndpoint);
     };
@@ -57,7 +61,6 @@ export const useSocketClient = () => {
 
 // Socket Subscribe function.
 export const SocketSubscriber = (client, endpoint, callback=(result)=>{}) => {
-  console.log(client);
   if (client.connected) { 
     if (subscribedEndpoint.includes(endpoint)) {
       console.log('Endpoint already subscribed: ', endpoint);
@@ -86,11 +89,12 @@ export const SocketUnsubscribe = (client, endpoint) => {
       client.unsubscribe(index);
       subscribedEndpoint.splice(index, 1);
       console.log('Endpoint unsubscribed:', endpoint);
+      console.log('List of endpoint subscribed:', subscribedEndpoint);
     } else {
       console.log('Endpoint has not subscribed yet:', endpoint);
+      console.log('List of endpoint subscribed:', subscribedEndpoint);
     }
   }
-  console.log('List of endpoint subscribed:', subscribedEndpoint);
 }
 
 // Socket Publish (send) function

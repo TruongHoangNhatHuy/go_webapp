@@ -1,4 +1,4 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, CircularProgress, Box, Button, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, CircularProgress, Box, Button, Divider, Drawer, IconButton, Stack, Typography, Skeleton } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { useState } from 'react';
 import { MdDeleteOutline } from "react-icons/md";
@@ -66,8 +66,18 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
             <KeyboardDoubleArrowLeftIcon />
           </IconButton>
           <Divider />
-          <Typography variant='h6' fontWeight='bold'>Thông Tin Tài Xế <CircularProgress size={16} /></Typography>
-          <DriverInfo />
+          <Typography variant='h6' fontWeight='bold'>Thông Tin Tài Xế</Typography>
+          {bookingInfo.status === ('FOUND'||'ON_RIDE'||'COMPLETE') ? (
+            <DriverInfo />
+          ) : (
+            <Stack direction='row' padding={1} spacing={2} alignItems='center'>
+              <Skeleton variant='circular' width={60} height={60}/>
+              <Stack spacing={1}>
+                <Skeleton variant='rounded' width={210} height={20}/>
+                <Skeleton variant='rounded' width={210} height={40}/>
+              </Stack>
+            </Stack>
+          )}
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Chi Tiết Đặt Xe</Typography>
           {bookingInfo.status !== 'WAITING' ? <div/> : (

@@ -77,9 +77,10 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         console.warn('Create booking failed', error);
         alert('Đặt xe thất bại');
         setFetching(false);
-        return;
       })
 
+    // Kiểm tra tạo đơn, thất bại thì không chuyển trang thanh toán
+    if (updatedBookingInfo.id === null) return;
     // Thực hiện thanh toán
     if (updatedBookingInfo.paymentMethod === 'VNPay') {
       await RedirectVNPay(updatedBookingInfo.id, updatedBookingInfo.paymentAmounts)
