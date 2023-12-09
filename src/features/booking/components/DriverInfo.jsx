@@ -3,14 +3,18 @@ import { Rating, Grid, Modal, Badge, Box, Button, Divider, IconButton, Stack, Ty
 import { blue, grey, green, yellow, pink } from '@mui/material/colors'
 import { useBookingContext } from 'contexts/BookingContext';
 import dayjs from 'dayjs';
-import { useState,useEffect } from 'react';
+import { useState,useEffect,useRef } from 'react';
 import { MdOutlineMessage, MdPersonSearch, MdClose, MdSend, MdTransgender, MdOutlineCake, MdOutlineHome, MdOutlinePhone, MdOutlineStarBorder, MdOutlinePortrait, MdOutlineLoyalty, MdCommute } from "react-icons/md";
 import { SocketSubscriber, SocketUnsubscribe, useSocketClient,SocketPublish } from 'services/websocket/StompOverSockJS';
+import ScrollableFeed from 'react-scrollable-feed'
 
 const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, conversation }) => {
   const [contentMessage,setContentMessage] = useState("")
   const socketClient = useSocketClient()
-
+	// const endOfMessagesRef = useRef(null)
+	// const scrollToBottom = () => {
+	// 	endOfMessagesRef.current?.scrollIntoView({behavior: 'smooth'})
+	// }
   const handleCreateMessage = (body) =>{
     SocketPublish(socketClient, '/app/message_send',body);
   }
@@ -29,6 +33,7 @@ const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, c
     })
     console.log('Send:', contentMessage, ', from', id_sender, 'to', id_receiver)
     setContentMessage("")
+    // scrollToBottom()
   }
 
   return (
@@ -92,6 +97,8 @@ const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, c
           }
         }}>
           {/* render message textbox theo điều kiện myMessage */}
+          <Box sx={{height:"100%"}}>
+          <ScrollableFeed>
           {conversation.messagesData.map(({time, content,id_sender}) => 
             <Box>
               <Stack direction="row" justifyContent={(id_sender === senderId)? "end" : 'start'}>
@@ -116,6 +123,10 @@ const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, c
               </Stack>
             </Box>
           )}
+          </ScrollableFeed>
+          </Box>
+          
+          {/* <Box ref={endOfMessagesRef} /> */}
         </Grid>
         { /* Footer conversation */ }
         <Grid xs={12} sm={12} md={12} sx={{}}>
