@@ -68,6 +68,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         // Update bookingInfo
         updatedBookingInfo.id = result.id;
         updatedBookingInfo.status = result.status;
+        updatedBookingInfo.customerId = result.customerId;
         updatedBookingInfo.timeSubmit = dayjs(result.createAt).format('DD/MM/YYYY[, ]HH:mm[ ]A');
         setBookingInfo(updatedBookingInfo);
         sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));

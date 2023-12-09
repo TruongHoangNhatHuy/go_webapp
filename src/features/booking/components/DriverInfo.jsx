@@ -1,20 +1,35 @@
-import { Rating, Grid, Modal, Badge, Box, Button, Divider, IconButton, Stack, Typography, ListItem, ListItemAvatar, Avatar, ListItemText, TextField, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import styled from '@emotion/styled';
+import { Rating, Grid, Modal, Badge, Box, Button, Divider, IconButton, Stack, Typography, ListItem, ListItemAvatar, Avatar, ListItemText, TextField, Table, TableBody, TableCell, TableRow, debounce } from '@mui/material';
 import { blue, grey, green, yellow, pink } from '@mui/material/colors'
-import { GridBody } from '@mui/x-data-grid';
+import { useBookingContext } from 'contexts/BookingContext';
 import dayjs from 'dayjs';
 import { useState,useEffect } from 'react';
 import { MdOutlineMessage, MdPersonSearch, MdClose, MdSend, MdTransgender, MdOutlineCake, MdOutlineHome, MdOutlinePhone, MdOutlineStarBorder, MdOutlinePortrait, MdOutlineLoyalty, MdCommute } from "react-icons/md";
 import { SocketSubscriber, SocketUnsubscribe, useSocketClient,SocketPublish } from 'services/websocket/StompOverSockJS';
 
-const MessageForm = ({ open, setOpenMessage,setConversation,conversation }) => {
+const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, conversation }) => {
   const [contentMessage,setContentMessage] = useState("")
   const socketClient = useSocketClient()
+
   const handleCreateMessage = (body) =>{
-      SocketPublish(socketClient, '/app/message_send',body);
+    SocketPublish(socketClient, '/app/message_send',body);
   }
   const handleCloseMessage = () => {
     setOpenMessage(false);
   };
+  const handleSend = () => {
+    if (contentMessage === '' || contentMessage === null) return
+    const id_sender = senderId
+    const id_receiver = receiverId
+    handleCreateMessage({
+      id_conversation: conversation.id_conversation,
+      id_receiver: id_receiver,
+      id_sender: id_sender, 
+      content: contentMessage
+    })
+    console.log('Send:', contentMessage, ', from', id_sender, 'to', id_receiver)
+    setContentMessage("")
+  }
 
   return (
     <Modal open={open} onClose={handleCloseMessage} sx={{
@@ -54,10 +69,10 @@ const MessageForm = ({ open, setOpenMessage,setConversation,conversation }) => {
         }}>
           <ListItem>
             <ListItemAvatar>
-              <Avatar src="https://scontent.fhan20-1.fna.fbcdn.net/v/t39.30808-1/368021133_1726419231151489_6853635133763153961_n.jpg?stp=dst-jpg_p320x320&_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=FgYf9CMpRYQAX9gLkse&_nc_ht=scontent.fhan20-1.fna&oh=00_AfB2TLCI9muhPj0U1P7214_AGbdtYYO_693BJyqBRJvr7g&oe=655C28D8">
+              <Avatar src={driverInfo.avtUrl}>
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary="Trần Trung Hiếu" secondary="Online" />
+            <ListItemText primary={driverInfo.fullName} secondary="Online" />
             <IconButton onClick={handleCloseMessage}>
               <MdClose />
             </IconButton>
@@ -77,20 +92,20 @@ const MessageForm = ({ open, setOpenMessage,setConversation,conversation }) => {
           }
         }}>
           {/* render message textbox theo điều kiện myMessage */}
-          {conversation[0].messagesData.map(({time, content,id_sender,id_receiver}) => 
+          {conversation.messagesData.map(({time, content,id_sender}) => 
             <Box>
-              <Stack direction="row" justifyContent={(id_sender === 4)? "end" : 'start'}>
+              <Stack direction="row" justifyContent={(id_sender === senderId)? "end" : 'start'}>
                 <Box mt={1.5} ml={3} mr={3} sx={{
                   width: "max-content"
                 }}>
                   <Typography variant="caption" color={grey[400]}>
-                    {time}
+                    {dayjs(time).format('HH:mm[ ]A')}
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="row" justifyContent={(id_sender === 4) ? "end" : 'start'}>
+              <Stack direction="row" justifyContent={(id_sender === senderId) ? "end" : 'start'}>
                 <Box p={1.5} ml={1.5} mr={1.5} sx={{
-                  bgcolor: ((id_sender === 4) ? green[100] : grey[100]),
+                  bgcolor: ((id_sender === senderId) ? green[100] : grey[100]),
                   borderRadius: "16px",
                   width: "max-content"
                 }}>
@@ -110,13 +125,7 @@ const MessageForm = ({ open, setOpenMessage,setConversation,conversation }) => {
             onChange={(e) => setContentMessage(e.target.value)}
             value={contentMessage}
             onKeyDown={(e) =>{
-              if(e.key == 'Enter'){
-                const id_sender = 4
-                const id_receiver = 6
-                  handleCreateMessage({id_conversation:conversation[0].id_conversation,id_receiver:id_receiver,id_sender:id_sender,content:contentMessage})
-                  console.log(contentMessage)
-                  setContentMessage("")
-              }
+              if(e.key == 'Enter') { handleSend() }
             }}
              InputProps={{
               sx: {
@@ -125,10 +134,7 @@ const MessageForm = ({ open, setOpenMessage,setConversation,conversation }) => {
             }}>
             </TextField>
             <IconButton 
-            onClick={(e) =>{
-              console.log(contentMessage)
-              setContentMessage("")
-            }}
+            onClick={(e) => handleSend()}
             sx={{
               color: blue[400]
             }}>
@@ -140,7 +146,7 @@ const MessageForm = ({ open, setOpenMessage,setConversation,conversation }) => {
     </Modal>);
 }
 
-const DriverInfoDetail = () => {
+const DriverInfoDetail = ({ driverInfo }) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(true);
@@ -159,15 +165,11 @@ const DriverInfoDetail = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          width: { xs: "100vw", md: "100%", sm: "100%" },
-          height: { xs: "100vh", md: "100%", sm: "100%" },
         }}
       >
         <Box
           sx={{
             display: "flex", flexDirection: 'column',
-            width: { xs: "100%", md: "30%", sm: "30%" },
-            height: { xs: "100%", md: "80%", sm: "80%" },
             bgcolor: "white", borderRadius: "16px",
             overflowY: 'scroll',
             msOverflowStyle: 'none',
@@ -184,66 +186,68 @@ const DriverInfoDetail = () => {
             onClick={handleClose}>
             <MdClose />
           </IconButton>
-
-          <Grid xs={12} sm={12} md={12} sx={{ height: "15%", width: "30%", ml: "auto", mr: "auto" }} >
-            <Avatar
-              sx={{
-                height: "100%",
-                width: "100%"
-              }}
-              src="https://scontent.fhan20-1.fna.fbcdn.net/v/t39.30808-1/368021133_1726419231151489_6853635133763153961_n.jpg?stp=dst-jpg_p320x320&_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=FgYf9CMpRYQAX9gLkse&_nc_ht=scontent.fhan20-1.fna&oh=00_AfB2TLCI9muhPj0U1P7214_AGbdtYYO_693BJyqBRJvr7g&oe=655C28D8">
-            </Avatar>
-          </Grid>
-          <Divider>Trần Trung Hiếu</Divider>
+          <Stack direction='row' justifyContent='center' alignItems='center' paddingBottom={1}>
+            <Avatar src={driverInfo.avtUrl} sx={{ height: "70px", width: "70px" }}/>
+          </Stack>
+          <Divider><Typography variant='h6' fontWeight='bold'>
+            {driverInfo.fullName}
+          </Typography></Divider>
           <Table size='small'>
             <TableBody>
-              <TableRow sx={{ padding: "8px 0px" }}>
-                <TableCell component="th" scope="row" >
-                  <IconButton sx={{ pointerEvents: 'none', color: blue[700] }}><MdOutlinePortrait /></IconButton>
-                  Nghề Nghiệp</TableCell>
-                <TableCell variant='head' align='right'>Tài Xế</TableCell>
-              </TableRow >
-              <TableRow >
-                <TableCell component="th" scope="row" >
-                  <IconButton sx={{ pointerEvents: 'none', color: pink[400] }}><MdOutlineCake /></IconButton>
-                  Ngày Sinh</TableCell>
-                <TableCell variant='head' align='right' >23/08/2002</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  <IconButton sx={{ pointerEvents: 'none', }}><MdOutlineHome /></IconButton>
-                  Quê Quán</TableCell>
-                <TableCell variant='head' align='right'>Quảng Trị</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  <IconButton sx={{ pointerEvents: 'none', color: blue[700] }}><MdTransgender /></IconButton>
-                  Giới Tính</TableCell>
-                <TableCell variant='head' align='right'>Nam</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  <IconButton sx={{ pointerEvents: 'none' }}><MdCommute /></IconButton>
-                  Loại Phương Tiện</TableCell>
-                <TableCell variant='head' align='right'>Xe Máy</TableCell>
-              </TableRow>
               <TableRow>
                 <TableCell component="th" scope="row">
                   <IconButton sx={{ pointerEvents: 'none', color: blue[700] }}><MdOutlinePhone /></IconButton>
-                  Số Điện Thoại</TableCell>
-                <TableCell variant='head' align='right'>0829837123</TableCell>
+                  Số Điện Thoại
+                </TableCell>
+                <TableCell variant='head' align='right'>
+                  {driverInfo.phoneNumber}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell component="th" scope="row">
                   <IconButton sx={{ pointerEvents: 'none', color: green[300] }}><MdOutlineLoyalty /></IconButton>
-                  Biển Số Xe</TableCell>
-                <TableCell variant='head' align='right'>43P1-0877</TableCell>
+                  Biển Số Xe
+                </TableCell>
+                <TableCell variant='head' align='right'>
+                  {driverInfo.licensePlate}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell component="th" scope="row" >
+                  <IconButton sx={{ pointerEvents: 'none', color: pink[400] }}><MdOutlineCake /></IconButton>
+                  Ngày Sinh
+                </TableCell>
+                <TableCell variant='head' align='right' >
+                  {dayjs(driverInfo.dateOfBirth).format('DD-MM-YYYY')}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell component="th" scope="row">
+                  <IconButton sx={{ pointerEvents: 'none', color: blue[700] }}><MdTransgender /></IconButton>
+                  Giới Tính
+                </TableCell>
+                <TableCell variant='head' align='right'>{driverInfo.male ? 'Nam' : 'Nữ'}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell component="th" scope="row">
+                  <IconButton sx={{ pointerEvents: 'none' }}><MdCommute /></IconButton>
+                  Loại Phương Tiện
+                </TableCell>
+                <TableCell variant='head' align='right'>
+                  {driverInfo.vehicleType === 'MOTORCYCLE' ? 'Xe máy' :
+                    driverInfo.vehicleType === 'CAR' ? 'Oto' :
+                      driverInfo.vehicleType
+                  }
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell component="th" scope="row">
                   <IconButton sx={{ pointerEvents: 'none', color: yellow[500] }}><MdOutlineStarBorder /></IconButton>
-                  Điểm Đánh Giá</TableCell>
-                <TableCell variant='head' align='right'><Rating defaultValue={3} readOnly /></TableCell>
+                  Điểm Đánh Giá
+                </TableCell>
+                <TableCell variant='head' align='right'>
+                  <Rating defaultValue={driverInfo.rating} precision={0.5} readOnly />
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -254,89 +258,109 @@ const DriverInfoDetail = () => {
 }
 
 export const DriverInfo = () => {
-  const conversationData=[
-    {
-      id_conversation: 10,
-      id_booking:1,
-      messagesData:[{
-          id:1,
-          id_sender: 4,
-          id_receiver: 6,
-          time: '11:09pm',
-          content: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
-        },
-        {
-          id:2,
-          id_sender: 6,
-          id_receiver: 4,
-          time: '11:09pm',
-          content: 'Tôi cần đi bến xe ngay bây giờ'
-        },
-        {
-          id:3,
-          id_sender: 4,
-          id_receiver: 6,
-          time: '11:09pm',
-          content: 'Tôi cần đi bến xe ngay bây giờ'
-        },
-        {
-          id:4,
-          id_sender: 6,
-          id_receiver: 4,
-          time: '11:09pm',
-          content: 'Hello đây là đoạn văn mẫu'
-        }]
-    }
-  ]
+  const conversationData=
+  {
+    id_conversation: 10,
+    id_booking:1,
+    messagesData:[{
+        id:1,
+        id_sender: 4,
+        id_receiver: 6,
+        time: '11:09pm',
+        content: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
+      },
+      {
+        id:2,
+        id_sender: 6,
+        id_receiver: 4,
+        time: '11:09pm',
+        content: 'Tôi cần đi bến xe ngay bây giờ'
+      },
+      {
+        id:3,
+        id_sender: 4,
+        id_receiver: 6,
+        time: '11:09pm',
+        content: 'Tôi cần đi bến xe ngay bây giờ'
+      },
+      {
+        id:4,
+        id_sender: 6,
+        id_receiver: 4,
+        time: '11:09pm',
+        content: 'Hello đây là đoạn văn mẫu'
+      }]
+  }
+  
   const [openMessage, setOpenMessage] = useState(false);
-  const [conversation,setConversation] = useState(conversationData)
+  const restoredConversation = sessionStorage.getItem('conversationCache');
+  const [conversation,setConversation] = useState(
+    restoredConversation === null ? conversationData : 
+    JSON.parse(restoredConversation)
+  );
   const [updated,setUpdated] = useState("") // Trigger rerender
   const socketClient = useSocketClient()
+
+  const [bookingInfo,] = useBookingContext()
+  const driverInfo = (bookingInfo.driverInfo !== null ? bookingInfo.driverInfo :
+  { // test data
+    avtUrl: 'placeholder',
+    dateOfBirth: 1701907200000,
+    email: 'example@email.com',
+    fullName: 'Placeholder data',
+    id: 3,
+    licensePlate: '43A1-49053',
+    male: true,
+    nonBlock: true,
+    phoneNumber: '0987654321',
+    rating: 4.5,
+    vehicleType: 'MOTORCYCLE'
+  })
+
   useEffect(() => {
     SocketSubscriber(socketClient,'/user/message_receive',SendMesssageCallback)
+    return () => {
+      SocketUnsubscribe(socketClient, '/user/message_receive')
+    }
   },[])
 
-    const SendMesssageCallback = (result) => {
-      const data = JSON.parse(result);
-      console.log("du lieu nhan ve", data);
-      const dataConfig = {
-        ...data,
-        id: conversation[0].messagesData.length + 1    
-      }
-      console.log("du lieu config", dataConfig);
-      const tempMessageData = conversation
-      tempMessageData[0].messagesData.push(dataConfig) 
-      setConversation(tempMessageData);
-      setUpdated(dayjs().toString());
+  const SendMesssageCallback = (result) => {
+    const data = JSON.parse(result);
+    console.log("du lieu nhan ve", data);
+    const dataConfig = {
+      ...data,
+      id: conversation.messagesData.length + 1    
     }
-  const handleCurrentChat = () =>{
-    // const socketEndpoint = '/user/booking_status'
-    // Socket
+    // console.log("du lieu config", dataConfig);
+    // console.log('after send', conversation);
+    const tempMessageData = conversation
+    tempMessageData.messagesData.push(dataConfig) 
+    setConversation(tempMessageData);
+    sessionStorage.setItem('conversationCache', JSON.stringify(tempMessageData));
+    setUpdated(dayjs().toString());
   }
   const handleOpenMessage = () => {
-    setConversation(conversation)
+    // setConversation(conversation)
     setOpenMessage(true)
   };
   return (
     <Stack spacing={1} padding={1}>
-      <ListItem>
+      <ListItem sx={{ p: 0 }}>
         <ListItemAvatar>
-          <Avatar src="https://scontent.fhan20-1.fna.fbcdn.net/v/t39.30808-1/368021133_1726419231151489_6853635133763153961_n.jpg?stp=dst-jpg_p320x320&_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=FgYf9CMpRYQAX9gLkse&_nc_ht=scontent.fhan20-1.fna&oh=00_AfB2TLCI9muhPj0U1P7214_AGbdtYYO_693BJyqBRJvr7g&oe=655C28D8">
-          </Avatar>
+          <Avatar src={driverInfo.avtUrl} sx={{ height: "50px", width: "50px" }}/>
         </ListItemAvatar>
-        <ListItemText primary="Trần Trung Hiếu" secondary="43P1-0877" />
-
+        <ListItemText primary={<b>{driverInfo.fullName}</b>} secondary={driverInfo.licensePlate} sx={{ pl: 1 }}/>
         {/* ở dưới là button tin nhắn */}
         <IconButton onClick={handleOpenMessage}>
         {/* badgeContent={10} */}
-          <Badge  color="error">
+          <Badge color="error">
             <MdOutlineMessage />
           </Badge>
         </IconButton>
         {/* MessageConversation Form */}
-        <MessageForm open={openMessage} setOpenMessage={setOpenMessage} setConversation={setConversation} conversation={conversation}/>
+        <MessageForm open={openMessage} setOpenMessage={setOpenMessage} driverInfo={driverInfo} senderId={bookingInfo.customerId} receiverId={bookingInfo.driverId} conversation={conversation}/>
       </ListItem>
-      <DriverInfoDetail />
+      <DriverInfoDetail driverInfo={driverInfo}/>
     </Stack>
   )
 }

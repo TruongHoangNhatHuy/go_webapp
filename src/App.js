@@ -70,7 +70,6 @@ const ReactRouter = () => {
             </SocketProvider></ProtectedRoute>}>
           <Route index element={<Navigate to={'orders'}/>} />
           <Route path='account' element={<Account />} />
-          <Route path='booking' element={<BookingContextProvider><Booking/></BookingContextProvider>} />
           <Route path='orders' element={<Orders/>} />
           <Route path='ratings' element={<text>Đánh giá</text>} />
           <Route path='analysis' element={<text>Thống kê</text>} />
