@@ -8,9 +8,11 @@ import { getDriverById } from 'features/account';
 import { SocketSubscriber, SocketUnsubscribe, useSocketClient } from 'services/websocket/StompOverSockJS';
 import { useUserContext } from 'contexts/UserContext';
 import { useBookingContext } from 'contexts/BookingContext';
+import { useNotifyContext } from 'layouts/MainLayout';
 
 const Booking = () => {
   const [user,] = useUserContext();
+  const [,setNotify] = useNotifyContext();
   // UI state
   const [bookingForm, setBookingForm] = useState(false);
   const [hadBooking, setHadBooking] = useState(false);
@@ -55,6 +57,7 @@ const Booking = () => {
   // WS code
   const socketClient = useSocketClient()
   const bookingStatusCallback = (result) => {
+    setNotify('booking');
     const data = JSON.parse(result);
     console.log('Payment result:', data);
     // Update status
@@ -68,6 +71,7 @@ const Booking = () => {
     }
   }
   const driverInfoCallback = async (result) => {
+    setNotify('booking');
     const data = JSON.parse(result);
     console.log('Driver id:', data);
     // update driver id
@@ -87,6 +91,7 @@ const Booking = () => {
     sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
   }
   const driverLocationCallback = (result) => {
+    setNotify('booking');
     const data = JSON.parse(result);
     // console.log('Driver location:', data);
     const locationStr = data.location;

@@ -1,12 +1,13 @@
 import { forwardRef, useEffect, useState } from "react";
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { Box, Drawer, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, IconButton } from "@mui/material";
+import { Box, Drawer, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, IconButton, Badge } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import CommuteIcon from '@mui/icons-material/Commute';
 import { MdOutlineReceiptLong, MdHistory, MdBookmarkBorder, MdMenu } from "react-icons/md";
 import CssBaseline from "@mui/material/CssBaseline";
 import './NavMenu.css';
 import { useUserContext } from "contexts/UserContext";
+import { useNotifyContext } from "./MainLayout";
 
 // List menu của khách hàng
 const customerMenu = [
@@ -42,11 +43,11 @@ const driverMenu = [
 		to: "account",
 		menuItem: "Tài khoản",
 	},
-	{
-		to: "booking",
-		menuItem: "Đặt xe",
-		menuIcon: <CommuteIcon />
-	},
+	// {
+	// 	to: "booking",
+	// 	menuItem: "Đặt xe",
+	// 	menuIcon: <CommuteIcon />
+	// },
 	{
 		to: "orders",
 		menuItem: "Đơn đặt",
@@ -100,7 +101,7 @@ const NavMenu = () => {
 		(user.role === 'driver') ? driverMenu : 
 		(user.role === 'admin') ? adminMenu : null;
 
-	const [seletedItem, setSelectedItem] = useState('');
+	const [selectedItem, setSelectedItem] = useState('');
 	const location = useLocation(); // Lấy location hiện tại của url
 	const current = location.pathname.split('/')[2];
 	useEffect(() => {
@@ -108,17 +109,27 @@ const NavMenu = () => {
 		setSelectedItem(current);
 	}, [current]);
 
+	// Kiểm tra item được gắn Badge
+	const [notify, setNotify] = useNotifyContext();
+	useEffect(() => {
+		if (selectedItem === notify) {
+			setNotify(null)
+		}
+	}, [selectedItem])
+
 	const drawerWidth = 120;
 	const drawer = (
 		menu.map(({ to, menuItem, menuIcon }) => (
 			<ListItem className='list-item' key={to} component={Link} to={to} sx={{ alignItems: "center" }}>
-				<ListItemButton className="list-item-btn" selected={seletedItem === to}>
-					<ListItemIcon sx={{ justifyContent: 'center', fontSize: 25 }}>
-						{menuIcon}
-					</ListItemIcon>
-					<ListItemText primary={menuItem} sx={{ color: "#70757a", whiteSpace: 'normal' }} />
-				</ListItemButton>
-			</ListItem>
+					<ListItemButton className="list-item-btn" selected={selectedItem === to}>
+						<ListItemIcon sx={{ justifyContent: 'center', fontSize: 25 }}>
+							<Badge variant="dot" color="primary" invisible={notify !== to || selectedItem === to}>
+								{menuIcon}
+							</Badge>
+						</ListItemIcon>
+						<ListItemText primary={menuItem} sx={{ color: "#70757a", whiteSpace: 'normal' }} />
+					</ListItemButton>
+				</ListItem>
 		))
 	)
 
