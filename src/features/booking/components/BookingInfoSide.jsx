@@ -2,9 +2,10 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, CircularProgress, Bo
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { useState } from 'react';
 import { MdDeleteOutline } from "react-icons/md";
-import { emptyBooking, useBookingContext } from 'contexts/BookingContext';
+import { useBookingContext } from 'contexts/BookingContext';
 import { BookingDetail } from './BookingDetail';
 import { DriverInfo } from './DriverInfo';
+import { LoadingButton } from '@mui/lab';
 
 export const BookingInfoSide = ({ handleBookingCancel }) => {
   const drawerWidth = 350;
@@ -14,11 +15,15 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
     setOpen(prev => !prev)
   }
 
-  const [bookingInfo, setBookingInfo] = useBookingContext();
-  const [cancelling, setCancelling] = useState(false);
+  const [bookingInfo,] = useBookingContext();
+  const [cancelDialog, setCancelDialog] = useState(false);
+  const [cancelling, setCancelling] = useState(
+    bookingInfo.status === 'WAITING_REFUND' ? true : false
+  );
+  
   const handleCancel = () => {
-    setBookingInfo(emptyBooking);
-    sessionStorage.setItem('bookingSession', JSON.stringify(emptyBooking));
+    setCancelling(true)
+    setCancelDialog(false)
     handleBookingCancel()
   }
   const handlePaymentRedirect = () => {
@@ -67,7 +72,7 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
           </IconButton>
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Thông Tin Tài Xế</Typography>
-          {bookingInfo.status === ('FOUND'||'ON_RIDE'||'COMPLETE') ? (
+          {bookingInfo.status === 'FOUND'|| bookingInfo.status === 'ON_RIDE'|| bookingInfo.status === 'COMPLETE' ? (
             <DriverInfo />
           ) : (
             <Stack direction='row' padding={1} spacing={2} alignItems='center'>
@@ -78,6 +83,9 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
               </Stack>
             </Stack>
           )}
+          {bookingInfo.status === 'COMPLETE' &&
+            <Typography>to do: Function đánh giá</Typography>
+          }
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Chi Tiết Đặt Xe</Typography>
           {bookingInfo.status !== 'WAITING' ? <div/> : (
@@ -87,12 +95,18 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
             </>
           )}
           <BookingDetail />
-          <Divider />
-          <Button variant='outlined' size='small' color='error' onClick={() => setCancelling(true)} startIcon={<MdDeleteOutline />}>Hủy đơn</Button>
+          {bookingInfo.status !== 'COMPLETE' &&
+            <LoadingButton variant='outlined' size='small' color='error'
+              loading={cancelling}
+              onClick={() => setCancelDialog(true)} 
+              startIcon={<MdDeleteOutline />}
+              children='Hủy đơn'
+            />
+          }
         </Stack>
       </Drawer>
       {/* Dialog xác nhận hủy đơn */}
-      <Dialog open={cancelling}>
+      <Dialog open={cancelDialog}>
         <DialogTitle sx={{ margin: 'auto' }}>
           <b>HỦY ĐẶT XE</b>
         </DialogTitle>
@@ -103,7 +117,7 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
         </DialogContent>
         <DialogActions>
           <Button variant='outlined' color='error' onClick={handleCancel}>Hủy</Button>
-          <Button variant='outlined' color='info' onClick={() => setCancelling(false)}>Không</Button>
+          <Button variant='outlined' color='info' onClick={() => setCancelDialog(false)}>Không</Button>
         </DialogActions>
       </Dialog>
     </Stack>
