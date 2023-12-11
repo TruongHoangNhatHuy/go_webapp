@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import './Map.css';
 import config from 'config.json';
 import { getLocationByCoordinates } from "./api_reverse";
-import DriverMarkerIcon from 'assets/driver-marker-icon.png';
+import CarIcon from 'assets/car.png';
+import MotocycleIcon from 'assets/motorcycle.png'
 
 // const apiKey = config.vietmap.primaryToken // 1000 req/ngày
 const apiKey = config.vietmap.secondaryToken // 10 req/phút
@@ -190,8 +191,9 @@ const Map = (props) => {
   // Gắn marker vị trí driver
   useEffect(() => {
     if (driverPosition !== null) {
+      var icon = driverPosition.vehicle === 'motorcycle' ? MotocycleIcon : CarIcon;
       var driverLngLat = [driverPosition.lng, driverPosition.lat];
-      handleMarker(driverMarkerRef, driverLngLat, createCustomMarkerElement(DriverMarkerIcon));
+      handleMarker(driverMarkerRef, driverLngLat, createCustomMarkerElement(icon));
     }
     else handleMarker(driverMarkerRef, null);
   }, [driverPosition])

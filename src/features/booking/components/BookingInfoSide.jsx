@@ -1,4 +1,4 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, CircularProgress, Box, Button, Divider, Drawer, IconButton, Stack, Typography, Skeleton } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Box, Button, Divider, Drawer, IconButton, Stack, Typography, Skeleton, Rating, Paper, TextField } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { useState } from 'react';
 import { MdDeleteOutline } from "react-icons/md";
@@ -7,7 +7,73 @@ import { BookingDetail } from './BookingDetail';
 import { DriverInfo } from './DriverInfo';
 import { LoadingButton } from '@mui/lab';
 
-export const BookingInfoSide = ({ handleBookingCancel }) => {
+const BookingRating = () => {
+  const [sent, setSent] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(-1);
+  const labels = {
+    1: 'Tệ',
+    2: 'Tạm',
+    3: 'Được',
+    4: 'Tốt',
+    5: 'Xuất sắc',
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget);  
+    console.log('Rating');
+    for(var pair of formData.entries()) {
+      console.log(pair[0]+ ': '+ pair[1]);
+    }
+    // to do: gửi rating cho server
+    setSent(true);
+  }
+
+  return (
+    <Paper elevation={2}>
+      <Box component='form' onSubmit={handleSubmit} padding={1}>
+        <Typography variant='h6' fontWeight='bold' paddingBottom={1}>
+          {sent ? 'Cảm ơn về đánh giá của bạn' :
+            'Đánh giá trải nghiệm của bạn'
+          }
+        </Typography>
+        <Stack paddingX={2} spacing={1}>
+          <Stack direction='row' alignItems='center' spacing={2}>
+            <Rating
+              id='booking-rating'
+              name='booking-rating'
+              size='large'
+              readOnly={sent}
+              value={rating}
+              onChange={(e, value) => setRating(value)}
+              onChangeActive={(e, newHover) => setHover(newHover)}
+            />
+            {rating !== null && (
+              <Typography>{labels[hover !== -1 ? hover : rating]}</Typography>
+            )}
+          </Stack>
+          <Stack display={rating ? 'flex' : 'none'} spacing={0.5}>
+            <Typography fontWeight='bold'>
+              {rating < 3 ? 'Để lại góp ý về chuyến đi' :
+                'Để lại nhận xét về chuyến đi'
+              }
+            </Typography>
+            <TextField multiline
+              rows={3}
+              id='booking-comment'
+              name='booking-comment'
+              disabled={sent}
+            />
+            <Button type='submit' disabled={sent}>Gửi</Button>
+          </Stack>
+        </Stack>
+      </Box>
+    </Paper>
+  )
+}
+
+export const BookingInfoSide = ({ handleBookingCancel, handleBookingComplete }) => {
   const drawerWidth = 350;
   // Đóng mở drawer
   const [open, setOpen] = useState(true);
@@ -84,7 +150,12 @@ export const BookingInfoSide = ({ handleBookingCancel }) => {
             </Stack>
           )}
           {bookingInfo.status === 'COMPLETE' &&
-            <Typography>to do: Function đánh giá</Typography>
+            <Stack justifyContent='center' spacing={2}>
+              <BookingRating/>
+              <Button variant='outlined' onClick={handleBookingComplete}>
+                Đặt chuyến xe mới
+              </Button>
+            </Stack>
           }
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Chi Tiết Đặt Xe</Typography>

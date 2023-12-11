@@ -65,7 +65,6 @@ const Booking = () => {
       // Nếu status là hủy đơn
       if (data.status === 'CANCELLED') {
         console.log('Booking cancelled')
-        // UI change
         // setStartLocation(null);
         // setEndLocation(null);
         // setVehicleRoute(null);
@@ -104,9 +103,13 @@ const Booking = () => {
     console.log('/user/customer_driver_location', data);
     const locationStr = data.location;
     const location = locationStr.split(',');
-    const driverLatLng = { lat: location[0] , lng: location[1] };
+    const driverPos = { 
+      vehicle: bookingInfo.vehicleType,
+      lat: location[0],
+      lng: location[1]
+    };
     // console.log('Driver latLng:', driverLatLng);
-    setDriverPosition(driverLatLng);
+    setDriverPosition(driverPos);
   }
   useEffect(() => {
     if (hadBooking) {
@@ -135,6 +138,9 @@ const Booking = () => {
     })
     console.log('Booking cancelling, id', bookingInfo.id);
   };
+  const handleBookingComplete = () => {
+    setHadBooking(false);
+  }
 
   return (
     <div>
@@ -153,7 +159,7 @@ const Booking = () => {
       <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setUserPosition={setUserPosition} setMapCenterRef={setMapCenterRef} driverPosition={driverPosition}/>
       {/* Side Drawer */}
       <LocationInputSide hidden={hadBooking} userPosition={userPosition} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
-      {hadBooking ? <BookingInfoSide handleBookingCancel={handleBookingCancel}/> : <div/>}
+      {hadBooking ? <BookingInfoSide handleBookingCancel={handleBookingCancel} handleBookingComplete={handleBookingComplete}/> : <div/>}
       {/* Cửa sổ mở Booking Form */}
       <Dialog open={bookingForm} >
         <DialogTitle 
