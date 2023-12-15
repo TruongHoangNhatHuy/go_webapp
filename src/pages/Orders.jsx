@@ -13,11 +13,14 @@ import { getAllOrders } from 'services/be_server/api_orders';
 const Orders = () => {
   const [user, setUser] = useUserContext();
   const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState([]);
-  const [paginationModel, setPaginationModel] = useState({
+  const [pageState,setPageState] = useState({
+    isLoading: false,
+    content:[],
+    totalElements: 0,
     page: 0,
-    pageSize: 5,
-  });
+    size: 5,
+
+  })
   const [filterModel, setFilterModel] = useState({
     items: [],
   });
@@ -35,16 +38,18 @@ const Orders = () => {
   }
   const [sortModel, setSortModel] = useState([]);
 
-  const handleChangeData =  async () => {
-    getAllOrders(user.token).then(result =>{
-      setRows(result)
+  const handleChangeData =  async (page,size) => {
+    console.log("=-==> ", page);
+    setPageState(old=>({...old, isLoading:true}))
+    await getAllOrders(user.token,page,size).then(result =>{
+      setPageState(old=>({...old, isLoading:false, content:result.content, totalElements:result.totalElements}))
     })
     .catch(err => console.log(err))
   };
 
   useEffect(() => { 
-    handleChangeData()
-  }, []);
+    handleChangeData(pageState.page,pageState.size)
+  }, [pageState.page,pageState.size]);
   const handleOpen = () => {
     setOpen(true);
   };
@@ -65,7 +70,7 @@ const Orders = () => {
         </ListItem>,
     },
     {
-      field: 'startDate', headerName: 'Thời Gian Đặt', flex: 0.7, headerAlign: 'center', type: 'dateTime', align: 'center',
+      field: 'createAt', headerName: 'Thời Gian Đặt', flex: 0.7, headerAlign: 'center', type: 'dateTime', align: 'center',
       valueGetter: ({ value }) => value && new Date(value),
       // valueformatter: params => 
       //   moment(params?.value).format("dd/mm/yyyy hh:mm a"),
@@ -171,18 +176,35 @@ const Orders = () => {
           sx={{
             '& .MuiDataGrid-columnHeader': {
               backgroundColor: '#F4F6F8',
-            }
+            },
+            "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" }
+            
           }}
           autoHeight
           autoWidth
+          loading={pageState.isLoading}
           columns={columns}
-          rows={rows}
-          rowHeight={80}
+          rows={pageState.content}
+          rowCount= {pageState.totalElements}
+          paginationMode= "server"
           initialState={{
-            pagination: {paginationModel}
+            pagination:
+            { 
+              paginationModel:
+              {
+              page: pageState.page,
+              pageSize: pageState.size
+              }
+            }
           }}
+          onPaginationModelChange={ (newPage) => {
+            console.log("new page ",newPage)
+            setPageState(old => ({...old,page:newPage.page}))
+          }}
+          onPageSizeChange={(newPageSize) => setPageState(old => ({...old,size:newPageSize}))}
+          rowHeight={80}
           pageSizeOptions={[5]}
-          checkboxSelection
+          // checkboxSelection
         >
         </DataGrid>
         <Stack >

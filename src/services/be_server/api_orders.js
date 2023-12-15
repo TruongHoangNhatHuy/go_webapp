@@ -3,7 +3,7 @@ import config from 'config.json';
 const serverUrl = config.be_rootUrl;
 
 
-export const getAllOrders = async (token,from = null,to = null,sortType = "desc",sortField = "createAt", page = 0, size = 5) => {
+export const getAllOrders = async (token, page, size,from = null,to = null,sortType = "desc",sortField = "createAt") => {
     const urlStringFrom = (from != null) ? "&from=" + from : ""
     const urlStringTo = (to != null) ? "&to=" + to : ""
     const urlString = serverUrl +"/bookings?" + "sortField=" + sortField + urlStringFrom + urlStringTo + "&sortType=" + sortType + "&size=" +  size  + "&page=" + page;
@@ -27,9 +27,8 @@ export const getAllOrders = async (token,from = null,to = null,sortType = "desc"
       })
       // await getting response body
       .then(data => {
-        console.log('get result', data.content);
-        console.log('get result', data);
-        return data.content;
+        console.log("server send",data);
+        return data;
       })
       // catch fail fetch
       .catch(error => {
