@@ -49,11 +49,11 @@ const Booking = () => {
           updatedBookingInfo.customerId = result.customerId;
           updatedBookingInfo.driverId = result.driverId;
 
-          const pickup = result.pickupLocation.split(',');
-          const startLocation = getLocationByCoordinates(pickup[1], pickup[0])[0];
+          const pickUp = result.pickUpLocation.split(',');
+          const startLocation = getLocationByCoordinates(pickUp[1], pickUp[0])[0];
           updatedBookingInfo.startLocation = {
             location: startLocation,
-            coordinates: { lat: pickup[0], lng: pickup[1] }
+            coordinates: { lat: pickUp[0], lng: pickUp[1] }
           };
           const dropOff = result.dropOffLocation.split(',');
           const endLocation = getLocationByCoordinates(dropOff[1], dropOff[0])[0];

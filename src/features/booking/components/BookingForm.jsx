@@ -62,7 +62,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
       .then(result => {
         console.log('Create booking result', result);
         // Kiểm tra result
-        if (result.pickupLocation !== pickUp || result.dropOffLocation !== dropOff || result.vehicleType !== vehicle) {
+        if (result.pickUpLocation !== pickUp || result.dropOffLocation !== dropOff || result.vehicleType !== vehicle) {
           throw new Error('Server trả về kết quả không khớp');
         }
         // Update bookingInfo
