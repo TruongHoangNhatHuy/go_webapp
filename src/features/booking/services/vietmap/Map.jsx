@@ -33,6 +33,7 @@ const Map = (props) => {
     el.style.backgroundSize = '100%';
     return ({
       element: el,
+      scale: 2, // not working
       offset: [0, -height/2]
     });
   }
@@ -103,7 +104,7 @@ const Map = (props) => {
         var lat = e.coords.latitude;
         var position = [lat, lng];
         setUserPosition(position);
-        // console.log('user position', position);
+        console.log('User position', position);
       });
     }
 

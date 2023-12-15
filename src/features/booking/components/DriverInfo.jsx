@@ -6,8 +6,9 @@ import { useState,useEffect,useRef } from 'react';
 import { MdOutlineMessage, MdPersonSearch, MdClose, MdSend, MdTransgender, MdOutlineCake, MdOutlineHome, MdOutlinePhone, MdOutlineStarBorder, MdOutlinePortrait, MdOutlineLoyalty, MdCommute } from "react-icons/md";
 import { SocketSubscriber, SocketUnsubscribe, useSocketClient,SocketPublish } from 'services/websocket/StompOverSockJS';
 import ScrollableFeed from 'react-scrollable-feed'
+import { useNotifyContext } from 'layouts/MainLayout';
 
-const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, conversation }) => {
+const MessageForm = ({ open, setOpenMessage, driverInfo, conversation }) => {
   const [contentMessage,setContentMessage] = useState("")
   const socketClient = useSocketClient()
 	// const endOfMessagesRef = useRef(null)
@@ -24,8 +25,8 @@ const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, c
     if (contentMessage === '' || contentMessage === null) return
     const body = {
       conversationId: conversation.id_booking,
-      receiverId: receiverId,
-      senderId: senderId, 
+      receiverId: conversation.id_receiver,
+      senderId: conversation.id_sender, 
       content: contentMessage
     }
     handleCreateMessage(body)
@@ -97,9 +98,9 @@ const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, c
           {/* render message textbox theo điều kiện myMessage */}
           <Box sx={{height:"100%"}}>
           <ScrollableFeed>
-          {conversation.messagesData.map(({time, content,id_sender}) => 
+          {conversation.messagesData.map(({time, content, senderId}) => 
             <Box>
-              <Stack direction="row" justifyContent={(id_sender === senderId)? "end" : 'start'}>
+              <Stack direction="row" justifyContent={(senderId === conversation.id_sender)? "end" : 'start'}>
                 <Box mt={1.5} ml={3} mr={3} sx={{
                   width: "max-content"
                 }}>
@@ -108,9 +109,9 @@ const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, c
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="row" justifyContent={(id_sender === senderId) ? "end" : 'start'}>
+              <Stack direction="row" justifyContent={(senderId === conversation.id_sender) ? "end" : 'start'}>
                 <Box p={1.5} ml={1.5} mr={1.5} sx={{
-                  bgcolor: ((id_sender === senderId) ? green[100] : grey[100]),
+                  bgcolor: ((senderId === conversation.id_sender) ? green[100] : grey[100]),
                   borderRadius: "16px",
                   width: "max-content"
                 }}>
@@ -285,6 +286,8 @@ export const DriverInfo = () => {
   const conversationData =
   {
     id_booking: bookingInfo.id,
+    id_sender: bookingInfo.customerId,
+    id_receiver: bookingInfo.driverId,
     messagesData: []
   }
   
@@ -295,18 +298,21 @@ export const DriverInfo = () => {
     JSON.parse(restoredConversation)
   );
   const [updated,setUpdated] = useState("") // Trigger rerender
+  const [notifyMessage, setNotifyMessage] = useState(false)
   const socketClient = useSocketClient()
-
+  const [, setNotify] = useNotifyContext()
 
   useEffect(() => {
-    conversation.id_booking = bookingInfo.id
-    SocketSubscriber(socketClient,'/user/message_receive',SendMesssageCallback)
-    return () => {
+    if (bookingInfo.status === 'FOUND'|| bookingInfo.status === 'ON_RIDE'|| bookingInfo.status === 'COMPLETE') {
+      SocketSubscriber(socketClient,'/user/message_receive',SendMesssageCallback)
+    } else {
       SocketUnsubscribe(socketClient, '/user/message_receive')
     }
   },[])
 
   const SendMesssageCallback = (result) => {
+    setNotify('booking');
+    setNotifyMessage(true);
     const data = JSON.parse(result);
     console.log("du lieu nhan ve", data);
     const dataConfig = {
@@ -323,6 +329,7 @@ export const DriverInfo = () => {
   }
   const handleOpenMessage = () => {
     // setConversation(conversation)
+    setNotifyMessage(false)
     setOpenMessage(true)
   };
   return (
@@ -335,12 +342,12 @@ export const DriverInfo = () => {
         {/* ở dưới là button tin nhắn */}
         <IconButton onClick={handleOpenMessage}>
         {/* badgeContent={10} */}
-          <Badge color="error">
+          <Badge color="error" variant='dot' invisible={!notifyMessage}>
             <MdOutlineMessage />
           </Badge>
         </IconButton>
         {/* MessageConversation Form */}
-        <MessageForm open={openMessage} setOpenMessage={setOpenMessage} driverInfo={driverInfo} senderId={bookingInfo.customerId} receiverId={bookingInfo.driverId} conversation={conversation}/>
+        <MessageForm open={openMessage} setOpenMessage={setOpenMessage} driverInfo={driverInfo} conversation={conversation}/>
       </ListItem>
       <DriverInfoDetail driverInfo={driverInfo}/>
     </Stack>

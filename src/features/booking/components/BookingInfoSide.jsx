@@ -2,7 +2,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, Box, Button, Divider
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { LoadingButton } from '@mui/lab';
 import { MdDeleteOutline } from "react-icons/md";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useBookingContext } from 'contexts/BookingContext';
 import { useUserContext } from 'contexts/UserContext';
 import { BookingDetail } from './BookingDetail';
@@ -88,7 +88,7 @@ const BookingRating = ({ bookingId }) => {
   )
 }
 
-export const BookingInfoSide = ({ handleBookingCancel, handleBookingComplete }) => {
+export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingComplete }) => {
   const drawerWidth = 350;
   // Đóng mở drawer
   const [open, setOpen] = useState(true);
@@ -97,10 +97,15 @@ export const BookingInfoSide = ({ handleBookingCancel, handleBookingComplete }) 
   }
 
   const [bookingInfo,] = useBookingContext();
+  const [statusUpdate, setStatusUpdate] = useState('') // trigger re-render
   const [cancelDialog, setCancelDialog] = useState(false);
   const [cancelling, setCancelling] = useState(
     bookingInfo.status === 'WAITING_REFUND' ? true : false
   );
+
+  useEffect(() => {
+    setStatusUpdate(bookingInfo.status);
+  }, [bookingInfo.status])
   
   const handleCancel = () => {
     setCancelling(true)
@@ -153,7 +158,7 @@ export const BookingInfoSide = ({ handleBookingCancel, handleBookingComplete }) 
           </IconButton>
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Thông Tin Tài Xế</Typography>
-          {bookingInfo.status === 'FOUND'|| bookingInfo.status === 'ON_RIDE'|| bookingInfo.status === 'COMPLETE' ? (
+          {hadDriver ? (
             <DriverInfo />
           ) : (
             <Stack direction='row' padding={1} spacing={2} alignItems='center'>

@@ -16,9 +16,13 @@ import { getLocationByCoordinates } from 'features/booking/services/vietmap/api_
 const Booking = () => {
   const [user,] = useUserContext();
   const [,setNotify] = useNotifyContext();
+  // Thông tin đặt xe
+  const [bookingInfo, setBookingInfo] = useBookingContext();
+  const updatedBookingInfo = bookingInfo;
   // UI state
   const [bookingForm, setBookingForm] = useState(false);
   const [hadBooking, setHadBooking] = useState(false);
+  const [hadDriver, setHadDriver] = useState(bookingInfo.driverInfo === null ? false : true);
   // Map state
   const [userPosition, setUserPosition] = useState(null);
   const [driverPosition, setDriverPosition] = useState(null);
@@ -27,9 +31,6 @@ const Booking = () => {
   const [vehicleRoute, setVehicleRoute] = useState(null); // Hiện thị tuyến đường
   // Function ref
   const setMapCenterRef = useRef({});
-  // Thông tin đặt xe
-  const [bookingInfo, setBookingInfo] = useBookingContext();
-  const updatedBookingInfo = bookingInfo;
   // Snackbar message
   const [sbMessage, setSbMessage] = useState(null);
 
@@ -71,6 +72,7 @@ const Booking = () => {
         .then((result) => {
           // console.log('Driver info', result);
           updatedBookingInfo.driverInfo = result;
+          setHadDriver(true);
         })
         .catch((error) => {
           console.log('Get driver info failed: ', error);
@@ -127,6 +129,7 @@ const Booking = () => {
         // setEndLocation(null);
         // setVehicleRoute(null);
         setHadBooking(false);
+        setHadDriver(false);
       }
       updatedBookingInfo.status = data.status;
       setBookingInfo(updatedBookingInfo);
@@ -148,6 +151,7 @@ const Booking = () => {
       .then((result) => {
         console.log('Driver info', result);
         updatedBookingInfo.driverInfo = result;
+        setHadDriver(true);
       })
       .catch((error) => {
         console.log('Get driver info failed');
@@ -217,7 +221,7 @@ const Booking = () => {
       <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setUserPosition={setUserPosition} setMapCenterRef={setMapCenterRef} driverPosition={driverPosition}/>
       {/* Side Drawer */}
       <LocationInputSide hidden={hadBooking} userPosition={userPosition} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
-      {hadBooking ? <BookingInfoSide handleBookingCancel={handleBookingCancel} handleBookingComplete={handleBookingComplete}/> : <div/>}
+      {hadBooking ? <BookingInfoSide hadDriver={hadDriver} handleBookingCancel={handleBookingCancel} handleBookingComplete={handleBookingComplete}/> : <div/>}
       {/* Cửa sổ mở Booking Form */}
       <Dialog open={bookingForm} >
         <DialogTitle 
