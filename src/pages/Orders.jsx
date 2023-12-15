@@ -6,10 +6,45 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import { useEffect,useState } from "react";
+import { useUserContext } from 'contexts/UserContext';
 import { getAllOrders } from 'services/be_server/api_orders';
 
+
 const Orders = () => {
+  const [user, setUser] = useUserContext();
   const [open, setOpen] = useState(false);
+  const [rows, setRows] = useState([]);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 5,
+  });
+  const [filterModel, setFilterModel] = useState({
+    items: [],
+  });
+  const setColor = (statusTitle) =>{
+    if (statusTitle == "ON_RIDE") return 'warning'
+    if (statusTitle == "COMPLETE") return 'success'
+    if (statusTitle == "CANCELLED") return 'error'
+    return null
+  }
+  const setTitleStatus = (statusTitle) =>{
+    if (statusTitle == "ON_RIDE") return 'Đang Chạy'
+    if (statusTitle == "COMPLETE") return 'Đã Hoàn Thành'
+    if (statusTitle == "CANCELLED") return 'Đã Hủy'
+    return null
+  }
+  const [sortModel, setSortModel] = useState([]);
+
+  const handleChangeData =  async () => {
+    getAllOrders(user.token).then(result =>{
+      setRows(result)
+    })
+    .catch(err => console.log(err))
+  };
+
+  useEffect(() => { 
+    handleChangeData()
+  }, []);
   const handleOpen = () => {
     setOpen(true);
   };
@@ -26,7 +61,7 @@ const Orders = () => {
             <Avatar src={rowData.row.avatar}>
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary={rowData.row.name} secondary={rowData.row.license} />
+          <ListItemText primary={rowData.row.driverId} secondary={rowData.row.license} />
         </ListItem>,
     },
     {
@@ -36,7 +71,7 @@ const Orders = () => {
       //   moment(params?.value).format("dd/mm/yyyy hh:mm a"),
     },
     {
-      field: 'cost', headerName: 'Giá Tiền (VNĐ)', flex: 0.7, headerAlign: 'center', align: 'center',
+      field: 'amount', headerName: 'Giá Tiền (VNĐ)', flex: 0.7, headerAlign: 'center', align: 'center',
       valueFormatter: (params) => {
         if (params.value == null) {
           return '';
@@ -53,12 +88,12 @@ const Orders = () => {
       field: 'status', headerName: 'Trạng Thái', flex: 0.5, headerAlign: 'center',
       renderCell: (rowData) =>
         <Chip
-          color={rowData.row.status}
+          color={setColor(rowData.row.status)}
           disabled={false}
           size="medium"
           variant="filled"
-          label={rowData.row.status}
-        />, align: 'center'
+          label={setTitleStatus(rowData.row.status)}
+        />, align: 'center',
     },
     {
       field: 'action', headerName: 'Hành Động', flex: 0.5, headerAlign: 'center', type: 'actions',
@@ -76,39 +111,10 @@ const Orders = () => {
             label="View"
           // onClick={handleOpen}
           />,
-          <GridActionsCellItem
-            icon={<IconButton sx={{
-              color: 'rgb(255, 86, 48)',
-            }}><MdDelete /></IconButton>}
-            label="Delete"
-
-          //   // onClick={toggleAdmin(params.id)}
-          //   // showInMenu
-          />,
-          // <GridActionsCellItem
-          //   icon={<FileCopyIcon />}
-          //   label="Duplicate User"
-          //   // onClick={duplicateUser(params.id)}
-          //   showInMenu
-          // />,
         ]
     }
     ,
   ]
-  const rows = [
-    { id: 3072, avatar: 'https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/368021133_1726419231151489_6853635133763153961_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=69Usxj6UgwwAX_IKtYe&_nc_ht=scontent.fhan14-1.fna&oh=00_AfD4HUPBnIMOJC5ozsB4i7BfkaDkCoX9BA9lkl_PVfVb4w&oe=656E0B96', name: 'Trần Trung Hiếu', license: '43P1-0877', rating: '3', status: 'error', cost: '32000000', startDate: '12/2/2023 13:35:22' },
-    { id: 2323, avatar: 'https://scontent.fhan14-2.fna.fbcdn.net/v/t39.30808-1/342455417_142632771949230_690728436599108059_n.jpg?stp=dst-jpg_p320x320&_nc_cat=106&ccb=1-7&_nc_sid=5740b7&_nc_eui2=AeFyRy3Pqvrbh5oqHPVCntUtOnZSSEzNvoQ6dlJITM2-hJT5HGfR_1UuQNkVK7F_ZaMArNvxZSitl2S-rK5jtTYF&_nc_ohc=186lXe8B0kEAX-jsjKZ&_nc_ht=scontent.fhan14-2.fna&oh=00_AfAmAAKbj68wgm8Lj-BSqxwxug0gkjAEw3KfHovjlcZvsg&oe=656E93C2', name: 'Nguyễn Thị Thúy Uyên', license: '75D1-2983', rating: '2', status: 'success', startDate: '12/2/2023 12:35:22', cost: '32000000' },
-    { id: 3022, avatar: 'https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/368021133_1726419231151489_6853635133763153961_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=69Usxj6UgwwAX_IKtYe&_nc_ht=scontent.fhan14-1.fna&oh=00_AfD4HUPBnIMOJC5ozsB4i7BfkaDkCoX9BA9lkl_PVfVb4w&oe=656E0B96', name: 'Trần Trung Hiếu', license: '43P1-0877', rating: '3', status: 'error', cost: '32000000', startDate: '12/2/2023 13:35:22' },
-    { id: 2333, avatar: 'https://scontent.fhan14-2.fna.fbcdn.net/v/t39.30808-1/342455417_142632771949230_690728436599108059_n.jpg?stp=dst-jpg_p320x320&_nc_cat=106&ccb=1-7&_nc_sid=5740b7&_nc_eui2=AeFyRy3Pqvrbh5oqHPVCntUtOnZSSEzNvoQ6dlJITM2-hJT5HGfR_1UuQNkVK7F_ZaMArNvxZSitl2S-rK5jtTYF&_nc_ohc=186lXe8B0kEAX-jsjKZ&_nc_ht=scontent.fhan14-2.fna&oh=00_AfAmAAKbj68wgm8Lj-BSqxwxug0gkjAEw3KfHovjlcZvsg&oe=656E93C2', name: 'Nguyễn Thị Thúy Uyên', license: '75D1-2983', rating: '2', status: 'success', startDate: '12/2/2023 12:35:22', cost: '32000000' },
-    { id: 3012, avatar: 'https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/368021133_1726419231151489_6853635133763153961_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=69Usxj6UgwwAX_IKtYe&_nc_ht=scontent.fhan14-1.fna&oh=00_AfD4HUPBnIMOJC5ozsB4i7BfkaDkCoX9BA9lkl_PVfVb4w&oe=656E0B96', name: 'Trần Trung Hiếu', license: '43P1-0877', rating: '3', status: 'error', cost: '32000000', startDate: '12/2/2023 13:35:22' },
-    { id: 2353, avatar: 'https://scontent.fhan14-2.fna.fbcdn.net/v/t39.30808-1/342455417_142632771949230_690728436599108059_n.jpg?stp=dst-jpg_p320x320&_nc_cat=106&ccb=1-7&_nc_sid=5740b7&_nc_eui2=AeFyRy3Pqvrbh5oqHPVCntUtOnZSSEzNvoQ6dlJITM2-hJT5HGfR_1UuQNkVK7F_ZaMArNvxZSitl2S-rK5jtTYF&_nc_ohc=186lXe8B0kEAX-jsjKZ&_nc_ht=scontent.fhan14-2.fna&oh=00_AfAmAAKbj68wgm8Lj-BSqxwxug0gkjAEw3KfHovjlcZvsg&oe=656E93C2', name: 'Nguyễn Thị Thúy Uyên', license: '75D1-2983', rating: '2', status: 'success', startDate: '12/2/2023 12:35:22', cost: '32000000' },
-    { id: 3062, avatar: 'https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/368021133_1726419231151489_6853635133763153961_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=69Usxj6UgwwAX_IKtYe&_nc_ht=scontent.fhan14-1.fna&oh=00_AfD4HUPBnIMOJC5ozsB4i7BfkaDkCoX9BA9lkl_PVfVb4w&oe=656E0B96', name: 'Trần Trung Hiếu', license: '43P1-0877', rating: '3', status: 'error', cost: '32000000', startDate: '12/2/2023 13:35:22' },
-    { id: 2373, avatar: 'https://scontent.fhan14-2.fna.fbcdn.net/v/t39.30808-1/342455417_142632771949230_690728436599108059_n.jpg?stp=dst-jpg_p320x320&_nc_cat=106&ccb=1-7&_nc_sid=5740b7&_nc_eui2=AeFyRy3Pqvrbh5oqHPVCntUtOnZSSEzNvoQ6dlJITM2-hJT5HGfR_1UuQNkVK7F_ZaMArNvxZSitl2S-rK5jtTYF&_nc_ohc=186lXe8B0kEAX-jsjKZ&_nc_ht=scontent.fhan14-2.fna&oh=00_AfAmAAKbj68wgm8Lj-BSqxwxug0gkjAEw3KfHovjlcZvsg&oe=656E93C2', name: 'Nguyễn Thị Thúy Uyên', license: '75D1-2983', rating: '2', status: 'success', startDate: '12/2/2023 12:35:22', cost: '32000000' },
-    { id: 3082, avatar: 'https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/368021133_1726419231151489_6853635133763153961_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=69Usxj6UgwwAX_IKtYe&_nc_ht=scontent.fhan14-1.fna&oh=00_AfD4HUPBnIMOJC5ozsB4i7BfkaDkCoX9BA9lkl_PVfVb4w&oe=656E0B96', name: 'Trần Trung Hiếu', license: '43P1-0877', rating: '3', status: 'error', cost: '32000000', startDate: '12/2/2023 13:35:22', cost: '32000000' },
-    { id: 2393, avatar: 'https://scontent.fhan14-2.fna.fbcdn.net/v/t39.30808-1/342455417_142632771949230_690728436599108059_n.jpg?stp=dst-jpg_p320x320&_nc_cat=106&ccb=1-7&_nc_sid=5740b7&_nc_eui2=AeFyRy3Pqvrbh5oqHPVCntUtOnZSSEzNvoQ6dlJITM2-hJT5HGfR_1UuQNkVK7F_ZaMArNvxZSitl2S-rK5jtTYF&_nc_ohc=186lXe8B0kEAX-jsjKZ&_nc_ht=scontent.fhan14-2.fna&oh=00_AfAmAAKbj68wgm8Lj-BSqxwxug0gkjAEw3KfHovjlcZvsg&oe=656E93C2', name: 'Nguyễn Thị Thúy Uyên', license: '75D1-2983', rating: '2', status: 'success', startDate: '12/2/2023 12:35:22', cost: '32000000' },
-    { id: 3232, avatar: 'https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/368021133_1726419231151489_6853635133763153961_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeHXc4Y4B9SC2Fny3yA8N-CUBC9cMpZD2bwEL1wylkPZvD4bJYKXx2IP8953lqBULM1Rvddh6Q3aEhnBc6AwmJmM&_nc_ohc=69Usxj6UgwwAX_IKtYe&_nc_ht=scontent.fhan14-1.fna&oh=00_AfD4HUPBnIMOJC5ozsB4i7BfkaDkCoX9BA9lkl_PVfVb4w&oe=656E0B96', name: 'Trần Trung Hiếu', license: '43P1-0877', rating: '3', status: 'error', cost: '32000000', startDate: '12/2/2023 13:35:22' },
-    { id: 1233, avatar: 'https://scontent.fhan14-2.fna.fbcdn.net/v/t39.30808-1/342455417_142632771949230_690728436599108059_n.jpg?stp=dst-jpg_p320x320&_nc_cat=106&ccb=1-7&_nc_sid=5740b7&_nc_eui2=AeFyRy3Pqvrbh5oqHPVCntUtOnZSSEzNvoQ6dlJITM2-hJT5HGfR_1UuQNkVK7F_ZaMArNvxZSitl2S-rK5jtTYF&_nc_ohc=186lXe8B0kEAX-jsjKZ&_nc_ht=scontent.fhan14-2.fna&oh=00_AfAmAAKbj68wgm8Lj-BSqxwxug0gkjAEw3KfHovjlcZvsg&oe=656E93C2', name: 'Nguyễn Thị Thúy Uyên', license: '75D1-2983', rating: '2', status: 'success', startDate: '12/2/2023 12:35:22', cost: '32000000' },
-  ];
 
 
 
@@ -173,11 +179,9 @@ const Orders = () => {
           rows={rows}
           rowHeight={80}
           initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 5 },
-            },
+            pagination: {paginationModel}
           }}
-          // pageSizeOptions={[5, 10]}
+          pageSizeOptions={[5]}
           checkboxSelection
         >
         </DataGrid>

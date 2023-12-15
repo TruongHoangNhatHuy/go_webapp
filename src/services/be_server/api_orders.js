@@ -6,7 +6,7 @@ const serverUrl = config.be_rootUrl;
 export const getAllOrders = async (token,from = null,to = null,sortType = "desc",sortField = "createAt", page = 0, size = 5) => {
     const urlStringFrom = (from != null) ? "&from=" + from : ""
     const urlStringTo = (to != null) ? "&to=" + to : ""
-    const urlString = serverUrl +"/bookings?" + "&sortField=" + sortField + urlStringFrom + urlStringTo + "&sortType=" + sortType + "&sortField=" +  sortField + "&size=" +  size  + "&page=" + page;
+    const urlString = serverUrl +"/bookings?" + "sortField=" + sortField + urlStringFrom + urlStringTo + "&sortType=" + sortType + "&size=" +  size  + "&page=" + page;
     const authToken = "Bearer " + token;
   
     return await fetch(urlString, {
@@ -26,8 +26,10 @@ export const getAllOrders = async (token,from = null,to = null,sortType = "desc"
         return response.json();
       })
       // await getting response body
-      .then(result => {
-        return result;
+      .then(data => {
+        console.log('get result', data.content);
+        console.log('get result', data);
+        return data.content;
       })
       // catch fail fetch
       .catch(error => {
