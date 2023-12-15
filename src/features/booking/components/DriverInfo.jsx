@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { Rating, Grid, Modal, Badge, Box, Button, Divider, IconButton, Stack, Typography, ListItem, ListItemAvatar, Avatar, ListItemText, TextField, Table, TableBody, TableCell, TableRow, debounce } from '@mui/material';
+import { Rating, Grid, Modal, Badge, Box, Button, Divider, IconButton, Stack, Typography, ListItem, ListItemAvatar, Avatar, ListItemText, TextField, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { blue, grey, green, yellow, pink } from '@mui/material/colors'
 import { useBookingContext } from 'contexts/BookingContext';
 import dayjs from 'dayjs';
@@ -77,7 +76,7 @@ const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, c
               <Avatar src={driverInfo.avtUrl}>
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={driverInfo.fullName} secondary="Online" />
+            <ListItemText primary={driverInfo.fullName} />
             <IconButton onClick={handleCloseMessage}>
               <MdClose />
             </IconButton>
@@ -269,38 +268,10 @@ const DriverInfoDetail = ({ driverInfo }) => {
 }
 
 export const DriverInfo = () => {
-  const conversationData=
+  const conversationData =
   {
-    id_conversation: 10,
-    id_booking:1,
-    messagesData:[{
-        id:1,
-        id_sender: 4,
-        id_receiver: 6,
-        time: '11:09pm',
-        content: 'Xin chào bạn! Tôi Sẽ Hướng Dẫn Bạn'
-      },
-      {
-        id:2,
-        id_sender: 6,
-        id_receiver: 4,
-        time: '11:09pm',
-        content: 'Tôi cần đi bến xe ngay bây giờ'
-      },
-      {
-        id:3,
-        id_sender: 4,
-        id_receiver: 6,
-        time: '11:09pm',
-        content: 'Tôi cần đi bến xe ngay bây giờ'
-      },
-      {
-        id:4,
-        id_sender: 6,
-        id_receiver: 4,
-        time: '11:09pm',
-        content: 'Hello đây là đoạn văn mẫu'
-      }]
+    id_booking: null,
+    messagesData: []
   }
   
   const [openMessage, setOpenMessage] = useState(false);
@@ -329,6 +300,7 @@ export const DriverInfo = () => {
   })
 
   useEffect(() => {
+    conversation.id_booking = bookingInfo.id
     SocketSubscriber(socketClient,'/user/message_receive',SendMesssageCallback)
     return () => {
       SocketUnsubscribe(socketClient, '/user/message_receive')

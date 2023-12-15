@@ -5,12 +5,14 @@ import { useEffect, useRef, useState } from 'react';
 import { MdOutlinePayment } from "react-icons/md";
 import { BookingForm, BookingInfoSide, LocationInputSide } from 'features/booking';
 import { getDriverById } from 'features/account';
-import { SocketSubscriber, SocketUnsubscribe, useSocketClient } from 'services/websocket/StompOverSockJS';
+import { SocketPublish, SocketSubscriber, SocketUnsubscribe, useSocketClient } from 'services/websocket/StompOverSockJS';
 import { useUserContext } from 'contexts/UserContext';
 import { useBookingContext } from 'contexts/BookingContext';
+import { useNotifyContext } from 'layouts/MainLayout';
 
 const Booking = () => {
   const [user,] = useUserContext();
+  const [,setNotify] = useNotifyContext();
   // UI state
   const [bookingForm, setBookingForm] = useState(false);
   const [hadBooking, setHadBooking] = useState(false);
@@ -55,10 +57,19 @@ const Booking = () => {
   // WS code
   const socketClient = useSocketClient()
   const bookingStatusCallback = (result) => {
+    setNotify('booking');
     const data = JSON.parse(result);
-    console.log('Payment result:', data);
+    console.log('Booking status change:', data);
     // Update status
     if (data['bookingId'] === bookingInfo.id) {
+      // Nếu status là hủy đơn
+      if (data.status === 'CANCELLED') {
+        console.log('Booking cancelled')
+        // setStartLocation(null);
+        // setEndLocation(null);
+        // setVehicleRoute(null);
+        setHadBooking(false);
+      }
       updatedBookingInfo.status = data.status;
       setBookingInfo(updatedBookingInfo);
       sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
@@ -68,8 +79,9 @@ const Booking = () => {
     }
   }
   const driverInfoCallback = async (result) => {
+    setNotify('booking');
     const data = JSON.parse(result);
-    console.log('Driver id:', data);
+    console.log('/user/customer_driver_info', data);
     // update driver id
     updatedBookingInfo.status = 'FOUND';
     updatedBookingInfo.driverId = data.driverId;
@@ -88,33 +100,47 @@ const Booking = () => {
   }
   const driverLocationCallback = (result) => {
     const data = JSON.parse(result);
-    // console.log('Driver location:', data);
+    console.log('/user/customer_driver_location', data);
     const locationStr = data.location;
     const location = locationStr.split(',');
-    const driverLatLng = { lat: location[0] , lng: location[1] };
+    const driverPos = { 
+      vehicle: bookingInfo.vehicleType,
+      lat: location[0],
+      lng: location[1]
+    };
     // console.log('Driver latLng:', driverLatLng);
-    setDriverPosition(driverLatLng);
+    setDriverPosition(driverPos);
   }
   useEffect(() => {
     if (hadBooking) {
       SocketSubscriber(socketClient, '/user/booking_status', bookingStatusCallback);
-      SocketSubscriber(socketClient, '/user/customer_driver_info', driverInfoCallback);
-      SocketSubscriber(socketClient, '/user/customer_driver_location', driverLocationCallback);
+      if (bookingInfo.status === 'PAID') {
+        SocketSubscriber(socketClient, '/user/customer_driver_info', driverInfoCallback);
+      }
+      if (bookingInfo.status === 'FOUND') {
+        SocketSubscriber(socketClient, '/user/customer_driver_location', driverLocationCallback);
+      }
     } else {
       SocketUnsubscribe(socketClient, '/user/booking_status');
       SocketUnsubscribe(socketClient, '/user/customer_driver_info');
       SocketUnsubscribe(socketClient, '/user/customer_driver_location');
       setDriverPosition(null);
     }
-  }, [hadBooking])
+  }, [hadBooking, bookingInfo.status])
   
   // Xử lý hủy đơn
   const handleBookingCancel = () => {
-    // setStartLocation(null);
-    // setEndLocation(null);
-    // setVehicleRoute(null);
-    setHadBooking(false);
+    // Thông báo cho server
+    SocketPublish(socketClient, '/app/booking_status', {
+      uid: bookingInfo.customerId,
+      bookingId: bookingInfo.id,
+      bookingStatus: 'CANCELLED'
+    })
+    console.log('Booking cancelling, id', bookingInfo.id);
   };
+  const handleBookingComplete = () => {
+    setHadBooking(false);
+  }
 
   return (
     <div>
@@ -133,7 +159,7 @@ const Booking = () => {
       <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setUserPosition={setUserPosition} setMapCenterRef={setMapCenterRef} driverPosition={driverPosition}/>
       {/* Side Drawer */}
       <LocationInputSide hidden={hadBooking} userPosition={userPosition} startLocation={startLocation} setStartLocation={setStartLocation} endLocation={endLocation} setEndLocation={setEndLocation} setVehicleRoute={setVehicleRoute} setMapCenterRef={setMapCenterRef} setBookingForm={setBookingForm} />
-      {hadBooking ? <BookingInfoSide handleBookingCancel={handleBookingCancel}/> : <div/>}
+      {hadBooking ? <BookingInfoSide handleBookingCancel={handleBookingCancel} handleBookingComplete={handleBookingComplete}/> : <div/>}
       {/* Cửa sổ mở Booking Form */}
       <Dialog open={bookingForm} >
         <DialogTitle 
