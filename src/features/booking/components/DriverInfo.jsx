@@ -18,15 +18,14 @@ const MessageForm = ({ open, setOpenMessage, driverInfo, senderId, receiverId, c
   };
   const handleSend = () => {
     if (contentMessage === '' || contentMessage === null) return
-    const id_sender = senderId
-    const id_receiver = receiverId
-    handleCreateMessage({
-      id_conversation: conversation.id_conversation,
-      id_receiver: id_receiver,
-      id_sender: id_sender, 
+    const body = {
+      conversationId: conversation.id_booking,
+      receiverId: receiverId,
+      senderId: senderId, 
       content: contentMessage
-    })
-    console.log('Send:', contentMessage, ', from', id_sender, 'to', id_receiver)
+    }
+    handleCreateMessage(body)
+    console.log('Send:', body)
     setContentMessage("")
   }
 
@@ -257,21 +256,6 @@ const DriverInfoDetail = ({ driverInfo }) => {
 }
 
 export const DriverInfo = () => {
-  const conversationData =
-  {
-    id_booking: null,
-    messagesData: []
-  }
-  
-  const [openMessage, setOpenMessage] = useState(false);
-  const restoredConversation = sessionStorage.getItem('conversationCache');
-  const [conversation,setConversation] = useState(
-    restoredConversation === null ? conversationData : 
-    JSON.parse(restoredConversation)
-  );
-  const [updated,setUpdated] = useState("") // Trigger rerender
-  const socketClient = useSocketClient()
-
   const [bookingInfo,] = useBookingContext()
   const driverInfo = (bookingInfo.driverInfo !== null ? bookingInfo.driverInfo :
   { // test data
@@ -287,6 +271,21 @@ export const DriverInfo = () => {
     rating: 4.5,
     vehicleType: 'MOTORCYCLE'
   })
+  const conversationData =
+  {
+    id_booking: bookingInfo.id,
+    messagesData: []
+  }
+  
+  const [openMessage, setOpenMessage] = useState(false);
+  const restoredConversation = sessionStorage.getItem('conversationCache');
+  const [conversation,setConversation] = useState(
+    restoredConversation === null ? conversationData : 
+    JSON.parse(restoredConversation)
+  );
+  const [updated,setUpdated] = useState("") // Trigger rerender
+  const socketClient = useSocketClient()
+
 
   useEffect(() => {
     conversation.id_booking = bookingInfo.id

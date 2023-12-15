@@ -54,3 +54,58 @@ export const createBooking = async (token, jsonBody) => {
       throw error;
     });
 }
+
+export const getActiveBooking = async (token) => {
+  var urlString = serverUrl + "/bookings/active";
+  var authToken = "Bearer " + token;
+
+  return await fetch(urlString, {
+    method: "GET",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+      "Authorization": authToken,
+      "Content-Type": "application/json",
+    },
+  })
+    .then(response => {
+      if (!response.ok)
+        throw new Error(`${response.status} ${response.statusText}`);
+      return response.json();
+    })
+    .then(result => {
+      return result;
+    })
+    .catch(error => {
+      console.warn('Get active booking failed: ', error);
+      throw error;
+    });
+}
+
+export const createReview = async (token, formData) => {
+  var urlString = serverUrl + "/reviews";
+  var authToken = "Bearer " + token;
+
+  return await fetch(urlString, {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+      "Authorization": authToken,
+    },
+    body: formData,
+    redirect: "follow"
+  })
+    .then(response => {
+      if (!response.ok)
+        throw new Error(`${response.status} ${response.statusText}`);
+      return response.json();
+    })
+    .then(result => {
+      return result;
+    })
+    .catch(error => {
+      console.warn('Create review failed: ', error);
+      throw error;
+    });
+}

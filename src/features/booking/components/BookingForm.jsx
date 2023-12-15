@@ -74,7 +74,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
       })
       .catch(error => {
-        console.warn('Create booking failed', error);
+        console.log('Create booking failed', error);
         alert('Đặt xe thất bại');
         setFetching(false);
       })

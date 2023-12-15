@@ -1,16 +1,20 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle, Box, Button, Divider, Drawer, IconButton, Stack, Typography, Skeleton, Rating, Paper, TextField } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import { useState } from 'react';
+import { LoadingButton } from '@mui/lab';
 import { MdDeleteOutline } from "react-icons/md";
+import { useState } from 'react';
 import { useBookingContext } from 'contexts/BookingContext';
+import { useUserContext } from 'contexts/UserContext';
 import { BookingDetail } from './BookingDetail';
 import { DriverInfo } from './DriverInfo';
-import { LoadingButton } from '@mui/lab';
+import { createReview } from '../services/be_server/api_booking';
 
-const BookingRating = () => {
+const BookingRating = ({ bookingId }) => {
+  const [user,] = useUserContext();
   const [sent, setSent] = useState(false);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(-1);
+  const [errorText, setErrorText] = useState(null);
   const labels = {
     1: 'Tệ',
     2: 'Tạm',
@@ -19,15 +23,24 @@ const BookingRating = () => {
     5: 'Xuất sắc',
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget);  
-    console.log('Rating');
+    formData.append('bookingId', bookingId);
+    console.log('Booking rating');
     for(var pair of formData.entries()) {
       console.log(pair[0]+ ': '+ pair[1]);
     }
-    // to do: gửi rating cho server
-    setSent(true);
+
+    await createReview(user.token, formData)
+      .then(result => {
+        console.log('Create review result: ', result);
+        setSent(true);
+      })
+      .catch(error => {
+        console.log('Create review failed: ', error);
+        setErrorText('Vui lòng thử lại');
+      })
   }
 
   return (
@@ -41,8 +54,8 @@ const BookingRating = () => {
         <Stack paddingX={2} spacing={1}>
           <Stack direction='row' alignItems='center' spacing={2}>
             <Rating
-              id='booking-rating'
-              name='booking-rating'
+              id='rating'
+              name='rating'
               size='large'
               readOnly={sent}
               value={rating}
@@ -61,9 +74,11 @@ const BookingRating = () => {
             </Typography>
             <TextField multiline
               rows={3}
-              id='booking-comment'
-              name='booking-comment'
+              id='content'
+              name='content'
               disabled={sent}
+              helperText={errorText}
+              FormHelperTextProps={{ sx: {color: 'red'} }}
             />
             <Button type='submit' disabled={sent}>Gửi</Button>
           </Stack>
@@ -151,7 +166,7 @@ export const BookingInfoSide = ({ handleBookingCancel, handleBookingComplete }) 
           )}
           {bookingInfo.status === 'COMPLETE' &&
             <Stack justifyContent='center' spacing={2}>
-              <BookingRating/>
+              <BookingRating bookingId={bookingInfo.id}/>
               <Button variant='outlined' onClick={handleBookingComplete}>
                 Đặt chuyến xe mới
               </Button>

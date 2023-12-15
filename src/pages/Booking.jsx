@@ -9,6 +9,9 @@ import { SocketPublish, SocketSubscriber, SocketUnsubscribe, useSocketClient } f
 import { useUserContext } from 'contexts/UserContext';
 import { useBookingContext } from 'contexts/BookingContext';
 import { useNotifyContext } from 'layouts/MainLayout';
+import { getActiveBooking } from 'features/booking/services/be_server/api_booking';
+import dayjs from 'dayjs';
+import { getLocationByCoordinates } from 'features/booking/services/vietmap/api_reverse';
 
 const Booking = () => {
   const [user,] = useUserContext();
@@ -30,12 +33,67 @@ const Booking = () => {
   // Snackbar message
   const [sbMessage, setSbMessage] = useState(null);
 
-  // khôi phục thông tin đặt xe nếu có
+  // Khôi phục thông tin đặt xe nếu có
+  const restoreBookingInfo = async () => {
+    await getActiveBooking(user.token)
+      .then(result => {
+        console.log(result)
+        if (result !== null) {
+          updatedBookingInfo.id = result.id;
+          updatedBookingInfo.status = result.status;
+          updatedBookingInfo.vehicleType = result.vehicleType.toLowerCase();
+          updatedBookingInfo.paymentAmounts = result.amount;
+          updatedBookingInfo.paymentMethod = result.paymentMethod;
+          updatedBookingInfo.timeSubmit = dayjs(result.createAt).format('DD/MM/YYYY[, ]HH:mm[ ]A');
+          updatedBookingInfo.customerId = result.customerId;
+          updatedBookingInfo.driverId = result.driverId;
+
+          const pickup = result.pickupLocation.split(',');
+          const startLocation = getLocationByCoordinates(pickup[1], pickup[0])[0];
+          updatedBookingInfo.startLocation = {
+            location: startLocation,
+            coordinates: { lat: pickup[0], lng: pickup[1] }
+          };
+          const dropOff = result.dropOffLocation.split(',');
+          const endLocation = getLocationByCoordinates(dropOff[1], dropOff[0])[0];
+          updatedBookingInfo.endLocation = {
+            location: endLocation,
+            coordinates: { lat: dropOff[0], lng: dropOff[1] }
+          };
+        }
+      })
+      .catch(error => {
+        console.log('getActiveBooking failed: ', error)
+      })
+    // khôi phục driverInfo
+    if (updatedBookingInfo.driverId !== null) {
+      await getDriverById(user.token, updatedBookingInfo.driverId)
+        .then((result) => {
+          // console.log('Driver info', result);
+          updatedBookingInfo.driverInfo = result;
+        })
+        .catch((error) => {
+          console.log('Get driver info failed: ', error);
+        })
+    }
+    if (updatedBookingInfo.status !== null) {
+      setBookingInfo(updatedBookingInfo);
+      sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
+      setHadBooking(true);
+      setStartLocation(updatedBookingInfo.startLocation);
+      setEndLocation(updatedBookingInfo.endLocation);
+    }
+  }
   useEffect(() => {
+    // lấy từ session storage
     if (bookingInfo.status !== null) {
-      setHadBooking(true)
-      setStartLocation(bookingInfo.startLocation)
-      setEndLocation(bookingInfo.endLocation)
+      setHadBooking(true);
+      setStartLocation(bookingInfo.startLocation);
+      setEndLocation(bookingInfo.endLocation);
+    }
+    // request lại từ server
+    else {
+      restoreBookingInfo();
     }
   }, []);
 
