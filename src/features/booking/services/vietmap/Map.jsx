@@ -6,8 +6,8 @@ import CarIcon from 'assets/car.png';
 import MotocycleIcon from 'assets/motorcycle.png'
 
 // const apiKey = config.vietmap.primaryToken // 1000 req/ngày
-const apiKey = config.vietmap.secondaryToken // 10 req/phút
-// const apiKey = config.vietmap.thirdToken // 5000 req/ngày
+// const apiKey = config.vietmap.secondaryToken // 10 req/phút
+const apiKey = config.vietmap.thirdToken // 5000 req/ngày
 
 const Map = (props) => {
   const { startLocation, endLocation, vehicleRoute, setUserPosition, setMapCenterRef, driverPosition } = props;

@@ -121,19 +121,21 @@ const Booking = () => {
     const data = JSON.parse(result);
     console.log('Booking status change:', data);
     // Update status
-    if (data['bookingId'] === bookingInfo.id) {
+    if (data.bookingId === bookingInfo.id) {
       // Nếu status là hủy đơn
       if (data.status === 'CANCELLED') {
         console.log('Booking cancelled')
+        sessionStorage.removeItem('bookingSession');
         // setStartLocation(null);
         // setEndLocation(null);
         // setVehicleRoute(null);
         setHadBooking(false);
         setHadDriver(false);
+      } else {
+        updatedBookingInfo.status = data.status;
+        setBookingInfo(updatedBookingInfo);
+        sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
       }
-      updatedBookingInfo.status = data.status;
-      setBookingInfo(updatedBookingInfo);
-      sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
     }
     else {
       console.log('Booking id not match, ignore result. Received:', data['bookingId'], '!= Current:', bookingInfo.id);
