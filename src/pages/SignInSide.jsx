@@ -133,7 +133,7 @@ export default function SignInSide() {
                 }}
               />
               {/* will remove later */}
-              {/* <Button onClick={handleAdminLogin}>Admin sign in</Button> */}
+              <Button onClick={handleAdminLogin}>Admin sign in</Button>
             </Box>
             <Copyright sx={{ mt: 20 }} />
           </Box>
