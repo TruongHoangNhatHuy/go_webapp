@@ -4,10 +4,11 @@ import config from 'config.json';
 import { getLocationByCoordinates } from "./api_reverse";
 import CarIcon from 'assets/car.png';
 import MotocycleIcon from 'assets/motorcycle.png'
+import polyline from "@mapbox/polyline";
 
 // const apiKey = config.vietmap.primaryToken // 1000 req/ngày
-const apiKey = config.vietmap.secondaryToken // 10 req/phút
-// const apiKey = config.vietmap.thirdToken // 5000 req/ngày
+// const apiKey = config.vietmap.secondaryToken // 10 req/phút
+const apiKey = config.vietmap.thirdToken // 5000 req/ngày
 
 const Map = (props) => {
   const { startLocation, endLocation, vehicleRoute, setUserPosition, setMapCenterRef, driverPosition } = props;
@@ -20,6 +21,7 @@ const Map = (props) => {
   const endMarkerRef = useRef(null);      // marker điểm đến
   const routeRef = useRef(null);          // route từ điểm đi tới điểm đến
   const driverMarkerRef = useRef(null);   // marker tài xế
+  const driverRouteRef = useRef(null);    // route từ tài xế tới khách hàng
 
   // Tạo custom marker
   const createCustomMarkerElement = (imagePath) => {
@@ -33,8 +35,23 @@ const Map = (props) => {
     el.style.backgroundSize = '100%';
     return ({
       element: el,
-      scale: 2, // not working
       offset: [0, -height/2]
+    });
+  }
+
+  const DriverMarker = (imagePath, bearing) => {
+    const el = document.createElement('div');
+    const width = 50;
+    const height = 50;
+    el.className = 'marker';
+    el.style.backgroundImage = 'url(' + imagePath + ')';
+    el.style.width = `${width}px`;
+    el.style.height = `${height}px`;
+    el.style.backgroundSize = '100%';
+    return ({
+      element: el,
+      rotation: bearing,
+      offset: [0, 0],
     });
   }
 
@@ -189,14 +206,64 @@ const Map = (props) => {
     };
   }, [startLocation, endLocation, vehicleRoute])
 
-  // Gắn marker vị trí driver
+  // Gắn marker vị trí driver & vẽ đường đi
   useEffect(() => {
     if (driverPosition !== null) {
-      var icon = driverPosition.vehicle === 'motorcycle' ? MotocycleIcon : CarIcon;
-      var driverLngLat = [driverPosition.lng, driverPosition.lat];
-      handleMarker(driverMarkerRef, driverLngLat, createCustomMarkerElement(icon));
+      const icon = driverPosition.vehicle === 'motorcycle' ? MotocycleIcon : CarIcon;
+      const driverLngLat = [driverPosition.lng, driverPosition.lat];
+      handleMarker(driverMarkerRef, driverLngLat, DriverMarker(icon, driverPosition.bearing));
+      // Vẽ đường đi tài xế
+      if (driverPosition.routeEncode !== null) {
+        const array = polyline.decode(driverPosition.routeEncode);
+        const swapArray = [];
+        array.forEach(point => {
+          swapArray.push([point[1], point[0]]);
+        });
+        const driverRoute = {
+          "type": "LineString",
+          "coordinates": swapArray
+        }
+        console.log(driverRoute);
+        // Nếu route cũ đang hiện trên bản đồ, xóa route cũ
+        if (driverRouteRef.current !== null) {
+          mapRef.current.removeLayer("driverRouteLayer");
+          mapRef.current.removeSource("driverRouteSource");
+        };
+        driverRouteRef.current = {};
+        driverRouteRef.current.source = {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            properties: {},
+            geometry: driverRoute,
+          }
+        };
+        driverRouteRef.current.layer = {
+          id: "driverRouteLayer",
+          type: "line",
+          source: "driverRouteSource",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "gray",
+            "line-width": 7,
+            "line-opacity": 0.7
+          }
+        };
+        mapRef.current.addSource("driverRouteSource", driverRouteRef.current.source);
+        mapRef.current.addLayer(driverRouteRef.current.layer);
+      }
     }
-    else handleMarker(driverMarkerRef, null);
+    else {
+      handleMarker(driverMarkerRef, null);
+      if (driverRouteRef.current !== null) {
+        mapRef.current.removeLayer("driverRouteLayer");
+        mapRef.current.removeSource("driverRouteSource");
+        driverRouteRef.current = {};
+      };
+    }
   }, [driverPosition])
 
   return (
