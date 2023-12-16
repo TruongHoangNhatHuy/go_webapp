@@ -22,6 +22,7 @@ const Booking = () => {
   // UI state
   const [bookingForm, setBookingForm] = useState(false);
   const [hadBooking, setHadBooking] = useState(false);
+  const [updated, setUpdated] = useState(null); // trigger re-render
   const [hadDriver, setHadDriver] = useState(bookingInfo.driverInfo === null ? false : true);
   // Map state
   const [userPosition, setUserPosition] = useState(null);
@@ -112,12 +113,13 @@ const Booking = () => {
       case 'FOUND': { setSbMessage('Đã tìm thấy tài xế'); break; }
       default: { setSbMessage(null); break; }
     }
-  }, [bookingInfo.status])
+  }, [updated])
 
   // WS code
   const socketClient = useSocketClient()
   const bookingStatusCallback = (result) => {
     setNotify('booking');
+    setUpdated(dayjs());
     const data = JSON.parse(result);
     console.log('Booking status change:', data);
     // Update status
@@ -126,9 +128,9 @@ const Booking = () => {
       if (data.status === 'CANCELLED') {
         console.log('Booking cancelled')
         sessionStorage.removeItem('bookingSession');
-        // setStartLocation(null);
-        // setEndLocation(null);
-        // setVehicleRoute(null);
+        setStartLocation(null);
+        setEndLocation(null);
+        setVehicleRoute(null);
         setHadBooking(false);
         setHadDriver(false);
       } else {
@@ -143,6 +145,7 @@ const Booking = () => {
   }
   const driverInfoCallback = async (result) => {
     setNotify('booking');
+    setUpdated(dayjs());
     const data = JSON.parse(result);
     console.log('/user/customer_driver_info', data);
     // update driver id
@@ -203,7 +206,12 @@ const Booking = () => {
     console.log('Booking cancelling, id', bookingInfo.id);
   };
   const handleBookingComplete = () => {
+    sessionStorage.removeItem('bookingSession');
+    sessionStorage.removeItem('conversationCache');
     setHadBooking(false);
+    setStartLocation(null);
+    setEndLocation(null);
+    setVehicleRoute(null);
   }
 
   return (

@@ -27,12 +27,14 @@ const BookingRating = ({ bookingId }) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget);  
     formData.append('bookingId', bookingId);
-    console.log('Booking rating');
+    
+    const jsonBody = {}
     for(var pair of formData.entries()) {
-      console.log(pair[0]+ ': '+ pair[1]);
+      jsonBody[pair[0]] = pair[1];
     }
+    console.log('Booking rating', jsonBody);
 
-    await createReview(user.token, formData)
+    await createReview(user.token, jsonBody)
       .then(result => {
         console.log('Create review result: ', result);
         setSent(true);
@@ -186,7 +188,7 @@ export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingC
             </>
           )}
           <BookingDetail />
-          {bookingInfo.status !== 'COMPLETE' &&
+          {bookingInfo.status !== 'COMPLETE' || bookingInfo.status !== 'ON_RIDE' &&
             <LoadingButton variant='outlined' size='small' color='error'
               loading={cancelling}
               onClick={() => setCancelDialog(true)} 

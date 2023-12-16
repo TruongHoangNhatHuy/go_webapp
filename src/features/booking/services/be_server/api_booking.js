@@ -82,7 +82,7 @@ export const getActiveBooking = async (token) => {
     });
 }
 
-export const createReview = async (token, formData) => {
+export const createReview = async (token, jsonBody) => {
   var urlString = serverUrl + "/reviews";
   var authToken = "Bearer " + token;
 
@@ -92,8 +92,9 @@ export const createReview = async (token, formData) => {
     cache: "no-cache",
     headers: {
       "Authorization": authToken,
+      "Content-Type": "application/json",
     },
-    body: formData,
+    body: JSON.stringify(jsonBody),
     redirect: "follow"
   })
     .then(response => {

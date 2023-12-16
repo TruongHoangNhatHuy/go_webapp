@@ -104,7 +104,7 @@ const Map = (props) => {
         var lat = e.coords.latitude;
         var position = [lat, lng];
         setUserPosition(position);
-        console.log('User position', position);
+        // console.log('User position', position);
       });
     }
 
