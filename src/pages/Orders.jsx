@@ -19,11 +19,7 @@ const Orders = () => {
     totalElements: 0,
     page: 0,
     size: 5,
-
   })
-  const [filterModel, setFilterModel] = useState({
-    items: [],
-  });
   const setColor = (statusTitle) =>{
     if (statusTitle == "ON_RIDE") return 'warning'
     if (statusTitle == "COMPLETE") return 'success'
@@ -36,10 +32,8 @@ const Orders = () => {
     if (statusTitle == "CANCELLED") return 'Đã Hủy'
     return null
   }
-  const [sortModel, setSortModel] = useState([]);
 
   const handleChangeData =  async (page,size) => {
-    console.log("=-==> ", page);
     setPageState(old=>({...old, isLoading:true}))
     await getAllOrders(user.token,page,size).then(result =>{
       setPageState(old=>({...old, isLoading:false, content:result.content, totalElements:result.totalElements}))

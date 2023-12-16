@@ -37,20 +37,21 @@ export default function SignInSide() {
 
   const handleLogin = async (credentialResponse) => {
     console.log('GG login', credentialResponse);
-    var status, role;
+    var status, role, id;
 
     await login(credentialResponse.credential)
       .then(result => {
         console.log('login result', result);
         status = String(result.data.status).toLowerCase();
         role = String(result.data.role).toLowerCase();
+        id = result.data.id;
       })
       .catch(error => {
         alert('Đăng nhập thất bại.');
         return;
       });
 
-    const userSession = { token: credentialResponse.credential, role: role };
+    const userSession = { token: credentialResponse.credential, role: role, id: id};
     // console.log('user session', userSession)  
 
     if (status === 'registered') {
