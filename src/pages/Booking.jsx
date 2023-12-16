@@ -19,7 +19,7 @@ const Booking = () => {
   // Thông tin đặt xe
   const [bookingInfo, setBookingInfo] = useBookingContext();
   const updatedBookingInfo = bookingInfo;
-  // UI state
+  // UI state 
   const [bookingForm, setBookingForm] = useState(false);
   const [hadBooking, setHadBooking] = useState(false);
   const [updated, setUpdated] = useState(null); // trigger re-render
@@ -168,14 +168,14 @@ const Booking = () => {
   const driverLocationCallback = (result) => {
     const data = JSON.parse(result);
     console.log('/user/customer_driver_location', data);
-    const locationStr = data.location;
-    const location = locationStr.split(',');
+    const location = data.location.split(',');
     const driverPos = { 
       vehicle: bookingInfo.vehicleType,
       lat: location[0],
-      lng: location[1]
+      lng: location[1],
+      bearing: data.bearing,
+      routeEncode: data.routeEncode
     };
-    // console.log('Driver latLng:', driverLatLng);
     setDriverPosition(driverPos);
   }
   useEffect(() => {
