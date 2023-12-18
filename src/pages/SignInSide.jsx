@@ -2,10 +2,11 @@ import * as React from 'react';
 import { Avatar, Button, CssBaseline, Link, Paper, Box, Grid, Typography } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { login } from 'services/be_server/api_login';
 import { useUserContext } from 'contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
+import { getTokensByAuthCode } from 'services/gg_cloud/tokenHelper';
 
 function Copyright(props) {
   return (
@@ -27,28 +28,42 @@ export default function SignInSide() {
   const [, setUser] = useUserContext();
   const navigate =  useNavigate();
 
-  const handleLogin = async (credentialResponse) => {
-    console.log('GG login', credentialResponse);
-    var status, role, id;
-
-    await login(credentialResponse.credential)
+  const handleLogin = async (codeResponse) => {
+    // console.log('auth-code:', codeResponse);
+    // Get tokens from GG Cloud
+    var ggTokens = null;
+    await getTokensByAuthCode(codeResponse.code)
       .then(result => {
-        console.log('login result', result);
-        status = String(result.data.status).toLowerCase();
-        role = String(result.data.role).toLowerCase();
-        id = result.data.id;
+        ggTokens = result;
       })
       .catch(error => {
-        alert('Đăng nhập thất bại.');
-        return;
+        alert('Đăng nhập bằng GG thất bại.');
+      })
+    if (ggTokens === null) return; // Không có tokens thì thoát hàm  
+    console.log('GG tokens', ggTokens);
+
+    // BE login
+    const userSession = {
+      token: ggTokens.id_token,
+      refreshToken: ggTokens.refresh_token,
+      status: null,
+      role: null,
+      id: null
+    }
+    await login(userSession.token)
+      .then(result => {
+        console.log('login result', result);
+        userSession.status = String(result.data.status).toLowerCase();
+        userSession.role = String(result.data.role).toLowerCase();
+        userSession.id = result.data.id;
+      })
+      .catch(error => {
+        alert('Yêu cầu đến Go server thất bại.');
       });
 
-    const userSession = { token: credentialResponse.credential, role: role, id: id};
-    // console.log('user session', userSession)  
-
-    if (status === 'registered') {
+    if (userSession.status === 'registered') {
       setUser(userSession);
-      switch (role) {
+      switch (userSession.role) {
         case 'customer':
           navigate("/customer");
           break;
@@ -59,24 +74,31 @@ export default function SignInSide() {
           navigate("/admin");
           break;
         default:
-          console.warn('Handle login failed: Role "'+ role +'" not existed');
+          console.warn('Handle login failed: Role "'+ userSession.role +'" not existed');
           break;
       }
     }
-    else if (status === 'unregistered') {
+    else if (userSession.status === 'unregistered') {
       setUser(userSession);
       navigate("/signup");
     }
-    else if (status === 'uncheck') {
+    else if (userSession.status === 'uncheck') {
       alert('Tài khoản tài xế đang chờ xét duyệt. Vui lòng thử lại sau.');
     }
-    else if (status === 'blocked') {
+    else if (userSession.status === 'blocked') {
       alert('Tài khoản đã bị khóa.');
     }
     else {
-      console.warn('Handle login failed: Status "'+ status +'" not existed');
+      console.warn('Handle login failed: Status "'+ userSession.status +'" not existed');
     }
   }
+
+  const ggLogin = useGoogleLogin({
+    flow: 'auth-code',
+    onSuccess: handleLogin,
+    onError: (error) => console.log(error)
+  })
+
   // Admin login, will remove later
   const handleAdminLogin = () => {
     const adminSession = { token: '', role: 'admin' };
@@ -107,12 +129,13 @@ export default function SignInSide() {
               Sign in
             </Typography>
             <Box mt={10}>
-              <GoogleLogin 
-                onSuccess={handleLogin}
-                onError={() => {
-                  console.log('GoogleLogin component: failed');
-                }}
-              />
+              <Button variant='outlined' onClick={ggLogin}>
+                Đăng nhập bằng tài khoản Google
+              </Button>
+              {/* <GoogleLogin 
+                onSuccess={(result) => console.log(result)}
+                onError={() => console.log('GoogleLogin component: failed')}
+              /> */}
               {/* will remove later */}
               {/* <Button onClick={handleAdminLogin}>Admin sign in</Button> */}
             </Box>

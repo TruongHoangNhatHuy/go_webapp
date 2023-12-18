@@ -13,7 +13,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import './NavMenu.css';
 import { useUserContext } from "contexts/UserContext";
 import { useNotifyContext } from "./MainLayout";
-import { googleLogout } from "@react-oauth/google";
 
 // List menu của khách hàng
 const customerMenu = [
@@ -121,7 +120,6 @@ const NavMenu = () => {
 		if (window.confirm('Xác nhận đăng xuất?')) {
 			setUser(null);
 			sessionStorage.clear();
-			googleLogout();
 			navigate('/');
 		}
 	}
