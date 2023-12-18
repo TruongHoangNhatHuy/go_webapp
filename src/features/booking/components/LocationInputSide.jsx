@@ -176,15 +176,14 @@ export const LocationInputSide = (props) => {
   }, [startLocation, endLocation])
 
   const handleVehicleChange = (_, value) => {
-    setVehicle(value);
-    if (value === 'motorcycle') {
-      setVehicleRoute(vehicleRouteRef.current.motorcycle)
-    } 
-    else if (value === 'car') {
-      setVehicleRoute(vehicleRouteRef.current.car)
-    }
-    else {
-      setVehicleRoute(null)
+    if (value !== null) {
+      setVehicle(value);
+      if (value === 'motorcycle') {
+        setVehicleRoute(vehicleRouteRef.current.motorcycle)
+      } 
+      else if (value === 'car') {
+        setVehicleRoute(vehicleRouteRef.current.car)
+      }
     }
   }
 

@@ -1,5 +1,8 @@
 {
   "be_rootUrl": "https://forlorn-bite-production.up.railway.app",
+  "gg_cloud": {    
+    "client_id":"650109837523-vcpbjogn6rgu2g4k1gojsfc5rtm5i7iq.apps.googleusercontent.com"
+  },
   "mapbox": {
     "accessToken": "pk.eyJ1IjoiaHV5MjAwMnRobiIsImEiOiJjbG5qempteHUwZ2oxMmtyejllMHlwaHY2In0.A5QuQitx_LYbunhA-F4xJA"
   },

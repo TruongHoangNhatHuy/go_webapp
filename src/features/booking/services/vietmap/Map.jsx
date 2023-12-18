@@ -215,15 +215,15 @@ const Map = (props) => {
       // Vẽ đường đi tài xế
       if (driverPosition.routeEncode !== null) {
         const array = polyline.decode(driverPosition.routeEncode);
-        const swapArray = [];
+        const correctedArray = [];
         array.forEach(point => {
-          swapArray.push([point[1], point[0]]);
+          correctedArray.push([point[1], point[0]]);
         });
         const driverRoute = {
           "type": "LineString",
-          "coordinates": swapArray
+          "coordinates": correctedArray
         }
-        console.log(driverRoute);
+        // console.log(driverRoute);
         // Nếu route cũ đang hiện trên bản đồ, xóa route cũ
         if (driverRouteRef.current !== null) {
           mapRef.current.removeLayer("driverRouteLayer");

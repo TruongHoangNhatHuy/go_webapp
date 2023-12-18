@@ -1,18 +1,11 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import CssBaseline from '@mui/material/CssBaseline';
-import Link from '@mui/material/Link';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import { Avatar, Button, CssBaseline, Link, Paper, Box, Grid, Typography } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { GoogleLogin } from '@react-oauth/google';
 import { login } from 'services/be_server/api_login';
 import { useUserContext } from 'contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -28,7 +21,6 @@ function Copyright(props) {
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
@@ -96,11 +88,7 @@ export default function SignInSide() {
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
+        <Grid item xs={false} sm={4} md={7}
           sx={{
             backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
             backgroundRepeat: 'no-repeat',
@@ -111,15 +99,7 @@ export default function SignInSide() {
           }}
         />
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-          <Box
-            sx={{
-              my: 8,
-              mx: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
+          <Box sx={{ my: 8, mx: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <LockOutlinedIcon />
             </Avatar>
@@ -134,7 +114,7 @@ export default function SignInSide() {
                 }}
               />
               {/* will remove later */}
-              <Button onClick={handleAdminLogin}>Admin sign in</Button>
+              {/* <Button onClick={handleAdminLogin}>Admin sign in</Button> */}
             </Box>
             <Copyright sx={{ mt: 20 }} />
           </Box>

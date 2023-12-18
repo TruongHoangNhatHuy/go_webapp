@@ -1,4 +1,4 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, Box, Button, Divider, Drawer, IconButton, Stack, Typography, Skeleton, Rating, Paper, TextField } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Box, Button, Divider, Drawer, IconButton, Stack, Typography, Skeleton, Rating, Paper, TextField, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { LoadingButton } from '@mui/lab';
 import { MdDeleteOutline } from "react-icons/md";
@@ -7,7 +7,7 @@ import { useBookingContext } from 'contexts/BookingContext';
 import { useUserContext } from 'contexts/UserContext';
 import { BookingDetail } from './BookingDetail';
 import { DriverInfo } from './DriverInfo';
-import { createReview } from '../services/be_server/api_booking';
+import { cancelBooking, createReview } from '../services/be_server/api_booking';
 
 const BookingRating = ({ bookingId }) => {
   const [user,] = useUserContext();
@@ -90,6 +90,61 @@ const BookingRating = ({ bookingId }) => {
   )
 }
 
+const BookingCancelDialog = ({ open, handleCancel }) => {
+  const [reasonType, setReasonType] = useState(null);
+  const [content, setContent] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const info = {
+      reasonType: reasonType,
+      content: content
+    };
+    handleCancel(info);
+  }
+
+  return (
+    <Dialog open={open}>
+      <Box component='form' onSubmit={handleSubmit}>
+        <DialogTitle sx={{ margin: 'auto' }}>
+          <b>HỦY ĐẶT XE</b>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={1}>
+            <Typography>Nguyên nhân hủy đơn?</Typography>
+            <ToggleButtonGroup
+              id='reasonType'
+              name='reasonType'
+              exclusive
+              value={reasonType}
+              onChange={(_, value) => setReasonType(value)}
+            >
+              <ToggleButton value='CUSTOMER'
+                sx={{ '&.Mui-selected': { color: 'green' } }}
+              >Phía khách hàng</ToggleButton>
+              <ToggleButton value='DRIVER'
+                sx={{ '&.Mui-selected': { color: 'green' } }}
+              >Phía tài xế</ToggleButton>
+            </ToggleButtonGroup>
+            <Typography>Chi tiết</Typography>
+            <TextField multiline
+              rows={2}
+              required
+              id='content'
+              name='content'
+              onChange={(e) => setContent(e.target.value)}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='outlined' color='error' type='submit'>Hủy đơn</Button>
+          <Button variant='outlined' color='info' onClick={() => handleCancel(null)}>Không</Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
+  )
+}
+
 export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingComplete }) => {
   const drawerWidth = 350;
   // Đóng mở drawer
@@ -98,21 +153,34 @@ export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingC
     setOpen(prev => !prev)
   }
 
+  const [user,] = useUserContext();
   const [bookingInfo,] = useBookingContext();
   const [statusUpdate, setStatusUpdate] = useState('') // trigger re-render
   const [cancelDialog, setCancelDialog] = useState(false);
-  const [cancelling, setCancelling] = useState(
-    bookingInfo.status === 'WAITING_REFUND' ? true : false
-  );
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     setStatusUpdate(bookingInfo.status);
   }, [bookingInfo.status])
   
-  const handleCancel = () => {
-    setCancelling(true)
-    setCancelDialog(false)
-    handleBookingCancel()
+  const handleCancel = async (info) => {
+    setCancelDialog(false);
+    if (info !== null) {
+      setCancelling(true);
+      console.log('Booking cancelling, id', bookingInfo.id, info);
+      const jsonBody = info;
+      setTimeout(async () => {
+        await cancelBooking(user.token, bookingInfo.id, jsonBody)
+          .then(result => {
+            if (result.status === "WAITING_REFUND")
+              handleBookingCancel(result.status);
+          })
+          .catch(error => {
+            alert('Hủy đơn thất bại. Vui lòng thử lại');
+          });
+        setCancelling(false);
+      }, 500);
+    }
   }
   const handlePaymentRedirect = () => {
     if (bookingInfo.paymentMethod === 'VNPay') {
@@ -171,14 +239,14 @@ export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingC
               </Stack>
             </Stack>
           )}
-          {bookingInfo.status === 'COMPLETE' &&
-            <Stack justifyContent='center' spacing={2}>
-              <BookingRating bookingId={bookingInfo.id}/>
-              <Button variant='outlined' onClick={handleBookingComplete}>
-                Đặt chuyến xe mới
-              </Button>
-            </Stack>
-          }
+          <Stack justifyContent='center' spacing={2}
+            display={(bookingInfo.status === 'COMPLETE' || bookingInfo.status === 'WAITING_REFUND' || bookingInfo.status === 'REFUNDED' || bookingInfo.status === 'CANCELLED') ? 'flex' : 'none'}
+          >
+            <BookingRating bookingId={bookingInfo.id}/>
+            <Button variant='outlined' onClick={handleBookingComplete}>
+              Đặt chuyến xe mới
+            </Button>
+          </Stack>
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Chi Tiết Đặt Xe</Typography>
           {bookingInfo.status !== 'WAITING' ? <div/> : (
@@ -188,31 +256,16 @@ export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingC
             </>
           )}
           <BookingDetail />
-          {bookingInfo.status !== 'COMPLETE' || bookingInfo.status !== 'ON_RIDE' &&
-            <LoadingButton variant='outlined' size='small' color='error'
-              loading={cancelling}
-              onClick={() => setCancelDialog(true)} 
-              startIcon={<MdDeleteOutline />}
-              children='Hủy đơn'
-            />
-          }
+          <LoadingButton variant='outlined' size='small' color='error'
+            loading={cancelling}
+            onClick={() => setCancelDialog(true)} 
+            startIcon={<MdDeleteOutline />}
+            disabled={bookingInfo.status === 'ON_RIDE' || bookingInfo.status === 'COMPLETE' || bookingInfo.status === 'WAITING_REFUND' || bookingInfo.status === 'REFUNDED' || bookingInfo.status === 'CANCELLED'}
+          >Hủy đơn</LoadingButton>
         </Stack>
       </Drawer>
       {/* Dialog xác nhận hủy đơn */}
-      <Dialog open={cancelDialog}>
-        <DialogTitle sx={{ margin: 'auto' }}>
-          <b>HỦY ĐẶT XE</b>
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ minWidth: '250px' }}>
-            <Typography variant='body1'>Xác nhận hủy đặt xe?</Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button variant='outlined' color='error' onClick={handleCancel}>Hủy</Button>
-          <Button variant='outlined' color='info' onClick={() => setCancelDialog(false)}>Không</Button>
-        </DialogActions>
-      </Dialog>
+      <BookingCancelDialog open={cancelDialog} handleCancel={handleCancel}/>
     </Stack>
   )
 }

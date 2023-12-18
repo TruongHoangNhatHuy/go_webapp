@@ -103,14 +103,15 @@ const Booking = () => {
   // Hiện thị thông báo trạng thái đơn đặt
   useEffect(() => {
     switch (bookingInfo.status) {
+      case 'WAITING': { setSbMessage('Đặt xe thành công, đang chờ thanh toán'); break; }
+      case 'PAID': { setSbMessage('Đã thanh toán thành công'); break; }
+      case 'FOUND': { setSbMessage('Đã tìm thấy tài xế'); break; }
+      case 'ARRIVED_PICKUP': { setSbMessage('Tài xế đã đón khách'); break; }
+      case 'ON_RIDE': { setSbMessage('Tài xế đang chở khách'); break; }
       case 'COMPLETE': { setSbMessage('Đã hoàn thành chuyến xe'); break; }
       case 'CANCELLED': { setSbMessage('Đã hủy chuyến xe'); break; }
-      case 'ON_RIDE': { setSbMessage('Tài xế đang chở khách hàng'); break; }
-      case 'WAITING': { setSbMessage('Đặt xe thành công, đang xử lý đơn đặt'); break; }
-      case 'PAID': { setSbMessage('Đã thanh toán thành công'); break; }
-      case 'REFUNDED': { setSbMessage('Đã hoàn tiền'); break; }
       case 'WAITING_REFUND': { setSbMessage('Đang thực hiện hoàn tiền'); break; }
-      case 'FOUND': { setSbMessage('Đã tìm thấy tài xế'); break; }
+      case 'REFUNDED': { setSbMessage('Đã hoàn tiền'); break; }
       default: { setSbMessage(null); break; }
     }
   }, [updated])
@@ -131,6 +132,7 @@ const Booking = () => {
         setStartLocation(null);
         setEndLocation(null);
         setVehicleRoute(null);
+        setSbMessage(null);
         setHadBooking(false);
         setHadDriver(false);
       } else {
@@ -196,19 +198,19 @@ const Booking = () => {
   }, [hadBooking, bookingInfo.status])
   
   // Xử lý hủy đơn
-  const handleBookingCancel = () => {
-    // Thông báo cho server
-    SocketPublish(socketClient, '/app/booking_status', {
-      uid: bookingInfo.customerId,
-      bookingId: bookingInfo.id,
-      bookingStatus: 'CANCELLED'
-    })
-    console.log('Booking cancelling, id', bookingInfo.id);
+  const handleBookingCancel = (status) => {
+    setNotify('booking');
+    setUpdated(dayjs());
+    updatedBookingInfo.status = status;
+    setBookingInfo(updatedBookingInfo);
+    sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
   };
+  // Xử lý đơn hoàn tất
   const handleBookingComplete = () => {
     sessionStorage.removeItem('bookingSession');
     sessionStorage.removeItem('conversationCache');
     setHadBooking(false);
+    setSbMessage(null);
     setStartLocation(null);
     setEndLocation(null);
     setVehicleRoute(null);
