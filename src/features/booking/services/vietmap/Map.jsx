@@ -153,6 +153,9 @@ const Map = (props) => {
       setMapCenter(endLngLat);
     }
     else handleMarker(endMarkerRef, null);
+    if (startLocation !== null && endLocation !== null) {
+      mapRef.current.fitBounds([startLocation.coordinates, endLocation.coordinates]);
+    }
   }, [startLocation, endLocation])
 
   // Vẽ route từ điểm đi tới điểm đến

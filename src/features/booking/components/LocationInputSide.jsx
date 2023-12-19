@@ -23,7 +23,7 @@ Khi chưa xác định thì ném lỗi "Convert Null toString" khi dùng search 
 
 const SearchBox = (props) => {
   const { userPosition, location, setLocation, setMapCenterRef, ...tfProps } = props;
-  const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState([{ "name": "Vị trí người dùng" }]);
   // Thông tin địa điểm được chọn
   const locationRef = useRef(null);
 

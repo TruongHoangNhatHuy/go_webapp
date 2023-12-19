@@ -44,10 +44,10 @@ const Booking = () => {
           updatedBookingInfo.status = result.status;
           updatedBookingInfo.vehicleType = result.vehicleType.toLowerCase();
           updatedBookingInfo.paymentAmounts = result.amount;
-          updatedBookingInfo.paymentMethod = result.paymentMethod;
+          updatedBookingInfo.paymentMethod = result.payment.paymentMethod;
           updatedBookingInfo.timeSubmit = dayjs(result.createAt).format('DD/MM/YYYY[, ]HH:mm[ ]A');
-          updatedBookingInfo.customerId = result.customerId;
-          updatedBookingInfo.driverId = result.driverId;
+          updatedBookingInfo.customerId = result.customer.id;
+          updatedBookingInfo.driverId = result.driver.id;
 
           const pickUp = result.pickUpLocation.split(',');
           const startLocation = getLocationByCoordinates(pickUp[1], pickUp[0])[0];
