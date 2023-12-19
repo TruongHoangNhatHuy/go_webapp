@@ -17,12 +17,13 @@ import { MdCloudUpload, MdChangeCircle } from "react-icons/md";
 import "dayjs/locale/en-gb";
 import { getInfoAccount, updateInfoAccount } from "services/be_server/api_info";
 import { useUserContext } from "contexts/UserContext";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useEffect, useState } from "react";
 import CircularProgress from "@mui/material-next/CircularProgress";
 
 const AccountInfo = () => {
   const [user, setUser] = useUserContext();
-  // const [name, setName] = useState("");
   const [edit, setEdit] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [inforUser, setInforUser] = useState({
@@ -33,6 +34,7 @@ const AccountInfo = () => {
     avatar: null,
     createAt: null,
     dateOfBirth: null,
+    isUpdate:false,
   });
   const handleGetData = async () => {
     await getInfoAccount(user.token, user.id)
@@ -54,6 +56,10 @@ const AccountInfo = () => {
   const handleUpdateData = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const avatarCheck = formData.get('avatar');
+    if(avatarCheck == null){
+      formData.delete('avatar')
+    }
     console.log("data before update");
     for (var pair of formData.entries()) {
       console.log(JSON.stringify(pair));
@@ -69,9 +75,31 @@ const AccountInfo = () => {
           dateOfBirth: result.dateOfBirth,
           phone: result.phoneNumber,
         });
+        toast.success('Cập nhật thành công!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
         setFetching(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err)
+        toast.error('Cập nhật thất bại!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
+      });
   };
   useEffect(() => {
     handleGetData();
@@ -171,7 +199,7 @@ const AccountInfo = () => {
           </Grid>
           <Grid item xs={1} sm={1} minWidth={"100%"} textAlign={"center"}>
             <TextField
-              required
+              // required
               type='file'
               inputProps={{ accept: 'image/*'}}
               id="avatar"
@@ -183,9 +211,7 @@ const AccountInfo = () => {
           <Grid item xs={1} sm={1} minWidth={"100%"} px={"12px"} pt={"24px"}>
             <TextField
               InputProps={{ sx: { borderRadius: "12px" } }}
-              // onChange={(e) => setName(e.target.value)}
               defaultValue={inforUser.fullname}
-              // value={name}
               id="Name"
               name="fullName"
               label="Họ tên"
@@ -317,6 +343,7 @@ const AccountInfo = () => {
             </Button>
           </Grid>
         </Grid>
+        <ToastContainer />
       </Grid>
     );
 };
@@ -335,6 +362,7 @@ const Account = () => {
         <AccountInfo />
       </Grid>
     </Grid>
+
   );
 };
 
