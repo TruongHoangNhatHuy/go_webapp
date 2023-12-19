@@ -19,7 +19,8 @@ export const emptyBooking = {
   timeSubmit: null,       // integer
   customerId: null,       // integer
   driverId: null,         // integer
-  driverInfo: null        // json driver info
+  driverInfo: null,       // json driver info
+  rating: null, /* = { bookingId, rating, content, createAt } */
 };
 
 // Context.Provider

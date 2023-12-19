@@ -11,9 +11,11 @@ import { cancelBooking, createReview } from '../services/be_server/api_booking';
 
 const BookingRating = ({ bookingId }) => {
   const [user,] = useUserContext();
+  const [bookingInfo, setBookingInfo] = useBookingContext();
   const [sent, setSent] = useState(false);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(-1);
+  const [content, setContent] = useState(null);
   const [errorText, setErrorText] = useState(null);
   const labels = {
     1: 'Tệ',
@@ -22,6 +24,17 @@ const BookingRating = ({ bookingId }) => {
     4: 'Tốt',
     5: 'Xuất sắc',
   };
+
+  useEffect(() => {
+    const restoredBookingInfo = JSON.parse(sessionStorage.getItem('bookingSession'));
+    if (restoredBookingInfo !== null && restoredBookingInfo.rating !== null) {
+      const restoredRating = restoredBookingInfo.rating;
+      console.log(restoredRating);
+      setSent(true);
+      setRating(restoredRating.rating);
+      setContent(restoredRating.content);
+    }
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -38,12 +51,16 @@ const BookingRating = ({ bookingId }) => {
       .then(result => {
         console.log('Create review result: ', result);
         setSent(true);
+        const updatedBookingInfo = bookingInfo;
+        updatedBookingInfo.rating = result;
+        setBookingInfo(updatedBookingInfo);
+        sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
       })
       .catch(error => {
         console.log('Create review failed: ', error);
         setErrorText('Vui lòng thử lại');
       })
-  }
+    }
 
   return (
     <Paper elevation={2}>
@@ -79,6 +96,8 @@ const BookingRating = ({ bookingId }) => {
               id='content'
               name='content'
               disabled={sent}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               helperText={errorText}
               FormHelperTextProps={{ sx: {color: 'red'} }}
             />
@@ -239,13 +258,13 @@ export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingC
               </Stack>
             </Stack>
           )}
-          <Stack justifyContent='center' spacing={2}
+          <Stack justifyContent='center' display={(bookingInfo.status === 'COMPLETE') ? 'flex' : 'none'}>
+            <BookingRating bookingId={bookingInfo.id}/>
+          </Stack>
+          <Stack justifyContent='center'
             display={(bookingInfo.status === 'COMPLETE' || bookingInfo.status === 'WAITING_REFUND' || bookingInfo.status === 'REFUNDED' || bookingInfo.status === 'CANCELLED') ? 'flex' : 'none'}
           >
-            <BookingRating bookingId={bookingInfo.id}/>
-            <Button variant='outlined' onClick={handleBookingComplete}>
-              Đặt chuyến xe mới
-            </Button>
+            <Button variant='outlined' onClick={handleBookingComplete}>Đặt chuyến xe mới</Button>
           </Stack>
           <Divider />
           <Typography variant='h6' fontWeight='bold'>Chi Tiết Đặt Xe</Typography>
