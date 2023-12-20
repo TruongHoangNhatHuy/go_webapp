@@ -8,22 +8,22 @@ import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import { useEffect,useState } from "react";
 import { useUserContext } from 'contexts/UserContext';
 import { getAllOrders } from 'services/be_server/api_orders';
+import dayjs from "dayjs";
+
 
 
 const Orders = () => {
   const [user, setUser] = useUserContext();
   const [open, setOpen] = useState(false);
+  const [startDate,setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [pageState,setPageState] = useState({
     isLoading: false,
     content:[],
     totalElements: 0,
     page: 0,
     size: 5,
-
   })
-  const [filterModel, setFilterModel] = useState({
-    items: [],
-  });
   const setColor = (statusTitle) =>{
     if (statusTitle == "ON_RIDE") return 'warning'
     if (statusTitle == "COMPLETE") return 'success'
@@ -36,10 +36,8 @@ const Orders = () => {
     if (statusTitle == "CANCELLED") return 'Đã Hủy'
     return null
   }
-  const [sortModel, setSortModel] = useState([]);
 
   const handleChangeData =  async (page,size) => {
-    console.log("=-==> ", page);
     setPageState(old=>({...old, isLoading:true}))
     await getAllOrders(user.token,page,size).then(result =>{
       setPageState(old=>({...old, isLoading:false, content:result.content, totalElements:result.totalElements}))
@@ -56,6 +54,11 @@ const Orders = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleDateFilter = (e) => {
+    setStartDate(e.value)
+    console.log(e.value);
+  }
 
   const columns = [
     {
@@ -100,24 +103,24 @@ const Orders = () => {
           label={setTitleStatus(rowData.row.status)}
         />, align: 'center',
     },
-    {
-      field: 'action', headerName: 'Hành Động', flex: 0.5, headerAlign: 'center', type: 'actions',
-      getActions: (params) =>
-        [
-          <GridActionsCellItem
-            icon={
-              <IconButton onClick={handleOpen}
-                sx={{
-                  color: 'rgb(33, 150, 243)',
-                }}>
-                <MdOutlineVisibility />
-              </IconButton>
-            }
-            label="View"
-          // onClick={handleOpen}
-          />,
-        ]
-    }
+    // {
+    //   field: 'action', headerName: 'Hành Động', flex: 0.5, headerAlign: 'center', type: 'actions',
+    //   getActions: (params) =>
+    //     [
+    //       <GridActionsCellItem
+    //         icon={
+    //           <IconButton onClick={handleOpen}
+    //             sx={{
+    //               color: 'rgb(33, 150, 243)',
+    //             }}>
+    //             <MdOutlineVisibility />
+    //           </IconButton>
+    //         }
+    //         label="View"
+    //       // onClick={handleOpen}
+    //       />,
+    //     ]
+    // }
     ,
   ]
 
@@ -126,7 +129,7 @@ const Orders = () => {
   return (
     <Grid container height={"100%"} width={"90vw"} p={4} spacing={1} flexDirection={"row"}  borderRadius={4} border={"1px solid"} borderColor={"grey.300"} >
       <Grid item container sm={9}>
-        <Grid item sm={6} >
+        {/* <Grid item sm={6} >
           <TextField
             InputProps=
             {{
@@ -136,15 +139,15 @@ const Orders = () => {
               </InputAdornment>)
             }}
             id="Search" label="Tìm Kiếm Tài Xế Trong Hóa Đơn" variant="outlined" fullWidth />
-        </Grid>
-        <Grid item sm={3} pl={2}>
+        </Grid> */}
+        {/* <Grid item sm={3} pl={2}>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb' fullWidth>
             <DatePicker disableFuture
+             onChange={handleDateFilter}
               slotProps={{
                 textField: {
                   variant: "outlined",
                   fullWidth: true,
-                  id: "StartDate",
                   label: "Từ Ngày",
                   InputProps: { sx: { borderRadius: '12px', } }
                 },
@@ -156,6 +159,8 @@ const Orders = () => {
         <Grid item sm={3} pl={2}>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb' fullWidth>
             <DatePicker disableFuture
+            //  onChange={handleDateFilter}
+              id="EndDate-sort" 
               slotProps={{
                 textField: {
                   variant: "outlined",
@@ -168,7 +173,7 @@ const Orders = () => {
             />
           </LocalizationProvider>
 
-        </Grid>
+        </Grid> */}
       </Grid>
       <Grid item sm={3}/>
       <Grid item sm={12} borderRadius={4} px={2} pb={2} minWidth={"100%"}>

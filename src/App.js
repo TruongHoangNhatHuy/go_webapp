@@ -1,22 +1,20 @@
 import './assets/App.css';
+import config from 'config.json';
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
-import SignInSide from './pages/SignInSide';
-import Booking from './pages/Booking';
-import SignUp from './pages/SignUp';
-import Orders from 'pages/Orders';
-import Account from './pages/Account';
 import { UserContextProvider, useUserContext } from 'contexts/UserContext';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BookingContextProvider } from 'contexts/BookingContext';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { SocketProvider } from 'services/websocket/StompOverSockJS';
+import MainLayout from 'layouts/MainLayout';
+import SignInSide from 'pages/SignInSide';
+import Booking from 'pages/Booking';
+import SignUp from 'pages/SignUp';
+import Orders from 'pages/Orders';
+import Account from 'pages/Account';
 import PaymentVerify from 'pages/PaymentVerify';
 import PaymentHistory from 'pages/PaymentHistory';
-import { DriverManage } from 'pages/DriversManage';
+import DriverManage from 'pages/DriversManage';
 import { DriverInterviewForm, DriverManageForm } from 'features/account';
-import { SocketProvider } from 'services/websocket/StompOverSockJS';
-
-// Google Cloud OAuth2 ID
-const clientId = "650109837523-vcpbjogn6rgu2g4k1gojsfc5rtm5i7iq.apps.googleusercontent.com"
 
 // Router Protect layer
 const ProtectedRoute = ({
@@ -91,7 +89,7 @@ const ReactRouter = () => {
 
 function App() {
   return (
-    <GoogleOAuthProvider clientId={clientId}>
+    <GoogleOAuthProvider clientId={config.gg_cloud.client_id}>
       <UserContextProvider>
         <ReactRouter/>
       </UserContextProvider>

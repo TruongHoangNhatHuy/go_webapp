@@ -1,17 +1,18 @@
-import { Dialog, DialogContent, DialogTitle, IconButton, Snackbar } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Map from '../features/booking/services/vietmap/Map';
 import { useEffect, useRef, useState } from 'react';
 import { MdOutlinePayment } from "react-icons/md";
 import { BookingForm, BookingInfoSide, LocationInputSide } from 'features/booking';
 import { getDriverById } from 'features/account';
-import { SocketPublish, SocketSubscriber, SocketUnsubscribe, useSocketClient } from 'services/websocket/StompOverSockJS';
+import { SocketSubscriber, SocketUnsubscribe, useSocketClient } from 'services/websocket/StompOverSockJS';
 import { useUserContext } from 'contexts/UserContext';
 import { useBookingContext } from 'contexts/BookingContext';
 import { useNotifyContext } from 'layouts/MainLayout';
 import { getActiveBooking } from 'features/booking/services/be_server/api_booking';
 import dayjs from 'dayjs';
 import { getLocationByCoordinates } from 'features/booking/services/vietmap/api_reverse';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Booking = () => {
   const [user,] = useUserContext();
@@ -32,8 +33,6 @@ const Booking = () => {
   const [vehicleRoute, setVehicleRoute] = useState(null); // Hiện thị tuyến đường
   // Function ref
   const setMapCenterRef = useRef({});
-  // Snackbar message
-  const [sbMessage, setSbMessage] = useState(null);
 
   // Khôi phục thông tin đặt xe nếu có
   const restoreBookingInfo = async () => {
@@ -45,10 +44,10 @@ const Booking = () => {
           updatedBookingInfo.status = result.status;
           updatedBookingInfo.vehicleType = result.vehicleType.toLowerCase();
           updatedBookingInfo.paymentAmounts = result.amount;
-          updatedBookingInfo.paymentMethod = result.paymentMethod;
+          updatedBookingInfo.paymentMethod = result.payment.paymentMethod;
           updatedBookingInfo.timeSubmit = dayjs(result.createAt).format('DD/MM/YYYY[, ]HH:mm[ ]A');
-          updatedBookingInfo.customerId = result.customerId;
-          updatedBookingInfo.driverId = result.driverId;
+          updatedBookingInfo.customerId = result.customer.id;
+          updatedBookingInfo.driverId = result.driver.id;
 
           const pickUp = result.pickUpLocation.split(',');
           const startLocation = getLocationByCoordinates(pickUp[1], pickUp[0])[0];
@@ -103,15 +102,16 @@ const Booking = () => {
   // Hiện thị thông báo trạng thái đơn đặt
   useEffect(() => {
     switch (bookingInfo.status) {
-      case 'COMPLETE': { setSbMessage('Đã hoàn thành chuyến xe'); break; }
-      case 'CANCELLED': { setSbMessage('Đã hủy chuyến xe'); break; }
-      case 'ON_RIDE': { setSbMessage('Tài xế đang chở khách hàng'); break; }
-      case 'WAITING': { setSbMessage('Đặt xe thành công, đang xử lý đơn đặt'); break; }
-      case 'PAID': { setSbMessage('Đã thanh toán thành công'); break; }
-      case 'REFUNDED': { setSbMessage('Đã hoàn tiền'); break; }
-      case 'WAITING_REFUND': { setSbMessage('Đang thực hiện hoàn tiền'); break; }
-      case 'FOUND': { setSbMessage('Đã tìm thấy tài xế'); break; }
-      default: { setSbMessage(null); break; }
+      case 'WAITING': { toast('Đặt xe thành công, đang chờ thanh toán'); break; }
+      case 'PAID': { toast('Đã thanh toán thành công'); break; }
+      case 'FOUND': { toast('Đã tìm thấy tài xế'); break; }
+      case 'ARRIVED_PICKUP': { toast('Tài xế đã đón khách'); break; }
+      case 'ON_RIDE': { toast('Tài xế đang chở khách'); break; }
+      case 'COMPLETE': { toast('Đã hoàn thành chuyến xe'); break; }
+      case 'CANCELLED': { toast('Đã hủy chuyến xe'); break; }
+      case 'WAITING_REFUND': { toast('Đang thực hiện hoàn tiền'); break; }
+      case 'REFUNDED': { toast('Đã hoàn tiền'); break; }
+      default: { break; }
     }
   }, [updated])
 
@@ -196,15 +196,14 @@ const Booking = () => {
   }, [hadBooking, bookingInfo.status])
   
   // Xử lý hủy đơn
-  const handleBookingCancel = () => {
-    // Thông báo cho server
-    SocketPublish(socketClient, '/app/booking_status', {
-      uid: bookingInfo.customerId,
-      bookingId: bookingInfo.id,
-      bookingStatus: 'CANCELLED'
-    })
-    console.log('Booking cancelling, id', bookingInfo.id);
+  const handleBookingCancel = (status) => {
+    setNotify('booking');
+    setUpdated(dayjs());
+    updatedBookingInfo.status = status;
+    setBookingInfo(updatedBookingInfo);
+    sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
   };
+  // Xử lý đơn hoàn tất
   const handleBookingComplete = () => {
     sessionStorage.removeItem('bookingSession');
     sessionStorage.removeItem('conversationCache');
@@ -216,16 +215,17 @@ const Booking = () => {
 
   return (
     <div>
-      <Snackbar 
-        open={sbMessage !== null}
-        message={sbMessage}
-        autoHideDuration={30000}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        action={
-          <IconButton onClick={() => setSbMessage(null)}>
-            <CloseIcon sx={{ color: 'white' }}/>
-          </IconButton>
-        }
+      <ToastContainer
+        position="bottom-right"
+        autoClose={10000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
       />
       {/* props của Map: để hiển thị marker điểm đi & điểm đến */}
       <Map startLocation={startLocation} endLocation={endLocation} vehicleRoute={vehicleRoute} setUserPosition={setUserPosition} setMapCenterRef={setMapCenterRef} driverPosition={driverPosition}/>

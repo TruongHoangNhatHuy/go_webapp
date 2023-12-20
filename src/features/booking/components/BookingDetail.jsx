@@ -16,14 +16,16 @@ export const BookingDetail = () => {
             <IconButton sx={{pointerEvents: 'none'}}><MdInfo/></IconButton>
               Trạng thái đơn</TableCell>
             <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>
-              { bookingInfo.status === 'COMPLETE' ? 'Đã hoàn thành' :
-                bookingInfo.status === 'CANCELLED' ? 'Đã hủy' :
-                bookingInfo.status === 'ON_RIDE' ? 'Đang thực hiện' : 
+              { 
                 bookingInfo.status === 'WAITING' ? 'Chưa thanh toán' : 
                 bookingInfo.status === 'PAID' ? 'Đã thanh toán' : 
-                bookingInfo.status === 'REFUNDED' ? 'Đã hoàn tiền' : 
-                bookingInfo.status === 'WAITING_REFUND' ? 'Chờ hoàn tiền' : 
                 bookingInfo.status === 'FOUND' ? 'Đã tìm thấy tài xế' : 
+                bookingInfo.status === 'ARRIVED_PICKUP' ? 'Tài xế đã đón khách' : 
+                bookingInfo.status === 'ON_RIDE' ? 'Đang chở khách' : 
+                bookingInfo.status === 'COMPLETE' ? 'Đã hoàn thành' :
+                bookingInfo.status === 'CANCELLED' ? 'Đã hủy' :
+                bookingInfo.status === 'WAITING_REFUND' ? 'Chờ hoàn tiền' : 
+                bookingInfo.status === 'REFUNDED' ? 'Đã hoàn tiền' : 
                 bookingInfo.status
               }
             </TableCell>
