@@ -160,17 +160,17 @@ const Map = (props) => {
 
   // Vẽ route từ điểm đi tới điểm đến
   useEffect(() => {
+    // Xóa route nếu đang có
+    if (routeRef.current !== null) {
+      mapRef.current.removeLayer("routeLayer");
+      mapRef.current.removeSource("routeSource");
+      routeRef.current = null;
+      // console.log("remove current route");
+    };
+    // Nếu có đủ 2 marker điểm đi & điểm đến
     if (startLocation !== null && endLocation !== null) {
-      // Nếu có đủ 2 marker điểm đi & điểm đến:
-      // Lấy thông tin tuyến đường
-      var route = vehicleRoute;
-      if (route !== null) {
-        // Nếu route cũ đang hiện trên bản đồ, xóa route cũ
-        if (routeRef.current !== null) {
-          mapRef.current.removeLayer("routeLayer");
-          mapRef.current.removeSource("routeSource");
-          // console.log("remove old route");
-        };
+      // Nếu đã chọn tuyến đường mới
+      if (vehicleRoute !== null) {
         // Hiện thị route mới trên bản đồ
         routeRef.current = {};
         routeRef.current.source = {
@@ -178,7 +178,7 @@ const Map = (props) => {
           data: {
             type: "Feature",
             properties: {},
-            geometry: route.paths[0].points,
+            geometry: vehicleRoute.paths[0].points,
           }
         };
         routeRef.current.layer = {
@@ -200,13 +200,6 @@ const Map = (props) => {
         // console.log("display current route");
       }
     }
-    else if (routeRef.current !== null) {
-      // Nếu không đủ 2 marker điểm đi & điểm đến, xóa route đang có
-      mapRef.current.removeLayer("routeLayer");
-      mapRef.current.removeSource("routeSource");
-      routeRef.current = null;
-      // console.log("remove current route");
-    };
   }, [startLocation, endLocation, vehicleRoute])
 
   // Gắn marker vị trí driver & vẽ đường đi

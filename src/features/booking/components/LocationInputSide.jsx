@@ -17,10 +17,6 @@ import { getRoute } from '../services/vietmap/api_route.js';
 import { getAmount } from '../services/be_server/api_booking.js';
 import { useBookingContext } from 'contexts/BookingContext.jsx';
 
-/* bug: Location search box dùng getLocationsAutocomplete, cần xác định vị trí người dùng. 
-Khi chưa xác định thì ném lỗi "Convert Null toString" khi dùng search box */
-/* fixed: không xác định được vị trí người dùng, thì dùng getLocationsByAddress. */
-
 const SearchBox = (props) => {
   const { userPosition, location, setLocation, setMapCenterRef, ...tfProps } = props;
   const [options, setOptions] = useState([{ "name": "Vị trí người dùng" }]);
@@ -147,7 +143,9 @@ export const LocationInputSide = (props) => {
   const vehicleRouteRef = useRef(null);   // Lưu thông tin các tuyến đường
   const vehicleAmountRef = useRef(null);  // Lưu giá tiền
   // Phượng tiện đã chọn
-  const [vehicle, setVehicle] = useState('motorcycle');
+  const [vehicle, setVehicle] = useState(null);
+  const minDistance = 200;    // 200m
+  const maxDistance = 150000; // 150km
   // Ẩn hiện bảng chọn tuyến đường
   const [vehicleSelect, setVehicleSelect] = useState(false);
 
@@ -164,8 +162,6 @@ export const LocationInputSide = (props) => {
         await getAmount(startLatLng, endLatLng).then((result) => {
           vehicleAmountRef.current = result.amounts
         });
-
-        setVehicleRoute(vehicleRouteRef.current.motorcycle);
         setVehicleSelect(true);
         setFetching(false);
       }, 500)
@@ -174,17 +170,27 @@ export const LocationInputSide = (props) => {
       vehicleAmountRef.current = null;
       setVehicleSelect(false);
     }
+    setVehicle(null);
+    setVehicleRoute(null);
     // console.log('vehicleRouteRef', vehicleRouteRef.current);
   }, [startLocation, endLocation])
 
   const handleVehicleChange = (_, value) => {
-    if (value !== null) {
-      setVehicle(value);
-      if (value === 'motorcycle') {
-        setVehicleRoute(vehicleRouteRef.current.motorcycle)
-      } 
-      else if (value === 'car') {
-        setVehicleRoute(vehicleRouteRef.current.car)
+    switch (value) {
+      case 'motorcycle': {
+        setVehicle(value);
+        setVehicleRoute(vehicleRouteRef.current.motorcycle);
+        break;
+      }
+      case 'car': {
+        setVehicle(value);
+        setVehicleRoute(vehicleRouteRef.current.car);
+        break;
+      }
+      default: {
+        setVehicle(null);
+        setVehicleRoute(null);
+        break;
       }
     }
   }
@@ -283,6 +289,7 @@ export const LocationInputSide = (props) => {
                   fullWidth
                   variant='outlined'
                   justifyContent='flex-start'
+                  disabled={vehicleRouteRef.current.motorcycle.paths[0].distance <= minDistance || vehicleRouteRef.current.motorcycle.paths[0].distance >= maxDistance}
                   sx={{ '&.Mui-selected': { color: 'green' } }}
                 >
                   <TwoWheelerIcon sx={{ height: 40, width: 40, marginRight: 1 }}/>
@@ -299,16 +306,23 @@ export const LocationInputSide = (props) => {
                         {metersToString(vehicleRouteRef.current.motorcycle.paths[0].distance)}
                       </Typography>
                     </Stack>
-                    <Stack flexDirection='row'>
-                      <PaidIcon sx={{ marginRight: 1 }}/>
-                      <Typography variant='body'>
-                        {Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          currencyDisplay: 'code'
-                        }).format(vehicleAmountRef.current['1'])}
-                      </Typography>
-                    </Stack>
+                    {vehicleRouteRef.current.motorcycle.paths[0].distance <= minDistance ? (
+                        <Typography variant='body' color='red'>Khoảng cách quá gần</Typography>
+                      ) : vehicleRouteRef.current.motorcycle.paths[0].distance >= maxDistance ? (
+                        <Typography variant='body' color='red'>Khoảng cách quá xa</Typography>
+                      ) : (
+                        <Stack flexDirection='row'>
+                          <PaidIcon sx={{ marginRight: 1 }}/>
+                          <Typography variant='body'>
+                            {Intl.NumberFormat('vi-VN', {
+                              style: 'currency',
+                              currency: 'VND',
+                              currencyDisplay: 'code'
+                            }).format(vehicleAmountRef.current['1'])}
+                          </Typography>
+                        </Stack>
+                      )
+                    }
                   </Stack>
                 </Box>
                 <Box component={ToggleButton}
@@ -316,6 +330,7 @@ export const LocationInputSide = (props) => {
                   fullWidth
                   variant='outlined'
                   justifyContent='flex-start'
+                  disabled={vehicleRouteRef.current.car.paths[0].distance <= minDistance || vehicleRouteRef.current.car.paths[0].distance >= maxDistance}
                   sx={{ '&.Mui-selected': { color: 'green' } }}
                 >
                   <DirectionsCarIcon sx={{ height: 40, width: 40, marginRight: 1 }} />
@@ -332,16 +347,23 @@ export const LocationInputSide = (props) => {
                         {metersToString(vehicleRouteRef.current.car.paths[0].distance)}
                       </Typography>
                     </Stack>
-                    <Stack flexDirection='row'>
-                      <PaidIcon sx={{ marginRight: 1 }}/>
-                      <Typography variant='body'>
-                        {Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                          currencyDisplay: 'code'
-                        }).format(vehicleAmountRef.current['2'])}
-                      </Typography>
-                    </Stack>
+                    {vehicleRouteRef.current.car.paths[0].distance <= minDistance ? (
+                        <Typography variant='body' color='red'>Khoảng cách quá gần</Typography>
+                      ) : vehicleRouteRef.current.car.paths[0].distance >= maxDistance ? (
+                        <Typography variant='body' color='red'>Khoảng cách quá xa</Typography>
+                      ) : ( 
+                        <Stack flexDirection='row'>
+                          <PaidIcon sx={{ marginRight: 1 }}/>
+                          <Typography variant='body'>
+                            {Intl.NumberFormat('vi-VN', {
+                              style: 'currency',
+                              currency: 'VND',
+                              currencyDisplay: 'code'
+                            }).format(vehicleAmountRef.current['2'])}
+                          </Typography>
+                        </Stack>
+                      )
+                    }
                   </Stack>
                 </Box>
               </ToggleButtonGroup>
@@ -349,6 +371,7 @@ export const LocationInputSide = (props) => {
                 type='submit'
                 fullWidth
                 variant='contained'
+                disabled={vehicle === null}
                 children='Đặt xe'
               />
             </Stack>

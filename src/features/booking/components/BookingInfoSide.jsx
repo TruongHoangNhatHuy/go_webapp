@@ -27,12 +27,12 @@ const BookingRating = ({ bookingId }) => {
 
   useEffect(() => {
     const restoredBookingInfo = JSON.parse(sessionStorage.getItem('bookingSession'));
-    if (restoredBookingInfo !== null && restoredBookingInfo.rating !== null) {
-      const restoredRating = restoredBookingInfo.rating;
-      console.log(restoredRating);
+    if (restoredBookingInfo !== null && restoredBookingInfo.review !== null) {
+      const restoredReview = restoredBookingInfo.review;
+      // console.log(restoredReview);
       setSent(true);
-      setRating(restoredRating.rating);
-      setContent(restoredRating.content);
+      setRating(restoredReview.rating);
+      setContent(restoredReview.content);
     }
   }, [])
 
@@ -45,14 +45,14 @@ const BookingRating = ({ bookingId }) => {
     for(var pair of formData.entries()) {
       jsonBody[pair[0]] = pair[1];
     }
-    console.log('Booking rating', jsonBody);
+    console.log('Booking review', jsonBody);
 
     await createReview(user.token, jsonBody)
       .then(result => {
         console.log('Create review result: ', result);
         setSent(true);
         const updatedBookingInfo = bookingInfo;
-        updatedBookingInfo.rating = result;
+        updatedBookingInfo.review = result;
         setBookingInfo(updatedBookingInfo);
         sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
       })
