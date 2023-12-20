@@ -45,9 +45,11 @@ const SearchBox = (props) => {
     // console.log('item', item)
     if (item !== null) {
       if (item.name === 'Vị trí người dùng') {
-        const [lat, lng] = userPosition;
-        const userLocation = getLocationByCoordinates(lng, lat)[0];
-        handleChange(_, userLocation);
+        if (userPosition !== null) {
+          const [lat, lng] = userPosition;
+          const userLocation = getLocationByCoordinates(lng, lat)[0];
+          handleChange(_, userLocation);
+        }
       }
       else {
         // lấy tọa độ
