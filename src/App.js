@@ -1,20 +1,21 @@
 import './assets/App.css';
 import config from 'config.json';
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import { UserContextProvider, useUserContext } from 'contexts/UserContext';
-import { BookingContextProvider } from 'contexts/BookingContext';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { SocketProvider } from 'services/websocket/StompOverSockJS';
-import MainLayout from 'layouts/MainLayout';
-import SignInSide from 'pages/SignInSide';
-import Booking from 'pages/Booking';
-import SignUp from 'pages/SignUp';
+import MainLayout from './layouts/MainLayout';
+import SignInSide from './pages/SignInSide';
+import Booking from './pages/Booking';
+import SignUp from './pages/SignUp';
 import Orders from 'pages/Orders';
-import Account from 'pages/Account';
+import Account from './pages/Account';
 import PaymentVerify from 'pages/PaymentVerify';
 import PaymentHistory from 'pages/PaymentHistory';
-import DriverManage from 'pages/DriversManage';
+import DriversManage from 'pages/DriversManage';
+import { UserContextProvider, useUserContext } from 'contexts/UserContext';
+import { BookingContextProvider } from 'contexts/BookingContext';
 import { DriverInterviewForm, DriverManageForm } from 'features/account';
+import { SocketProvider } from 'services/websocket/StompOverSockJS';
+import CustomersManage from 'pages/CustomersManage';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Router Protect layer
 const ProtectedRoute = ({
@@ -75,11 +76,11 @@ const ReactRouter = () => {
         <Route path='/admin' element={<ProtectedRoute user={user} role={'admin'}><MainLayout/></ProtectedRoute>}>
           <Route index element={<Navigate to={'drivers'}/>} />
           <Route path='account' element={<Account />} />
-          <Route path='drivers' element={<DriverManage/>}>
+          <Route path='drivers' element={<DriversManage/>}>
             <Route path='interview' element={<DriverInterviewForm/>} />
             <Route path='manage' element={<DriverManageForm/>} />
           </Route>
-          <Route path='customers' element={<text>Quản lí khách hàng</text>} />
+          <Route path='customers' element={<CustomersManage/>} />
           <Route path='analysis' element={<text>Thống kê</text>} />
         </Route>
       </Routes>

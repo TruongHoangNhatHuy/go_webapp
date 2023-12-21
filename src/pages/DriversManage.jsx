@@ -2,7 +2,7 @@ import { AppBar, Container, ListItem, ListItemButton, ListItemText } from "@mui/
 import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 
-const DriverManage = () => {
+const DriversManage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const current = location.pathname.split('/')[3];
@@ -39,4 +39,4 @@ const DriverManage = () => {
   )
 }
 
-export default DriverManage
+export default DriversManage
