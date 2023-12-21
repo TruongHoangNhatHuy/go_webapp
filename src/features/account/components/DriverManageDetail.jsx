@@ -1,37 +1,12 @@
-import { Avatar, Card, CardActionArea, CardMedia, Chip, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, Stack, Typography } from "@mui/material"
+import { Avatar, Card, CardActionArea, CardMedia, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, Stack, Typography } from "@mui/material"
 import CloseIcon from '@mui/icons-material/Close';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import BlockIcon from '@mui/icons-material/Block';
-import placeholderImg from 'assets/logo512.png'
 import { useEffect, useState } from "react"
 import { ZoomableImage } from "components/ZoomableImage";
 import { useUserContext } from "contexts/UserContext";
 import { getDriverDetail } from "../services/be_server/api_account_for_admin";
 import dayjs from "dayjs";
 
-const testDetail = {
-  id: 0,
-  fullName: "Prototype data",
-  email: "example@email.com",
-  phoneNumber: "0987654321",
-  dateOfBirth: 961545600000,
-  avtUrl: "",
-  licensePlate: "75F 49053",
-  rating: 5,
-  vehicleType: "CAR",
-  idCard: "123456789123",
-  status: "NOT_ACTIVATED",
-  activityArea: null,
-  drivingLicense: "123412345678",
-  drivingLicenseImg1: "",
-  drivingLicenseImg2: "",
-  cardId1: "",
-  cardId2: "",
-  nonBlock: true,
-  male: true
-}
-
-export const DriverInterviewDetail = ({ openDetail, setOpenDetail, handleCheckOrCancel }) => {
+export const DriverManageDetail = ({ openDetail, setOpenDetail }) => {
   const [user,] = useUserContext();
   const [driverDetail, setDriverDetail] = useState(null);
   const [openImage, setOpenImage] = useState(null);
@@ -60,18 +35,6 @@ export const DriverInterviewDetail = ({ openDetail, setOpenDetail, handleCheckOr
     setOpenDetail(null);
     setDriverDetail(null);
   }
-  const handleCheck = () => {
-    const updatedDriverDetail = driverDetail;
-    updatedDriverDetail.status = 'ACTIVATE';
-    setDriverDetail(updatedDriverDetail);
-    handleCheckOrCancel(driverDetail.id, 'ACTIVATE');
-  }
-  const handleCancel = () => {
-    const updatedDriverDetail = driverDetail;
-    updatedDriverDetail.status = 'REFUSE';
-    setDriverDetail(updatedDriverDetail);
-    handleCheckOrCancel(driverDetail.id, 'REFUSE');
-  }
 
   return (
     <Dialog open={openDetail !== null} maxWidth='100vw' onClose={handleClose}>
@@ -82,26 +45,9 @@ export const DriverInterviewDetail = ({ openDetail, setOpenDetail, handleCheckOr
             Thông tin tài xế
           </Typography>
           {/* action group */}
-          <Stack direction='row' spacing={2}>
-            {openDetail?.status === 'NOT_ACTIVATED' ? (
-                <Chip label='Đang chờ' color="info"/>
-              ) : openDetail?.status === 'ACTIVATE' ? (
-                <Chip label='Duyệt' color="success"/>
-              ) : openDetail?.status === 'REFUSE' && (
-                <Chip label='Từ chối' color='error'/>
-            )}
-            <Stack direction='row' spacing={2}>
-              <IconButton onClick={handleCheck} sx={{ padding: 0 }}>
-                <CheckCircleOutlineIcon sx={{ color: 'green' }}/>
-              </IconButton>
-              <IconButton onClick={handleCancel} sx={{ padding: 0 }}>
-                <BlockIcon sx={{ color: 'red' }}/>
-              </IconButton>
-            </Stack>
-            <IconButton onClick={handleClose} sx={{ padding: 0 }}>
-              <CloseIcon/>
-            </IconButton>
-          </Stack>
+          <IconButton onClick={handleClose} sx={{ padding: 0 }}>
+            <CloseIcon/>
+          </IconButton>
         </Stack>
       </DialogTitle>
       {driverDetail ? (

@@ -1,80 +1,63 @@
-import { Button, Chip, Grid, IconButton, InputAdornment, MenuItem, Paper, TextField } from "@mui/material";
+import { Button, Chip, Grid, IconButton, InputAdornment, MenuItem, Paper, TextField, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import InfoIcon from '@mui/icons-material/Info';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import BlockIcon from '@mui/icons-material/Block';
 import CloseIcon from '@mui/icons-material/Close';
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DriverInterviewDetail } from "./DriverInterviewDetail";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-
-const createData = (id, name, timestamp, status = 'waiting') => {
-  return { id, name, timestamp, status }
-}
-const testData = [
-  createData(1, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(2, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(3, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(4, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(5, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(6, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(7, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(8, 'Lê Thiện Tám', '2023-11-30 11:42 am'),
-  createData(9, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(10, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(11, 'Lê Văn Chín', '2023-11-30 11:42 am'),
-  createData(12, 'Lê Văn Chín', '2023-11-30 11:42 am'),
-  createData(13, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(14, 'Lê Văn Bảy', '2023-11-30 11:42 am'),
-  createData(15, 'Lê Văn Bảy', '2023-11-30 11:42 am'),
-  createData(16, 'Lê Văn Bảy', '2023-11-30 11:42 am'),
-  createData(17, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(18, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(19, 'Lê Văn Saul', '2023-11-30 11:42 am'),
-  createData(20, 'Lê Văn Sáu', '2023-11-30 11:42 am'),
-  createData(21, 'Lê Văn Sáu', '2023-11-30 11:42 am'),
-  createData(22, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-  createData(23, 'Lê Văn Tám', '2023-11-30 11:42 am'),
-]
+import { getNotActivatedDriver } from "../services/be_server/api_account_for_admin";
+import { useUserContext } from "contexts/UserContext";
+import dayjs from "dayjs";
 
 export const DriverInterviewForm = () => {
+  const [gridData, setGridData] = useState([]);
   const columns = [
-    { field: 'id', headerName: 'STT', flex: 0.1 },
-    { field: 'name', headerName: 'Họ tên', flex: 0.25 },
-    { field: 'timestamp', headerName: 'Thời gian', flex: 0.25 },
+    { field: 'id', headerName: 'STT', flex: 0.1,
+      renderCell: (data) => {
+        return gridData.indexOf(data.row)+1
+      }
+    },
+    { field: 'fullName', headerName: 'Họ tên', flex: 0.25 },
+    { field: 'createDate', headerName: 'Thời gian', flex: 0.25,
+      renderCell: (data) => {
+        return dayjs(data.row.createDate).format('DD-MM-YYYY HH:mm:ss A')
+      }
+    },
     { field: 'status', headerName: 'Tình trạng', flex: 0.2, 
-      renderCell: (gridData) => {
-        switch (gridData.row.status) {
-          case 'waiting':
+      renderCell: (data) => {
+        switch (data.row.status) {
+          case 'NOT_ACTIVATED':
             return <Chip label='Đang chờ' color="info"/>
-          case 'checked':
-            return <Chip label='Đã duyệt' color="success"/>
-          case 'cancelled':
-            return <Chip label='Đã từ chối' color='error'/>
+          case 'ACTIVATE':
+            return <Chip label='Duyệt' color="success"/>
+          case 'REFUSE':
+            return <Chip label='Từ chối' color='error'/>
           default:
-            return <Chip label={gridData.row.status}/>
+            return <Chip label={data.row.status}/>
         }
       }
     },
     { field: 'action', headerName: 'Hành động', flex: 0.2, type: 'actions',
-      getActions: (gridData) => [
+      getActions: (data) => [
         <GridActionsCellItem
           icon={
-            <IconButton onClick={() => handleOpenDetail(gridData.row)}>
+            <IconButton onClick={() => handleOpenDetail(data.row)}>
               <InfoIcon sx={{ color: 'deepskyblue' }}/>
             </IconButton>
           }
         />,
         <GridActionsCellItem
           icon={
-            <IconButton onClick={() => handleCheckOrCancel(gridData.row.id, 'checked')}>
+            <IconButton onClick={() => handleCheckOrCancel(data.row.id, 'ACTIVATE')}>
               <CheckCircleOutlineIcon sx={{ color: 'green' }}/>
             </IconButton>
           }
         />,
         <GridActionsCellItem
           icon={
-            <IconButton onClick={() => handleCheckOrCancel(gridData.row.id, 'cancelled')}>
+            <IconButton onClick={() => handleCheckOrCancel(data.row.id, 'REFUSE')}>
               <BlockIcon sx={{ color: 'red' }}/>
             </IconButton>
           }
@@ -83,16 +66,42 @@ export const DriverInterviewForm = () => {
     }
   ]
 
-  const [gridData, setGridData] = useState(testData);
-  const [openDetail, setOpenDetail] = useState(false);
-  const driverDetailRef = useRef(null);
+  const [user,] = useUserContext();
+  const [fetching, setFetching] = useState(true);
+  const [rowCount, setRowCount] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 6,
+    page: 0,
+  });
+  const [openDetail, setOpenDetail] = useState(null);
+  const handleOpenDetail = (driver) => {
+    setOpenDetail(driver);
+  }
   
+  // fetch all data
+  const fetchData = () => {
+    getNotActivatedDriver(user.token)
+      .then(result => {
+        console.log(result);
+        if (result !== null) {
+          setRowCount(result.totalElements);
+          setGridData(result.content);
+          setFetching(false);
+        }
+      })
+      .catch(error => {
+        alert('Lấy dữ liệu thất bại.');
+      })
+  }
+  useEffect(fetchData, []);
+  
+  // filter data
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const filtedData = useMemo(() =>
     gridData.filter(data => 
-      data.name.toLowerCase().includes(search.toLowerCase()) &&
-      data.status.includes(statusFilter === 'all' ? '' : statusFilter)
+      data.fullName?.toLowerCase().includes(search.toLowerCase()) &&
+      data.status?.startsWith(statusFilter === 'all' ? '' : statusFilter)
     )
   ,[gridData, statusFilter, search])
 
@@ -107,21 +116,26 @@ export const DriverInterviewForm = () => {
   const handleStatusFilter = (e) => {
     setStatusFilter(e.target.value)
   };
-  const handleOpenDetail = (driver) => {
-    driverDetailRef.current = driver;
-    setOpenDetail(true);
-  }
+
+  // change data
   const handleCheckOrCancel = (id, status) => {
     var updatedGridData = [...gridData];
-    const data = updatedGridData.filter(x => x.id === id)[0];   // get data
+    const data = updatedGridData.filter(x => x.id === id)[0];
     data['status'] = status;
-    console.log(data);
     setGridData(updatedGridData);
   };
+  const SaveChange = () => {
+    // to do: call api
+    alert('UNDER CONSTRUCTION !!!')
+  }
+  const CancelChange = () => {
+    setFetching(true);
+    fetchData();
+  }
   
   return (
     <Grid container spacing={1} padding={1} maxWidth='100%'  sx={{ bgcolor: 'white' }}>
-      <DriverInterviewDetail driverRef={driverDetailRef} open={openDetail} setOpen={setOpenDetail} handleCheckOrCancel={handleCheckOrCancel}/>
+      <DriverInterviewDetail openDetail={openDetail} setOpenDetail={setOpenDetail} handleCheckOrCancel={handleCheckOrCancel}/>
       <Grid item xs={9}>
         <TextField 
           fullWidth
@@ -147,34 +161,62 @@ export const DriverInterviewForm = () => {
           fullWidth 
           size="small" 
           id='status-filter'
-          // label="Lọc theo tình trạng"
           defaultValue={statusFilter}
           onChange={handleStatusFilter}
         >
           <MenuItem value='all'><Chip label='Tất cả' size="small"/></MenuItem>
-          <MenuItem value='waiting'><Chip label='Đang chờ' size="small" color="info"/></MenuItem>
-          <MenuItem value='checked'><Chip label='Đã duyệt' size="small" color="success"/></MenuItem>
-          <MenuItem value='cancelled'><Chip label='Đã từ chối' size="small" color='error'/></MenuItem>
+          <MenuItem value='NOT_ACTIVATED'><Chip label='Đang chờ' size="small" color="info"/></MenuItem>
+          <MenuItem value='ACTIVATE'><Chip label='Duyệt' size="small" color="success"/></MenuItem>
+          <MenuItem value='REFUSE'><Chip label='Từ chối' size="small" color='error'/></MenuItem>
         </TextField>
       </Grid>
       <Grid item xs={12}>
-        <Paper elevation={2} sx={{ height: '80vh' }}>
+        <Paper elevation={2} sx={{ height: '70vh' }}>
           <DataGrid
-            rows={filtedData}
             columns={columns}
             disableRowSelectionOnClick
             initialState={{
-              pagination: { paginationModel: { pageSize: 7, page: 0 } },
+              pagination: { paginationModel: paginationModel },
             }}
             autoPageSize
-            // pagination
-            // paginationModel={{ pageSize: 7, page: 0 }}
+            // paginationMode="server"
+            rows={filtedData}
+            rowCount={rowCount}
+            loading={fetching}
+            paginationModel={paginationModel}
+            onPaginationModelChange={(model) => {
+              setPaginationModel(model)
+              // setFetching(true);
+            }}
             sx={{
               "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" }
             }}
-            />
+          />
         </Paper>
       </Grid>
+      <Grid item xs={true}/>
+      <Grid item xs={'auto'}>
+        <Typography><Chip label='Đang chờ' size="small" color="info"/>
+          {" "+gridData.filter(x => x.status === 'NOT_ACTIVATED').length}
+        </Typography>
+      </Grid>
+      <Grid item xs={'auto'}>
+        <Typography><Chip label='Duyệt' size="small" color="success"/>
+          {" "+gridData.filter(x => x.status === 'ACTIVATE').length}
+        </Typography>
+      </Grid>
+      <Grid item xs={'auto'}>
+        <Typography><Chip label='Từ chối' size="small" color='error'/>
+          {" "+gridData.filter(x => x.status === 'REFUSE').length}
+        </Typography>
+      </Grid>
+      <Grid item xs={1}>
+        <Button variant="outlined" fullWidth onClick={CancelChange}>Hủy</Button>
+      </Grid>
+      <Grid item xs={'auto'}>
+        <Button variant="contained" onClick={SaveChange}>Lưu thay đổi</Button>
+      </Grid>
+      {/* <Grid item xs={true}/> */}
     </Grid>
   )
 }
