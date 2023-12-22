@@ -11,12 +11,18 @@ import { useUserContext } from "contexts/UserContext";
 import { getDrivers } from "../services/be_server/api_account_for_admin";
 
 export const DriverManageForm = () => {
+  const [user,] = useUserContext();
   const [gridData, setGridData] = useState([]);
+  const [fetching, setFetching] = useState(true);
+  const [rowCount, setRowCount] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 7,
+    page: 0,
+  });
+
   const columns = [
     { field: 'id', headerName: 'STT', flex: 0.1,
-      renderCell: (data) => {
-        return gridData.indexOf(data.row)+1
-      }
+      renderCell: (data) => gridData.indexOf(data.row)+1 + paginationModel.page*paginationModel.pageSize
     },
     { field: 'fullName', headerName: 'Họ tên', flex: 0.25 },
     { field: 'phoneNumber', headerName: 'Số điện thoại', flex: 0.25 },
@@ -42,7 +48,7 @@ export const DriverManageForm = () => {
         }
       }
     },
-    { field: 'action', headerName: 'Hành động', flex: 0.2, type: 'actions',
+    { field: 'action', headerName: 'Hành động', width: 160, type: 'actions',
       getActions: (data) => [
         <GridActionsCellItem
           icon={
@@ -69,28 +75,14 @@ export const DriverManageForm = () => {
     }
   ]
 
-  const [user,] = useUserContext();
-  const [fetching, setFetching] = useState(true);
-  const [rowCount, setRowCount] = useState(0);
-  const [paginationModel, setPaginationModel] = useState({
-    pageSize: 7,
-    page: 0,
-  });
-  const [openDetail, setOpenDetail] = useState(null);
-  const handleOpenDetail = (driver) => {
-    setOpenDetail(driver);
-  }
-
   // fetch all data
   const fetchData = () => {
     getDrivers(user.token, paginationModel.pageSize, paginationModel.page)
       .then(result => {
-        console.log(result);
+        // console.log(result);
         if (result !== null) {
-          const notActivateDrivers = result.content.filter(x => x.status === 'NOT_ACTIVATED');
-          const drivers = result.content.filter(x => !notActivateDrivers.includes(x))
-          setRowCount(drivers.length);
-          setGridData(drivers);
+          setRowCount(result.totalElements);
+          setGridData(result.content);
           setFetching(false);
         }
       })
@@ -99,7 +91,13 @@ export const DriverManageForm = () => {
       })
   }
   useEffect(fetchData, [paginationModel.page, paginationModel.pageSize]);
+
+  const [openDetail, setOpenDetail] = useState(null);
+  const handleOpenDetail = (driver) => {
+    setOpenDetail(driver);
+  }
   
+  // filter data
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const filtedData = useMemo(() =>
@@ -120,6 +118,8 @@ export const DriverManageForm = () => {
   const handleStatusFilter = (e) => {
     setStatusFilter(e.target.value)
   };
+
+  // change data
   const handleChangeBlockStatus = (id, isBlock) => {
     alert('Only SEE')
   }
@@ -168,9 +168,10 @@ export const DriverManageForm = () => {
             columns={columns}
             disableRowSelectionOnClick
             initialState={{
-              pagination: { paginationModel: { pageSize: 7, page: 0 } },
+              pagination: { paginationModel: paginationModel },
             }}
-            autoPageSize
+            // autoPageSize
+            /* pagination */
             paginationMode="server"
             rows={filtedData}
             rowCount={rowCount}

@@ -31,7 +31,7 @@ const testDetail = {
   male: true
 }
 
-export const DriverInterviewDetail = ({ openDetail, setOpenDetail, handleCheckOrCancel }) => {
+export const DriverInterviewDetail = ({ openDetail, setOpenDetail, handleActivateOrRefuse }) => {
   const [user,] = useUserContext();
   const [driverDetail, setDriverDetail] = useState(null);
   const [openImage, setOpenImage] = useState(null);
@@ -64,13 +64,13 @@ export const DriverInterviewDetail = ({ openDetail, setOpenDetail, handleCheckOr
     const updatedDriverDetail = driverDetail;
     updatedDriverDetail.status = 'ACTIVATE';
     setDriverDetail(updatedDriverDetail);
-    handleCheckOrCancel(driverDetail.id, 'ACTIVATE');
+    handleActivateOrRefuse(driverDetail.id, 'ACTIVATE');
   }
   const handleCancel = () => {
     const updatedDriverDetail = driverDetail;
     updatedDriverDetail.status = 'REFUSE';
     setDriverDetail(updatedDriverDetail);
-    handleCheckOrCancel(driverDetail.id, 'REFUSE');
+    handleActivateOrRefuse(driverDetail.id, 'REFUSE');
   }
 
   return (

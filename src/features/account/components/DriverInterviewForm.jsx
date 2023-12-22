@@ -7,23 +7,29 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DriverInterviewDetail } from "./DriverInterviewDetail";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { getNotActivatedDriver } from "../services/be_server/api_account_for_admin";
+import { activateDriver, getNotActivatedDriver, refuseDriver } from "../services/be_server/api_account_for_admin";
 import { useUserContext } from "contexts/UserContext";
 import dayjs from "dayjs";
+import { ToastContainer, toast } from "react-toastify";
+import { LoadingButton } from "@mui/lab";
 
 export const DriverInterviewForm = () => {
+  const [user,] = useUserContext();
   const [gridData, setGridData] = useState([]);
+  const [fetching, setFetching] = useState(true);
+  const [rowCount, setRowCount] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 6,
+    page: 0,
+  });
+
   const columns = [
     { field: 'id', headerName: 'STT', flex: 0.1,
-      renderCell: (data) => {
-        return gridData.indexOf(data.row)+1
-      }
+      renderCell: (data) => gridData.indexOf(data.row)+1
     },
     { field: 'fullName', headerName: 'Họ tên', flex: 0.25 },
     { field: 'createDate', headerName: 'Thời gian', flex: 0.25,
-      renderCell: (data) => {
-        return dayjs(data.row.createDate).format('DD-MM-YYYY HH:mm:ss A')
-      }
+      renderCell: (data) => dayjs(data.row.createDate).format('DD-MM-YYYY HH:mm:ss A')
     },
     { field: 'status', headerName: 'Tình trạng', flex: 0.2, 
       renderCell: (data) => {
@@ -39,7 +45,7 @@ export const DriverInterviewForm = () => {
         }
       }
     },
-    { field: 'action', headerName: 'Hành động', flex: 0.2, type: 'actions',
+    { field: 'action', headerName: 'Hành động', width: 160, type: 'actions',
       getActions: (data) => [
         <GridActionsCellItem
           icon={
@@ -50,14 +56,14 @@ export const DriverInterviewForm = () => {
         />,
         <GridActionsCellItem
           icon={
-            <IconButton onClick={() => handleCheckOrCancel(data.row.id, 'ACTIVATE')}>
+            <IconButton onClick={() => handleActivateOrRefuse(data.row.id, 'ACTIVATE')}>
               <CheckCircleOutlineIcon sx={{ color: 'green' }}/>
             </IconButton>
           }
         />,
         <GridActionsCellItem
           icon={
-            <IconButton onClick={() => handleCheckOrCancel(data.row.id, 'REFUSE')}>
+            <IconButton onClick={() => handleActivateOrRefuse(data.row.id, 'REFUSE')}>
               <BlockIcon sx={{ color: 'red' }}/>
             </IconButton>
           }
@@ -65,24 +71,12 @@ export const DriverInterviewForm = () => {
       ]
     }
   ]
-
-  const [user,] = useUserContext();
-  const [fetching, setFetching] = useState(true);
-  const [rowCount, setRowCount] = useState(0);
-  const [paginationModel, setPaginationModel] = useState({
-    pageSize: 6,
-    page: 0,
-  });
-  const [openDetail, setOpenDetail] = useState(null);
-  const handleOpenDetail = (driver) => {
-    setOpenDetail(driver);
-  }
   
   // fetch all data
   const fetchData = () => {
     getNotActivatedDriver(user.token)
       .then(result => {
-        console.log(result);
+        // console.log(result);
         if (result !== null) {
           setRowCount(result.totalElements);
           setGridData(result.content);
@@ -94,6 +88,11 @@ export const DriverInterviewForm = () => {
       })
   }
   useEffect(fetchData, []);
+
+  const [openDetail, setOpenDetail] = useState(null);
+  const handleOpenDetail = (driver) => {
+    setOpenDetail(driver);
+  }
   
   // filter data
   const [search, setSearch] = useState('');
@@ -118,24 +117,67 @@ export const DriverInterviewForm = () => {
   };
 
   // change data
-  const handleCheckOrCancel = (id, status) => {
+  const [saving, setSaving] = useState(false);
+  const handleActivateOrRefuse = (id, status) => {
     var updatedGridData = [...gridData];
     const data = updatedGridData.filter(x => x.id === id)[0];
     data['status'] = status;
     setGridData(updatedGridData);
   };
-  const SaveChange = () => {
-    // to do: call api
-    alert('UNDER CONSTRUCTION !!!')
-  }
+  const SaveChange = async () => {
+    setSaving(true);
+    const activateIds = [], refuseIds = [];
+    gridData.forEach(driver => {
+      if (driver.status === 'ACTIVATE')
+        activateIds.push(driver.id)
+      else if (driver.status === 'REFUSE')
+        refuseIds.push(driver.id)
+    });
+    // console.log(activateIds.toString(), '|', refuseIds.toString());
+    // return;
+    const apiCall = [];
+    if (activateIds.length !== 0) apiCall.push(activateDriver(user.token, activateIds.toString()))
+    if (refuseIds.length !== 0) apiCall.push(refuseDriver(user.token, refuseIds.toString()))
+    if (apiCall.length === 0) {
+      toast.warning('Không có thay đổi');
+      setSaving(false);
+    } else {
+      await Promise.all(apiCall)
+        .then(results => {
+          results.forEach(result => console.log('Saving result:', result));
+          toast.success('Lưu thay đổi thành công');
+          setSaving(false);
+          fetchData();
+        })
+        .catch(error => {
+          console.log('Saving failed:', error);
+          toast.error('Lưu thay đổi thất bại');
+          setSaving(false);
+        })
+    }
+  };
   const CancelChange = () => {
     setFetching(true);
     fetchData();
-  }
+  };
   
   return (
     <Grid container spacing={1} padding={1} maxWidth='100%'  sx={{ bgcolor: 'white' }}>
-      <DriverInterviewDetail openDetail={openDetail} setOpenDetail={setOpenDetail} handleCheckOrCancel={handleCheckOrCancel}/>
+      {/* sub components */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={10000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+      <DriverInterviewDetail openDetail={openDetail} setOpenDetail={setOpenDetail} handleActivateOrRefuse={handleActivateOrRefuse}/>
+      {/* main components */}
       <Grid item xs={9}>
         <TextField 
           fullWidth
@@ -179,6 +221,7 @@ export const DriverInterviewForm = () => {
               pagination: { paginationModel: paginationModel },
             }}
             autoPageSize
+            /* pagination */
             // paginationMode="server"
             rows={filtedData}
             rowCount={rowCount}
@@ -211,10 +254,19 @@ export const DriverInterviewForm = () => {
         </Typography>
       </Grid>
       <Grid item xs={1}>
-        <Button variant="outlined" fullWidth onClick={CancelChange}>Hủy</Button>
+        <Button 
+          disabled={saving}
+          fullWidth 
+          variant="outlined" 
+          onClick={CancelChange}
+        >Hủy</Button>
       </Grid>
       <Grid item xs={'auto'}>
-        <Button variant="contained" onClick={SaveChange}>Lưu thay đổi</Button>
+        <LoadingButton 
+          loading={saving}
+          variant="contained" 
+          onClick={SaveChange}
+        >Lưu thay đổi</LoadingButton>
       </Grid>
       {/* <Grid item xs={true}/> */}
     </Grid>

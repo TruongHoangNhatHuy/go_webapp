@@ -17,7 +17,7 @@ const DriversManage = () => {
   }, [current]);
 
   return (
-    <Container component='main' disableGutters sx={{ margin: 0, padding: 0 }}>
+    <Container component='main' disableGutters sx={{ margin: 0, padding: 0, width: '100%' }}>
       {/* Tab bar */}
       <AppBar position="sticky" elevation={1} sx={{ width: '100%', bgcolor: 'whitesmoke' }}>
         <ListItem disablePadding>
