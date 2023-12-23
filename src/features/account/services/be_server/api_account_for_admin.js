@@ -142,6 +142,34 @@ export const getDriverDetail = async (token, id) => {
       throw error;
     });
 }
+export const blockDriver = async (token, id, isBlock) => {
+  var urlString = serverUrl +`/drivers/block/${id}?isBlock=${isBlock}`;
+  var authToken = "Bearer " + token;
+
+  return await fetch(urlString, {
+    method: "PUT",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+      "Authorization": authToken,
+      "Content-Type": "application/json",
+    },
+    redirect: "follow"
+  })
+    .then(response => {
+      if (!response.ok)
+        throw new Error(`${response.status} ${response.statusText}`);
+      return response.json();
+    })
+    .then(result => {
+      return result;
+    })
+    .catch(error => {
+      console.warn('blockDriver failed: ', error);
+      throw error;
+    });
+}
+
 
 // customer manage api
 export const getCustomers = async (token, size = 30, page = 0, isNonBlock = null, searchName = "") => {
@@ -170,6 +198,33 @@ export const getCustomers = async (token, size = 30, page = 0, isNonBlock = null
     })
     .catch(error => {
       console.warn('getCustomers failed: ', error);
+      throw error;
+    });
+}
+export const blockCustomer = async (token, id, isNonBlock) => {
+  var urlString = serverUrl +`/account/user/${id}?isnonblock=${isNonBlock}`;
+  var authToken = "Bearer " + token;
+
+  return await fetch(urlString, {
+    method: "PUT",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+      "Authorization": authToken,
+      "Content-Type": "application/json",
+    },
+    redirect: "follow"
+  })
+    .then(response => {
+      if (!response.ok)
+        throw new Error(`${response.status} ${response.statusText}`);
+      return response.json();
+    })
+    .then(result => {
+      return result;
+    })
+    .catch(error => {
+      console.warn('blockCustomer failed: ', error);
       throw error;
     });
 }

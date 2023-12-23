@@ -7,8 +7,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useMemo, useState } from "react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { useUserContext } from "contexts/UserContext";
-import { getCustomers } from "../services/be_server/api_account_for_admin";
+import { blockCustomer, getCustomers } from "../services/be_server/api_account_for_admin";
 import dayjs from "dayjs";
+import { ToastContainer, toast } from "react-toastify";
 
 export const CustomerManageForm = () => {
   const [user,] = useUserContext();
@@ -20,8 +21,8 @@ export const CustomerManageForm = () => {
     page: 0,
   });
   const [search, setSearch] = useState('');
-  const [isNonBlock, setIsNonBlock] = useState('')
-  const [blockFilter, setBlockFilter] = useState('all');
+  const [blockFilter, setBlockFilter] = useState(true);
+  const [changing, setChanging] = useState([]); // array of customer ids being change isNonBlock
 
   const columns = [
     { field: 'id', headerName: 'STT', flex: 0.05, 
@@ -74,7 +75,8 @@ export const CustomerManageForm = () => {
         // />,
         <GridActionsCellItem
           icon={
-            <IconButton onClick={() => handleChangeBlockStatus(data.row.id, true)}>
+            changing.includes(data.row.id) ? <CircularProgress size={40}/> :
+            <IconButton onClick={() => handleChangeBlockStatus(data.row.id, false)}>
               <LockIcon sx={{ color: '#d32f2f' }} />
             </IconButton>
           }
@@ -82,7 +84,8 @@ export const CustomerManageForm = () => {
         />,
         <GridActionsCellItem
           icon={
-            <IconButton onClick={() => handleChangeBlockStatus(data.row.id, false)}>
+            changing.includes(data.row.id) ? <CircularProgress size={40}/> :
+            <IconButton onClick={() => handleChangeBlockStatus(data.row.id, true)}>
               <LockOpenIcon sx={{ color: 'green' }} />
             </IconButton>
           }
@@ -94,7 +97,7 @@ export const CustomerManageForm = () => {
 
   // fetch all data
   const fetchData = () => {
-    getCustomers(user.token, paginationModel.pageSize, paginationModel.page, isNonBlock, search)
+    getCustomers(user.token, paginationModel.pageSize, paginationModel.page, blockFilter, search)
       .then(result => {
         // console.log(result);
         if (result !== null) {
@@ -107,7 +110,7 @@ export const CustomerManageForm = () => {
         alert('Lấy dữ liệu thất bại.');
       })
   }
-  useEffect(fetchData, [paginationModel.page, paginationModel.pageSize, isNonBlock, search]);
+  useEffect(fetchData, [paginationModel.page, paginationModel.pageSize, blockFilter, search]);
   
   const filtedData = useMemo(() => gridData);
     // gridData.filter(data =>
@@ -134,31 +137,49 @@ export const CustomerManageForm = () => {
   };
   const handleBlockFilter = (e) => {
     setFetching(true);
-    switch (e.target.value) {
-      case 'all':
-        setIsNonBlock('');
-        setBlockFilter('all');
-        break;
-      case 'nonBlock':
-        setIsNonBlock(true);
-        setBlockFilter(true);
-        break;
-      case 'blocked':
-        setIsNonBlock(false);
-        setBlockFilter(false);
-        break;
-      default:
-        break;
-    }
+    setBlockFilter(e.target.value);
   };
 
   // change data
-  const handleChangeBlockStatus = (id, isBlock) => {
-    alert('Only SEE')
+  const handleChangeBlockStatus = async (id, isNonBlock) => {
+    const updatedChanging = changing;
+    updatedChanging.push(id);
+    setChanging(updatedChanging);
+
+    await blockCustomer(user.token, id, isNonBlock)
+      .then(result => {
+        fetchData();
+        const updatedChanging = changing;
+        const index = updatedChanging.indexOf(id);
+        updatedChanging.splice(index, 1);
+        setChanging(updatedChanging);
+      })
+      .catch(error => {
+        fetchData();
+        const updatedChanging = changing;
+        const index = updatedChanging.indexOf(id);
+        updatedChanging.splice(index, 1);
+        setChanging(updatedChanging);
+        toast.error('Thao tác thất bại.')
+      })
   }
 
   return (
     <Grid container spacing={1} padding={1} paddingTop={3} maxWidth='100%' sx={{ bgcolor: 'white' }}>
+      {/* sub components */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+      {/* main components */}
       <Grid item xs={9}>
         <TextField
           fullWidth
@@ -187,9 +208,8 @@ export const CustomerManageForm = () => {
           defaultValue={blockFilter}
           onChange={handleBlockFilter}
         >
-          <MenuItem value='all'><Chip label='Tất cả' size="small" /></MenuItem>
-          <MenuItem value='nonBlock'><Chip label='Không bị chặn' size="small" color="success"/></MenuItem>
-          <MenuItem value='blocked'><Chip label='Bị chặn' size="small" color='error' /></MenuItem>
+          <MenuItem value={true}><Chip label='Không bị chặn' size="small" color="success"/></MenuItem>
+          <MenuItem value={false}><Chip label='Bị chặn' size="small" color='error' /></MenuItem>
         </TextField>
       </Grid>
       <Grid item xs={12}>

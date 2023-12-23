@@ -166,7 +166,7 @@ export const DriverInterviewForm = () => {
       {/* sub components */}
       <ToastContainer
         position="bottom-right"
-        autoClose={10000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

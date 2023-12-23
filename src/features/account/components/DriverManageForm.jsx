@@ -8,7 +8,8 @@ import { useEffect, useMemo, useState } from "react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { DriverManageDetail } from "./DriverManageDetail";
 import { useUserContext } from "contexts/UserContext";
-import { getDrivers } from "../services/be_server/api_account_for_admin";
+import { blockDriver, getDrivers } from "../services/be_server/api_account_for_admin";
+import { ToastContainer, toast } from "react-toastify";
 
 export const DriverManageForm = () => {
   const [user,] = useUserContext();
@@ -22,7 +23,7 @@ export const DriverManageForm = () => {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [changing, setChanging] = useState(false);
+  const [changing, setChanging] = useState([]); // array of driver ids being change status (block/unblock)
 
   const columns = [
     { field: 'id', headerName: 'STT', flex: 0.075,
@@ -72,22 +73,20 @@ export const DriverManageForm = () => {
         />,
         <GridActionsCellItem
           icon={
-            changing ? <CircularProgress size={40}/> :
+            changing.includes(data.row.id) ? <CircularProgress size={40}/> :
             <IconButton onClick={() => handleChangeBlockStatus(data.row.id, true)}>
               <LockIcon sx={{ color: '#d32f2f' }} />
             </IconButton>
           }
-          disabled={changing}
           sx={{ display: (data.row.status === 'REFUSED' || data.row.status === 'BLOCK') ? 'none' : 'flex'}}
         />,
         <GridActionsCellItem
           icon={
-            changing ? <CircularProgress size={40}/> :
+            changing.includes(data.row.id) ? <CircularProgress size={40}/> :
             <IconButton onClick={() => handleChangeBlockStatus(data.row.id, false)}>
               <LockOpenIcon sx={{ color: 'green' }} />
             </IconButton>
           }
-          disabled={changing}
           sx={{ display: (data.row.status === 'REFUSED' || data.row.status !== 'BLOCK') ? 'none' : 'flex'}}
         />,
       ]
@@ -144,15 +143,46 @@ export const DriverManageForm = () => {
   };
 
   // change data
-  const handleChangeBlockStatus = (id, isBlock) => {
-    setChanging(true);
-    fetchData();
-    setTimeout(()=>setChanging(false), 2000);
+  const handleChangeBlockStatus = async (id, isBlock) => {
+    const updatedChanging = changing;
+    updatedChanging.push(id);
+    setChanging(updatedChanging);
+
+    await blockDriver(user.token, id, isBlock)
+      .then(result => {
+        fetchData();
+        const updatedChanging = changing;
+        const index = updatedChanging.indexOf(id);
+        updatedChanging.splice(index, 1);
+        setChanging(updatedChanging);
+      })
+      .catch(error => {
+        fetchData();
+        const updatedChanging = changing;
+        const index = updatedChanging.indexOf(id);
+        updatedChanging.splice(index, 1);
+        setChanging(updatedChanging);
+        toast.error('Thao tác thất bại.')
+      })
   }
   
   return (
     <Grid container spacing={1} padding={1} maxWidth='100%'  sx={{ bgcolor: 'white' }}>
+      {/* sub components */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       <DriverManageDetail openDetail={openDetail} setOpenDetail={setOpenDetail}/>
+      {/* main components */}
       <Grid item xs={9}>
         <TextField 
           fullWidth
