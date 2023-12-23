@@ -19,36 +19,49 @@ export const DriverManageForm = () => {
     pageSize: 7,
     page: 0,
   });
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [changing, setChanging] = useState(false);
 
   const columns = [
-    { field: 'id', headerName: 'STT', flex: 0.1,
+    { field: 'id', headerName: 'STT', flex: 0.075,
       renderCell: (data) => gridData.indexOf(data.row)+1 + paginationModel.page*paginationModel.pageSize
     },
     { field: 'fullName', headerName: 'Họ tên', flex: 0.25 },
-    { field: 'phoneNumber', headerName: 'Số điện thoại', flex: 0.25 },
-    { field: 'status', headerName: 'Trạng thái', flex: 0.2, 
+    { field: 'email', headerName: 'Tài khoản', flex: 0.25 },
+    { field: 'phoneNumber', headerName: 'Số điện thoại', flex: 0.15 },
+    { field: 'status', headerName: 'Trạng thái', flex: 0.175, 
       renderCell: (data) => {
         switch (data.row.status) {
-          case 'waiting':
-            return <Chip label='Đang chờ' color="info"/>
+          case 'OFF':
+            return <Chip label='Không hoạt động' size="small"/>
+          case 'FREE':
+            return <Chip label='Rảnh' size="small" color="success"/>
+          case 'ON_RIDE':
+            return <Chip label='Đang chở khách' size="small" color="info"/>
+          case 'BLOCK':
+            return <Chip label='Bị chặn' size="small" color="error"/>
+          case 'REFUSED':
+            return <Chip label='Đã từ chối' size="small" color="error"/>
           default:
             return <Chip label={data.row.status}/>
         }
       }
     },
-    { field: 'nonBlock', headerName: 'Bị chặn', flex: 0.1,
-      renderCell: (data) => {
-        switch (data.row.nonBlock) {
-          case true:
-            return <Chip label='Không' color="success"/>
-          case false:
-            return <Chip label='Bị chặn' color="error"/>
-          default:
-            return <CircularProgress size={25}/>
-        }
-      }
-    },
-    { field: 'action', headerName: 'Hành động', width: 160, type: 'actions',
+    // { field: 'nonBlock', headerName: 'Bị chặn', flex: 0.1,
+    //   renderCell: (data) => {
+    //     switch (data.row.nonBlock) {
+    //       case true:
+    //         return <Chip label='Không' color="success"/>
+    //       case false:
+    //         return <Chip label='Bị chặn' color="error"/>
+    //       default:
+    //         return <CircularProgress size={25}/>
+    //     }
+    //   }
+    // },
+    { field: 'action', headerName: 'Hành động', width: 130, type: 'actions',
       getActions: (data) => [
         <GridActionsCellItem
           icon={
@@ -59,17 +72,23 @@ export const DriverManageForm = () => {
         />,
         <GridActionsCellItem
           icon={
+            changing ? <CircularProgress size={40}/> :
             <IconButton onClick={() => handleChangeBlockStatus(data.row.id, true)}>
               <LockIcon sx={{ color: '#d32f2f' }} />
             </IconButton>
           }
+          disabled={changing}
+          sx={{ display: (data.row.status === 'REFUSED' || data.row.status === 'BLOCK') ? 'none' : 'flex'}}
         />,
         <GridActionsCellItem
           icon={
+            changing ? <CircularProgress size={40}/> :
             <IconButton onClick={() => handleChangeBlockStatus(data.row.id, false)}>
               <LockOpenIcon sx={{ color: 'green' }} />
             </IconButton>
           }
+          disabled={changing}
+          sx={{ display: (data.row.status === 'REFUSED' || data.row.status !== 'BLOCK') ? 'none' : 'flex'}}
         />,
       ]
     }
@@ -77,7 +96,7 @@ export const DriverManageForm = () => {
 
   // fetch all data
   const fetchData = () => {
-    getDrivers(user.token, paginationModel.pageSize, paginationModel.page)
+    getDrivers(user.token, paginationModel.pageSize, paginationModel.page, status, search)
       .then(result => {
         // console.log(result);
         if (result !== null) {
@@ -90,38 +109,45 @@ export const DriverManageForm = () => {
         alert('Lấy dữ liệu thất bại.');
       })
   }
-  useEffect(fetchData, [paginationModel.page, paginationModel.pageSize]);
+  useEffect(fetchData, [paginationModel.page, paginationModel.pageSize, status, search]);
+
+  const filtedData = useMemo(() => gridData);
+  //   gridData.filter(data => 
+  //     data.fullName?.toLowerCase().includes(search.toLowerCase()) &&
+  //     data.status?.includes(statusFilter === 'all' ? '' : statusFilter)
+  //   )
+  // ,[gridData, statusFilter, search])
 
   const [openDetail, setOpenDetail] = useState(null);
   const handleOpenDetail = (driver) => {
     setOpenDetail(driver);
   }
-  
-  // filter data
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const filtedData = useMemo(() =>
-    gridData.filter(data => 
-      data.fullName?.toLowerCase().includes(search.toLowerCase()) &&
-      data.status?.includes(statusFilter === 'all' ? '' : statusFilter)
-    )
-  ,[gridData, statusFilter, search])
 
+  // filter data
   const handleSearch = () => {
+    setFetching(true);
     const term = document.getElementById('search-box').value;
     setSearch(term);
   };
   const handleSearchReset = () => {
+    setFetching(true);
     document.getElementById('search-box').value = '';
     setSearch('');
   };
   const handleStatusFilter = (e) => {
+    setFetching(true);
     setStatusFilter(e.target.value)
+    if (e.target.value === 'all')
+      setStatus('');
+    else 
+      setStatus(e.target.value);
   };
 
   // change data
   const handleChangeBlockStatus = (id, isBlock) => {
-    alert('Only SEE')
+    setChanging(true);
+    fetchData();
+    setTimeout(()=>setChanging(false), 2000);
   }
   
   return (
@@ -152,14 +178,15 @@ export const DriverManageForm = () => {
           fullWidth 
           size="small" 
           id='status-filter'
-          // label="Lọc theo tình trạng"
           defaultValue={statusFilter}
           onChange={handleStatusFilter}
         >
           <MenuItem value='all'><Chip label='Tất cả' size="small"/></MenuItem>
-          {/* <MenuItem value='waiting'><Chip label='Đang chờ' size="small" color="info"/></MenuItem>
-          <MenuItem value='checked'><Chip label='Đã duyệt' size="small" color="success"/></MenuItem>
-          <MenuItem value='cancelled'><Chip label='Đã từ chối' size="small" color='error'/></MenuItem> */}
+          <MenuItem value='OFF'><Chip label='Không hoạt động' size="small"/></MenuItem>
+          <MenuItem value='FREE'><Chip label='Rảnh' size="small" color="success"/></MenuItem>
+          <MenuItem value='ON_RIDE'><Chip label='Đang chở khách' size="small" color="info"/></MenuItem>
+          <MenuItem value='BLOCK'><Chip label='Bị chặn' size="small" color="error"/></MenuItem>
+          <MenuItem value='REFUSED'><Chip label='Đã từ chối' size="small" color="error"/></MenuItem>
         </TextField>
       </Grid>
       <Grid item xs={12}>
