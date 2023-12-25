@@ -7,8 +7,8 @@ import MotocycleIcon from 'assets/motorcycle.png'
 import polyline from "@mapbox/polyline";
 
 // const apiKey = config.vietmap.primaryToken // 1000 req/ngày
-const apiKey = config.vietmap.secondaryToken // 10 req/phút
-// const apiKey = config.vietmap.thirdToken // 5000 req/ngày
+// const apiKey = config.vietmap.secondaryToken // 10 req/phút
+const apiKey = config.vietmap.thirdToken // 5000 req/ngày
 
 const Map = (props) => {
   const { startLocation, endLocation, vehicleRoute, setUserPosition, setMapCenterRef, driverPosition } = props;
