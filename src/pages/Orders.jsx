@@ -5,18 +5,20 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import { useEffect,useState } from "react";
+import { useEffect,useState,useRef } from "react";
 import { useUserContext } from 'contexts/UserContext';
 import { getAllOrders } from 'services/be_server/api_orders';
 import dayjs from "dayjs";
+import { OrdersDetail } from "./OrdersDetail";
 
 
 
 const Orders = () => {
   const [user, setUser] = useUserContext();
   const [open, setOpen] = useState(false);
-  const [startDate,setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  // const [startDate,setStartDate] = useState(null);
+  // const [endDate, setEndDate] = useState(null);
+  const ordersDetailRef = useRef(null);
   const [pageState,setPageState] = useState({
     isLoading: false,
     content:[],
@@ -28,12 +30,22 @@ const Orders = () => {
     if (statusTitle == "ON_RIDE") return 'warning'
     if (statusTitle == "COMPLETE") return 'success'
     if (statusTitle == "CANCELLED") return 'error'
+    if (statusTitle == "PAID") return 'info'
+    if (statusTitle == "WAITING") return 'secondary'
+    if (statusTitle == "REFUNDED") return 'info'
+    if (statusTitle == "WAITING_REFUND") return 'info'
+    if (statusTitle == "FOUND") return 'info'
     return null
   }
   const setTitleStatus = (statusTitle) =>{
     if (statusTitle == "ON_RIDE") return 'Đang Chạy'
     if (statusTitle == "COMPLETE") return 'Đã Hoàn Thành'
     if (statusTitle == "CANCELLED") return 'Đã Hủy'
+    if (statusTitle == "WAITING") return 'Chưa Thanh Toán'
+    if (statusTitle == "PAID") return 'Đã Thanh Toán'
+    if (statusTitle == "REFUNDED") return 'Đã Hoàn Tiền'
+    if (statusTitle == "WAITING_REFUND") return 'Chờ Hoàn Tiền'
+    if (statusTitle == "FOUND") return 'Đã Tìm Thấy Tài Xế'
     return null
   }
 
@@ -48,17 +60,15 @@ const Orders = () => {
   useEffect(() => { 
     handleChangeData(pageState.page,pageState.size)
   }, [pageState.page,pageState.size]);
-  const handleOpen = () => {
+  const handleOpenDetail = (order) => {
+    ordersDetailRef.current = order;
     setOpen(true);
   };
-  const handleClose = () => {
-    setOpen(false);
-  };
 
-  const handleDateFilter = (e) => {
-    setStartDate(e.value)
-    console.log(e.value);
-  }
+  // const handleDateFilter = (e) => {
+  //   setStartDate(e.value)
+  //   console.log(e.value);
+  // }
 
   const columns = [
     {
@@ -75,8 +85,6 @@ const Orders = () => {
     {
       field: 'createAt', headerName: 'Thời Gian Đặt', flex: 0.7, headerAlign: 'center', type: 'dateTime', align: 'center',
       valueGetter: ({ value }) => value && new Date(value),
-      // valueformatter: params => 
-      //   moment(params?.value).format("dd/mm/yyyy hh:mm a"),
     },
     {
       field: 'amount', headerName: 'Giá Tiền (VNĐ)', flex: 0.7, headerAlign: 'center', align: 'center',
@@ -103,24 +111,22 @@ const Orders = () => {
           label={setTitleStatus(rowData.row.status)}
         />, align: 'center',
     },
-    // {
-    //   field: 'action', headerName: 'Hành Động', flex: 0.5, headerAlign: 'center', type: 'actions',
-    //   getActions: (params) =>
-    //     [
-    //       <GridActionsCellItem
-    //         icon={
-    //           <IconButton onClick={handleOpen}
-    //             sx={{
-    //               color: 'rgb(33, 150, 243)',
-    //             }}>
-    //             <MdOutlineVisibility />
-    //           </IconButton>
-    //         }
-    //         label="View"
-    //       // onClick={handleOpen}
-    //       />,
-    //     ]
-    // }
+    {
+      field: 'action', headerName: 'Hành Động', flex: 0.5, headerAlign: 'center', type: 'actions',
+      getActions: (rowData) =>
+        [
+          <GridActionsCellItem
+            icon={
+              <IconButton onClick={() => handleOpenDetail(rowData.row)}
+                sx={{
+                  color: 'rgb(33, 150, 243)',
+                }}>
+                <MdOutlineVisibility />
+              </IconButton>
+            }
+          />,
+        ]
+    }
     ,
   ]
 
@@ -212,29 +218,7 @@ const Orders = () => {
           // checkboxSelection
         >
         </DataGrid>
-        <Stack >
-          <Modal
-            open={open}
-            onClose={handleClose}
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: { xs: "100vw", md: "100%", sm: "100%" },
-              height: { xs: "100vh", md: "100%", sm: "100%" }
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex", flexDirection: 'column',
-                width: { xs: "100%", md: "30%", sm: "30%" },
-                height: { xs: "100%", md: "80%", sm: "80%" },
-                bgcolor: "white", borderRadius: "16px"
-              }}
-            >
-            </Box>
-          </Modal>
-        </Stack>
+        <OrdersDetail ordersRef={ordersDetailRef} open={open} setOpen={setOpen}/>
       </Grid>
     </Grid>
   )
