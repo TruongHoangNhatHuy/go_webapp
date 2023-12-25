@@ -77,6 +77,7 @@ const ReactRouter = () => {
           <Route index element={<Navigate to={'drivers'}/>} />
           <Route path='account' element={<Account />} />
           <Route path='drivers' element={<DriversManage/>}>
+            <Route index element={<Navigate to={'interview'}/>} />
             <Route path='interview' element={<DriverInterviewForm/>} />
             <Route path='manage' element={<DriverManageForm/>} />
           </Route>

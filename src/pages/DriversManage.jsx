@@ -17,12 +17,18 @@ const DriversManage = () => {
   }, [current]);
 
   return (
-    <Container component='main' disableGutters sx={{ margin: 0, padding: 0, width: '100%' }}>
+    <div>
       {/* Tab bar */}
       <AppBar position="sticky" elevation={1} sx={{ width: '100%', bgcolor: 'whitesmoke' }}>
-        <ListItem disablePadding>
+        <ListItem disablePadding 
+          sx={{
+            ".Mui-selected": { bgcolor: 'lightgray',
+              ".MuiListItemText-root": { color: 'green' }
+            }
+          }}
+        >
           <ListItemButton component={Link} to='interview' selected={selectedItem === 'interview'}>
-            <ListItemText sx={{ color: selectedItem === 'interview' ? 'darkgreen' : 'gray' }}>
+            <ListItemText sx={{ color: selectedItem === 'interview' ? 'green' : 'gray' }}>
               <b>Xét duyệt tài xế</b>
             </ListItemText>
           </ListItemButton>
@@ -34,8 +40,10 @@ const DriversManage = () => {
         </ListItem>
       </AppBar>
       {/* Cửa sổ chính */}
-      <Outlet/>
-    </Container>
+      <div style={{ paddingLeft: 8 }}>
+        <Outlet/>
+      </div>
+    </div>
   )
 }
 

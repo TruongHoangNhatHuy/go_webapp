@@ -239,7 +239,8 @@ export const DriverManageForm = () => {
               setFetching(true);
             }}
             sx={{
-              "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" }
+              "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" },
+              ".MuiDataGrid-columnHeaderTitle": { fontWeight: 'bold' }
             }}
             />
         </Paper>
