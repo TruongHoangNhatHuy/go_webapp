@@ -145,11 +145,11 @@ const NavMenu = () => {
 		<Box height='100vh'>
 			{menu.map(({ to, menuItem, menuIcon }) => (
 				<ListItem key={to} component={Link} to={to} sx={{ padding: 0, alignItems: "center",
-				".Mui-selected": {
-					bgcolor: 'lightgray',
-					".MuiListItemIcon-root": { color: 'green' },
-					".MuiListItemText-root": { color: 'green' }
-				} 
+					".Mui-selected": {
+						bgcolor: 'lightgrey!important',
+						".MuiListItemIcon-root": { color: 'green' },
+						".MuiListItemText-root": { color: 'green' }
+					} 
 				}}>
 					<ListItemButton selected={selectedItem === to} sx={{ display: 'block', padding: 2 }}>
 						<ListItemIcon sx={{ justifyContent: 'center', fontSize: 25 }}>
