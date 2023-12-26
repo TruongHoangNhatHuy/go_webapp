@@ -14,7 +14,7 @@ export const BookingDetail = () => {
           <TableRow>
             <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
             <IconButton sx={{pointerEvents: 'none'}}><MdInfo/></IconButton>
-              Trạng thái đơn</TableCell>
+              Trạng thái</TableCell>
             <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>
               { 
                 bookingInfo.status === 'WAITING' ? 'Chưa thanh toán' : 
@@ -33,7 +33,7 @@ export const BookingDetail = () => {
           <TableRow>
             <TableCell component="th" scope="row" sx={{padding:"16px 0px"}}>
             <IconButton sx={{pointerEvents: 'none', color: blue[700]}}><MdOutlineAccessTime/></IconButton>
-              Thời gian đặt</TableCell>
+              Thời gian</TableCell>
             <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingInfo.timeSubmit}</TableCell>
           </TableRow>
           <TableRow>
@@ -60,7 +60,7 @@ export const BookingDetail = () => {
             <TableRow>
               <TableCell component="th" scope="row"sx={{padding:"16px 0px"}}>
               <IconButton sx={{pointerEvents: 'none', color: blue[700]}}><MdPayment/></IconButton>
-              Phương thức thanh toán</TableCell>
+              Phương thức</TableCell>
               <TableCell variant='head' align='right'sx={{padding:"16px 0px"}}>{bookingInfo.paymentMethod}</TableCell>
             </TableRow>
             <TableRow>

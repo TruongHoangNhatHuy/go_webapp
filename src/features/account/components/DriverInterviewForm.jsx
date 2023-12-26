@@ -217,9 +217,9 @@ export const DriverInterviewForm = () => {
           <DataGrid
             columns={columns}
             disableRowSelectionOnClick
-            initialState={{
-              pagination: { paginationModel: paginationModel },
-            }}
+            // initialState={{
+            //   pagination: { paginationModel: paginationModel },
+            // }}
             autoPageSize
             /* pagination */
             // paginationMode="server"

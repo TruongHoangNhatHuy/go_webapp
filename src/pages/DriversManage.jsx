@@ -22,7 +22,7 @@ const DriversManage = () => {
       <AppBar position="sticky" elevation={1} sx={{ width: '100%', bgcolor: 'whitesmoke' }}>
         <ListItem disablePadding 
           sx={{
-            ".Mui-selected": { bgcolor: 'lightgray',
+            ".Mui-selected": { bgcolor: 'lightgray!important',
               ".MuiListItemText-root": { color: 'green' }
             }
           }}

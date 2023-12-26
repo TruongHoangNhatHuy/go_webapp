@@ -38,7 +38,7 @@ const Booking = () => {
   const restoreBookingInfo = async () => {
     await getActiveBooking(user.token)
       .then(result => {
-        console.log(result)
+        console.log('restore booking:',result);
         if (result !== null) {
           updatedBookingInfo.id = result.id;
           updatedBookingInfo.status = result.status;
@@ -47,7 +47,7 @@ const Booking = () => {
           updatedBookingInfo.paymentMethod = result.payment.paymentMethod;
           updatedBookingInfo.timeSubmit = dayjs(result.createAt).format('DD/MM/YYYY[, ]HH:mm[ ]A');
           updatedBookingInfo.customerId = result.customer.id;
-          updatedBookingInfo.driverId = result.driver.id;
+          updatedBookingInfo.driverId = (result.driver === null) ? null : result.driver.id;
 
           const pickUp = result.pickUpLocation.split(',');
           const startLocation = getLocationByCoordinates(pickUp[1], pickUp[0])[0];
@@ -102,7 +102,7 @@ const Booking = () => {
   // Hiện thị thông báo trạng thái đơn đặt
   useEffect(() => {
     switch (bookingInfo.status) {
-      case 'WAITING': { toast('Đặt xe thành công, đang chờ thanh toán'); break; }
+      // case 'WAITING': { toast('Đặt xe thành công, đang chờ thanh toán'); break; }
       case 'PAID': { toast('Đã thanh toán thành công'); break; }
       case 'FOUND': { toast('Đã tìm thấy tài xế'); break; }
       case 'ARRIVED_PICKUP': { toast('Tài xế đã đón khách'); break; }

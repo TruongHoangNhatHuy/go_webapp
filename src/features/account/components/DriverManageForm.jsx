@@ -224,10 +224,10 @@ export const DriverManageForm = () => {
           <DataGrid
             columns={columns}
             disableRowSelectionOnClick
-            initialState={{
-              pagination: { paginationModel: paginationModel },
-            }}
-            // autoPageSize
+            // initialState={{
+            //   pagination: { paginationModel: paginationModel },
+            // }}
+            autoPageSize
             /* pagination */
             paginationMode="server"
             rows={filtedData}
