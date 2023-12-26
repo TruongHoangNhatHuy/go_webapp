@@ -10,6 +10,7 @@ import Account from './pages/Account';
 import PaymentVerify from 'pages/PaymentVerify';
 import PaymentHistory from 'pages/PaymentHistory';
 import DriversManage from 'pages/DriversManage';
+import Statistic from 'pages/Statistic';
 import { UserContextProvider, useUserContext } from 'contexts/UserContext';
 import { BookingContextProvider } from 'contexts/BookingContext';
 import { DriverInterviewForm, DriverManageForm } from 'features/account';
@@ -63,26 +64,28 @@ const ReactRouter = () => {
           <Route path='favorites' element={<text>Địa điểm yêu thích</text>} />
         </Route>
         <Route path='/payment-verify' element={<PaymentVerify/>}></Route>
-        <Route path='/driver' element={<ProtectedRoute user={user} role={'driver'}>
+        <Route path='/driver' element={
+          <ProtectedRoute user={user} role={'driver'}>
            <SocketProvider>
               <MainLayout/>
-            </SocketProvider></ProtectedRoute>}>
+            </SocketProvider>
+          </ProtectedRoute>
+        }>
           <Route index element={<Navigate to={'orders'}/>} />
           <Route path='account' element={<Account />} />
           <Route path='orders' element={<Orders/>} />
           <Route path='ratings' element={<text>Đánh giá</text>} />
-          <Route path='analysis' element={<text>Thống kê</text>} />
+          <Route path='statistic' element={<text>Thống kê</text>} />
         </Route>
         <Route path='/admin' element={<ProtectedRoute user={user} role={'admin'}><MainLayout/></ProtectedRoute>}>
-          <Route index element={<Navigate to={'drivers'}/>} />
-          <Route path='account' element={<Account />} />
+          <Route index element={<Navigate to={'statistic'}/>} />
+          <Route path='statistic' element={<Statistic/>} />
           <Route path='drivers' element={<DriversManage/>}>
             <Route index element={<Navigate to={'interview'}/>} />
             <Route path='interview' element={<DriverInterviewForm/>} />
             <Route path='manage' element={<DriverManageForm/>} />
           </Route>
           <Route path='customers' element={<CustomersManage/>} />
-          <Route path='analysis' element={<text>Thống kê</text>} />
         </Route>
       </Routes>
     </BrowserRouter>
