@@ -1,12 +1,21 @@
 import { StatisticForm } from "features/statistic"
+import {Box} from '@mui/material';
 
 const Statistic = () => {
   return (
-    <div style={{ overflowY: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none',
-      '&::-webkit-scrollbar': { display: 'none' }
+    <Box
+    height={"100%"}
+    width={"100%"} 
+    sx={{
+      overflowY: 'scroll',
+      msOverflowStyle: 'none',
+      scrollbarWidth: 'none',
+      '&::-webkit-scrollbar': {
+      display: 'none'
+    },
     }}>
       <StatisticForm/>
-    </div>
+    </Box>
   )
 }
 
