@@ -7,7 +7,7 @@ import { BookingForm, BookingInfoSide, LocationInputSide } from 'features/bookin
 import { getDriverById } from 'features/account';
 import { SocketSubscriber, SocketUnsubscribe, useSocketClient } from 'services/websocket/StompOverSockJS';
 import { useUserContext } from 'contexts/UserContext';
-import { useBookingContext } from 'contexts/BookingContext';
+import { emptyBooking, useBookingContext } from 'contexts/BookingContext';
 import { useNotifyContext } from 'layouts/MainLayout';
 import { getActiveBooking } from 'features/booking/services/be_server/api_booking';
 import dayjs from 'dayjs';
@@ -207,7 +207,9 @@ const Booking = () => {
   const handleBookingComplete = () => {
     sessionStorage.removeItem('bookingSession');
     sessionStorage.removeItem('conversationCache');
+    setBookingInfo(emptyBooking);
     setHadBooking(false);
+    setHadDriver(false);
     setStartLocation(null);
     setEndLocation(null);
     setVehicleRoute(null);

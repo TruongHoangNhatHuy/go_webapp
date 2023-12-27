@@ -68,7 +68,6 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
         // Update bookingInfo
         updatedBookingInfo.id = result.id;
         updatedBookingInfo.status = result.status;
-        updatedBookingInfo.customerId = result.customerId;
         updatedBookingInfo.timeSubmit = dayjs(result.createAt).format('DD/MM/YYYY[, ]HH:mm[ ]A');
         setBookingInfo(updatedBookingInfo);
         sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
@@ -135,7 +134,7 @@ export const BookingForm = ({ setBookingForm, setHadBooking }) => {
           label='Phương thức thanh toán'
           onChange={(_, item) => setPaymentMethod(item.props.value)}
         >
-          <MenuItem value='Momo'>Momo</MenuItem>
+          {/* <MenuItem value='Momo'>Momo</MenuItem> */}
           <MenuItem value='VNPay'>VNPay</MenuItem>
         </TextField>
       </Stack>

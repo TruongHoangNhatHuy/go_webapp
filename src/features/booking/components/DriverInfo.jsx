@@ -7,6 +7,7 @@ import { MdOutlineMessage, MdPersonSearch, MdClose, MdSend, MdTransgender, MdOut
 import { SocketSubscriber, SocketUnsubscribe, useSocketClient,SocketPublish } from 'services/websocket/StompOverSockJS';
 import ScrollableFeed from 'react-scrollable-feed'
 import { useNotifyContext } from 'layouts/MainLayout';
+import { useUserContext } from 'contexts/UserContext';
 
 const MessageForm = ({ open, setOpenMessage, driverInfo, conversation }) => {
   const [contentMessage,setContentMessage] = useState("")
@@ -268,7 +269,8 @@ const DriverInfoDetail = ({ driverInfo }) => {
 }
 
 export const DriverInfo = () => {
-  const [bookingInfo,] = useBookingContext()
+  const [user,] = useUserContext();
+  const [bookingInfo,] = useBookingContext();
   const driverInfo = (bookingInfo.driverInfo !== null ? bookingInfo.driverInfo :
   { // test data
     avtUrl: 'placeholder',
@@ -286,7 +288,7 @@ export const DriverInfo = () => {
   const conversationData =
   {
     id_booking: bookingInfo.id,
-    id_sender: bookingInfo.customerId,
+    id_sender: user.id,
     id_receiver: bookingInfo.driverId,
     messagesData: []
   }
