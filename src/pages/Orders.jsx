@@ -76,10 +76,10 @@ const Orders = () => {
       renderCell: (rowData) =>
         <ListItem>
           <ListItemAvatar>
-            <Avatar src={rowData.row.avatar}>
+            <Avatar src={rowData.row.driver?.avatarUrl}>
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary={rowData.row.driverId} secondary={rowData.row.license} />
+          <ListItemText primary={rowData.row.driver?.fullName == null ? "Không tìm thấy tài xế" : rowData.row.driver.fullName} secondary={rowData.row.driver?.licensePlate} />
         </ListItem>,
     },
     {
@@ -98,7 +98,7 @@ const Orders = () => {
     {
       field: 'rating', headerName: 'Đánh Giá', flex: 0.7, headerAlign: 'center',
       renderCell: (rowData) =>
-        <Rating defaultValue={rowData.row.rating} readOnly />, align: 'center'
+        <Rating defaultValue={rowData.row.driver?.rating} readOnly />, align: 'center'
     },
     {
       field: 'status', headerName: 'Trạng Thái', flex: 0.5, headerAlign: 'center',

@@ -44,7 +44,7 @@ export const OrdersDetail = ({ ordersRef, open, setOpen}) => {
               height: { xs: "100vh", md: "100%", sm: "100%" }
             }}
           >
-            <Box
+          {ordersDetail !== null ? (  <Box
               sx={{
                 display: "flex", flexDirection: 'column',
                 position:"relative",
@@ -83,10 +83,11 @@ export const OrdersDetail = ({ ordersRef, open, setOpen}) => {
                <Grid item sm={1} minWidth={"100%"}>
                <ListItem >
                   <ListItemAvatar>
-                    <Avatar src="https://i.pinimg.com/236x/79/e2/58/79e258043025bf2566aef5d88b927db6.jpg" sx={{ height: "50px", width: "50px" }}/>
+                    <Avatar src={ordersDetail.driver?.avatarUrl} sx={{ height: "50px", width: "50px" }}/>
                   </ListItemAvatar>
-                  <ListItemText primary={<b>Lê Văn Hào</b>} secondary="43P1-0877" sx={{ pl: 1 }}/>
-                  <Rating defaultValue={4} precision={0.5} readOnly />
+                  {console.log(ordersDetail)}
+                  <ListItemText primary={ordersDetail.driver?.fullName == null ? "Không tìm thấy tài xế" : ordersDetail.driver.fullName} secondary={ordersDetail.driver?.licensePlate} sx={{ pl: 1 }}/>
+                  <Rating defaultValue={ordersDetail.driver?.rating} precision={0.5} readOnly />
                 
                 </ListItem>
                 </Grid>
@@ -102,7 +103,7 @@ export const OrdersDetail = ({ ordersRef, open, setOpen}) => {
                     rows={4}
                     color="info"
                     // focused 
-                    defaultValue="Tài Xế Lái Rất Tốt"
+                    defaultValue={ordersDetail.review?.content}
                     // sx={{padding: "0px 16px"}}
                     InputProps={{
                       readOnly: true,
@@ -181,7 +182,23 @@ export const OrdersDetail = ({ ordersRef, open, setOpen}) => {
                   </TableContainer>   ) :   <Grid item container flexDirection={"column"} sm={6} height={"100%"}></Grid>}
                </Grid>
               </Grid>
-            </Box>
+            </Box>):  
+          
+          <Box
+              sx={{
+                display: "flex", flexDirection: 'column',
+                position:"relative",
+                width: { xs: "100%", md: "70%", sm: "70%" },
+                height: { xs: "100%", md: "80%", sm: "80%" },
+                bgcolor: "white", borderRadius: "16px",
+                  overflowY: 'scroll',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': {
+              display: 'none'
+            },
+              }}
+            ></Box>}
           </Modal>
         </Stack>
     )
