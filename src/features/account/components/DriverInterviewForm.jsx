@@ -28,10 +28,10 @@ export const DriverInterviewForm = () => {
       renderCell: (data) => gridData.indexOf(data.row)+1
     },
     { field: 'fullName', headerName: 'Họ tên', flex: 0.25 },
-    { field: 'createDate', headerName: 'Thời gian', flex: 0.25,
+    { field: 'createDate', headerName: 'Đăng kí lúc', flex: 0.25,
       renderCell: (data) => dayjs(data.row.createDate).format('DD-MM-YYYY HH:mm:ss A')
     },
-    { field: 'status', headerName: 'Tình trạng', flex: 0.2, 
+    { field: 'status', headerName: 'Trạng thái', flex: 0.2, 
       renderCell: (data) => {
         switch (data.row.status) {
           case 'NOT_ACTIVATED':
@@ -217,9 +217,9 @@ export const DriverInterviewForm = () => {
           <DataGrid
             columns={columns}
             disableRowSelectionOnClick
-            initialState={{
-              pagination: { paginationModel: paginationModel },
-            }}
+            // initialState={{
+            //   pagination: { paginationModel: paginationModel },
+            // }}
             autoPageSize
             /* pagination */
             // paginationMode="server"
@@ -232,26 +232,29 @@ export const DriverInterviewForm = () => {
               // setFetching(true);
             }}
             sx={{
-              "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" }
+              "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" },
+              ".MuiDataGrid-columnHeaderTitle": { fontWeight: 'bold' }
             }}
           />
         </Paper>
       </Grid>
       <Grid item xs={true}/>
-      <Grid item xs={'auto'}>
-        <Typography><Chip label='Đang chờ' size="small" color="info"/>
-          {" "+gridData.filter(x => x.status === 'NOT_ACTIVATED').length}
-        </Typography>
-      </Grid>
-      <Grid item xs={'auto'}>
-        <Typography><Chip label='Duyệt' size="small" color="success"/>
-          {" "+gridData.filter(x => x.status === 'ACTIVATE').length}
-        </Typography>
-      </Grid>
-      <Grid item xs={'auto'}>
-        <Typography><Chip label='Từ chối' size="small" color='error'/>
-          {" "+gridData.filter(x => x.status === 'REFUSE').length}
-        </Typography>
+      <Grid container spacing={1} alignItems={'center'} item xs={'auto'}>
+        <Grid item xs={'auto'}>
+          <Typography><Chip label='Đang chờ' size="small" color="info"/>
+            {" "+gridData.filter(x => x.status === 'NOT_ACTIVATED').length}
+          </Typography>
+        </Grid>
+        <Grid item xs={'auto'}>
+          <Typography><Chip label='Duyệt' size="small" color="success"/>
+            {" "+gridData.filter(x => x.status === 'ACTIVATE').length}
+          </Typography>
+        </Grid>
+        <Grid item xs={'auto'}>
+          <Typography><Chip label='Từ chối' size="small" color='error'/>
+            {" "+gridData.filter(x => x.status === 'REFUSE').length}
+          </Typography>
+        </Grid>
       </Grid>
       <Grid item xs={1}>
         <Button 

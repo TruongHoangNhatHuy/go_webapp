@@ -109,10 +109,15 @@ const BookingRating = ({ bookingId }) => {
   )
 }
 
-const BookingCancelDialog = ({ open, handleCancel }) => {
-  const [reasonType, setReasonType] = useState(null);
+const BookingCancelDialog = ({ open, handleCancel, hadDriver }) => {
+  const [reasonType, setReasonType] = useState('CUSTOMER');
   const [content, setContent] = useState(null);
 
+  const handleChangeReason = (_, value) => {
+    if (value !== null) {
+      setReasonType(value);
+    }
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
     const info = {
@@ -136,12 +141,12 @@ const BookingCancelDialog = ({ open, handleCancel }) => {
               name='reasonType'
               exclusive
               value={reasonType}
-              onChange={(_, value) => setReasonType(value)}
+              onChange={handleChangeReason}
             >
               <ToggleButton value='CUSTOMER'
                 sx={{ '&.Mui-selected': { color: 'green' } }}
               >Phía khách hàng</ToggleButton>
-              <ToggleButton value='DRIVER'
+              <ToggleButton value='DRIVER' disabled={!hadDriver}
                 sx={{ '&.Mui-selected': { color: 'green' } }}
               >Phía tài xế</ToggleButton>
             </ToggleButtonGroup>
@@ -191,6 +196,7 @@ export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingC
       setTimeout(async () => {
         await cancelBooking(user.token, bookingInfo.id, jsonBody)
           .then(result => {
+            console.log(result);
             if (result.status === "WAITING_REFUND")
               handleBookingCancel(result.status);
           })
@@ -284,7 +290,7 @@ export const BookingInfoSide = ({ hadDriver, handleBookingCancel, handleBookingC
         </Stack>
       </Drawer>
       {/* Dialog xác nhận hủy đơn */}
-      <BookingCancelDialog open={cancelDialog} handleCancel={handleCancel}/>
+      <BookingCancelDialog open={cancelDialog} handleCancel={handleCancel} hadDriver={hadDriver}/>
     </Stack>
   )
 }

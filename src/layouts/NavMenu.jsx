@@ -10,7 +10,6 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import PeopleIcon from '@mui/icons-material/People';
 import { MdOutlineReceiptLong, MdHistory, MdBookmarkBorder, MdMenu } from "react-icons/md";
 import CssBaseline from "@mui/material/CssBaseline";
-import './NavMenu.css';
 import { useUserContext } from "contexts/UserContext";
 import { useNotifyContext } from "./MainLayout";
 
@@ -72,11 +71,11 @@ const driverMenu = [
 ]
 // List menu của admin
 const adminMenu = [
-	{
-		to: "account",
-		menuItem: "Tài khoản",
-		menuIcon: <AccountBoxIcon />
-	},
+	// {
+	// 	to: "account",
+	// 	menuItem: "Tài khoản",
+	// 	menuIcon: <AccountBoxIcon />
+	// },
 	{
 		to: "drivers",
 		menuItem: "Quản lí tài xế",
@@ -145,8 +144,14 @@ const NavMenu = () => {
 	const drawer = (
 		<Box height='100vh'>
 			{menu.map(({ to, menuItem, menuIcon }) => (
-				<ListItem className='list-item' key={to} component={Link} to={to} sx={{ alignItems: "center" }}>
-					<ListItemButton className="list-item-btn" selected={selectedItem === to}>
+				<ListItem key={to} component={Link} to={to} sx={{ padding: 0, alignItems: "center",
+					".Mui-selected": {
+						bgcolor: 'lightgrey!important',
+						".MuiListItemIcon-root": { color: 'green' },
+						".MuiListItemText-root": { color: 'green' }
+					} 
+				}}>
+					<ListItemButton selected={selectedItem === to} sx={{ display: 'block', padding: 2 }}>
 						<ListItemIcon sx={{ justifyContent: 'center', fontSize: 25 }}>
 							<Badge variant="dot" color="primary" invisible={notify !== to || selectedItem === to}>
 								{menuIcon}
@@ -156,8 +161,8 @@ const NavMenu = () => {
 					</ListItemButton>
 				</ListItem>
 			))}
-			<ListItem className='list-item' sx={{ alignItems: "center" }}>
-				<ListItemButton className="list-item-btn" onClick={logout}>
+			<ListItem sx={{ padding: 0, alignItems: "center" }}>
+				<ListItemButton onClick={logout} sx={{ display: 'block', padding: 2 }}>
 					<ListItemIcon sx={{ justifyContent: 'center', fontSize: 25 }}>
 						<LogoutIcon/>
 					</ListItemIcon>

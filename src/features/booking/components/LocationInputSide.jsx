@@ -16,6 +16,7 @@ import { getLocationsAutocomplete } from '../services/vietmap/api_autocomplete.j
 import { getRoute } from '../services/vietmap/api_route.js';
 import { getAmount } from '../services/be_server/api_booking.js';
 import { useBookingContext } from 'contexts/BookingContext.jsx';
+import { useUserContext } from 'contexts/UserContext.jsx';
 
 const SearchBox = (props) => {
   const { userPosition, location, setLocation, setMapCenterRef, ...tfProps } = props;
@@ -133,6 +134,7 @@ const SearchBox = (props) => {
 export const LocationInputSide = (props) => {
   const { hidden, userPosition, startLocation, setStartLocation, endLocation, setEndLocation, setVehicleRoute, setMapCenterRef, setBookingForm } = props;
   const [bookingInfo, setBookingInfo] = useBookingContext();
+  const [user,] = useUserContext();
 
   const drawerWidth = 350;
   // Đóng mở drawer
@@ -161,10 +163,14 @@ export const LocationInputSide = (props) => {
         vehicleRouteRef.current = {};
         vehicleRouteRef.current.motorcycle = getRoute(startLatLng, endLatLng, 'motorcycle');
         vehicleRouteRef.current.car = getRoute(startLatLng, endLatLng, 'car');
-        await getAmount(startLatLng, endLatLng).then((result) => {
-          vehicleAmountRef.current = result.amounts
-        });
-        setVehicleSelect(true);
+        await getAmount(user.token, startLatLng, endLatLng)
+          .then((result) => {
+            vehicleAmountRef.current = result.amounts
+            setVehicleSelect(true);
+          })
+          .catch(error => {
+            alert('Vui lòng thử lại.');
+          });
         setFetching(false);
       }, 500)
     } else {

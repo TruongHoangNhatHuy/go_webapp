@@ -17,7 +17,6 @@ export const emptyBooking = {
   paymentAmounts: null,   // integer
   paymentMethod: null,    // 'Momo'|'VNPay'
   timeSubmit: null,       // integer
-  customerId: null,       // integer
   driverId: null,         // integer
   driverInfo: null,       // json driver info
   review: null, /* = { bookingId, rating, content, createAt } */

@@ -1,4 +1,4 @@
-import { Avatar, Card, CardActionArea, CardMedia, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, Stack, Typography } from "@mui/material"
+import { Avatar, Card, CardActionArea, CardMedia, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, Rating, Stack, Typography } from "@mui/material"
 import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useState } from "react"
 import { ZoomableImage } from "components/ZoomableImage";
@@ -64,6 +64,13 @@ export const DriverManageDetail = ({ openDetail, setOpenDetail }) => {
               <Grid item xs={6} lg={4} alignSelf='center'>
                 <Typography variant="h5">{driverDetail.fullName}</Typography>
                 <Typography>{driverDetail.email}</Typography>
+                <Rating
+                  readOnly
+                  value={driverDetail.rating}
+                  max={5}
+                  precision={0.5}
+                  sx={{ paddingTop: 0.5 }}
+                />
               </Grid>
             </Grid>
             {/* lower left */}
@@ -114,6 +121,10 @@ export const DriverManageDetail = ({ openDetail, setOpenDetail }) => {
                 <Divider><b>Thông tin tài xế</b></Divider>
               </Grid>
               <Grid item xs={6}>
+                <Typography fontWeight='bold'>Ngày bắt đầu hoạt động</Typography>
+                <Typography>{dayjs(driverDetail.startWorkDay).format("DD-MM-YYYY")}</Typography>
+              </Grid>
+              <Grid item xs={6}>
                 <Typography fontWeight='bold'>Phương tiện</Typography>
                 <Typography>
                   {driverDetail.vehicleType === 'MOTORCYCLE' ? 'Xe máy' : 
@@ -125,7 +136,7 @@ export const DriverManageDetail = ({ openDetail, setOpenDetail }) => {
                 <Typography fontWeight='bold'>Biển kiểm soát</Typography>
                 <Typography>{driverDetail.licensePlate}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <Typography fontWeight='bold'>Giấy phép lái xe số</Typography>
                 <Typography>{driverDetail.drivingLicense}</Typography>
               </Grid>

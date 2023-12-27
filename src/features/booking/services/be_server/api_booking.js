@@ -3,11 +3,17 @@ import config from 'config.json';
 const serverUrl = config.be_rootUrl;
 
 // Lấy giá tiền của đơn đặt
-export const getAmount = async (pickUpLngLat, dropOffLngLat) => {
+export const getAmount = async (token, pickUpLngLat, dropOffLngLat) => {
   var urlString = serverUrl + "/bookings/travel-info?pickUpLocation="+ pickUpLngLat +"&dropOffLocation="+ dropOffLngLat;
+  var authToken = "Bearer " + token;
 
   return await fetch(urlString, {
     method: "GET",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+      "Authorization": authToken
+    },
     redirect: "follow"
   })
     // await receiving response

@@ -59,7 +59,7 @@ const ReactRouter = () => {
           <Route path='account' element={<Account />} />
           <Route path='booking' element={<BookingContextProvider><Booking/></BookingContextProvider>} />
           <Route path='orders' element={<Orders/>} />
-          <Route path='bills' element={<PaymentHistory/>} />
+          {/* <Route path='bills' element={<PaymentHistory/>} /> */}
           <Route path='favorites' element={<text>Địa điểm yêu thích</text>} />
         </Route>
         <Route path='/payment-verify' element={<PaymentVerify/>}></Route>
@@ -77,6 +77,7 @@ const ReactRouter = () => {
           <Route index element={<Navigate to={'drivers'}/>} />
           <Route path='account' element={<Account />} />
           <Route path='drivers' element={<DriversManage/>}>
+            <Route index element={<Navigate to={'interview'}/>} />
             <Route path='interview' element={<DriverInterviewForm/>} />
             <Route path='manage' element={<DriverManageForm/>} />
           </Route>

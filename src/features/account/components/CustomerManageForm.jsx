@@ -26,13 +26,11 @@ export const CustomerManageForm = () => {
 
   const columns = [
     { field: 'id', headerName: 'STT', flex: 0.05, 
-      renderCell: (data) => {
-        return gridData.indexOf(data.row)+1
-      }
+      renderCell: (data) => gridData.indexOf(data.row)+1 + paginationModel.page*paginationModel.pageSize
     },
     { field: 'fullName', headerName: 'Họ tên', flex: 0.15 },
     { field: 'email', headerName: 'Tài khoản', editable: true, flex: 0.1 },
-    { field: 'gender', headerName: 'Giói tính', flex: 0.075,
+    { field: 'gender', headerName: 'Giới tính', flex: 0.075,
       renderCell: (data) => {
         switch (data.row.gender) {
           case true:
@@ -217,9 +215,9 @@ export const CustomerManageForm = () => {
           <DataGrid
             columns={columns}
             disableRowSelectionOnClick
-            initialState={{
-              pagination: { paginationModel: paginationModel },
-            }}
+            // initialState={{
+            //   pagination: { paginationModel: paginationModel },
+            // }}
             autoPageSize
             /* pagination */
             paginationMode="server"
@@ -232,7 +230,8 @@ export const CustomerManageForm = () => {
               setFetching(true);
             }}
             sx={{
-              "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" }
+              "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" },
+              ".MuiDataGrid-columnHeaderTitle": { fontWeight: 'bold' }
             }}
           />
         </Paper>

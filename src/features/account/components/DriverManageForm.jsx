@@ -224,10 +224,10 @@ export const DriverManageForm = () => {
           <DataGrid
             columns={columns}
             disableRowSelectionOnClick
-            initialState={{
-              pagination: { paginationModel: paginationModel },
-            }}
-            // autoPageSize
+            // initialState={{
+            //   pagination: { paginationModel: paginationModel },
+            // }}
+            autoPageSize
             /* pagination */
             paginationMode="server"
             rows={filtedData}
@@ -239,7 +239,8 @@ export const DriverManageForm = () => {
               setFetching(true);
             }}
             sx={{
-              "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" }
+              "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" },
+              ".MuiDataGrid-columnHeaderTitle": { fontWeight: 'bold' }
             }}
             />
         </Paper>
