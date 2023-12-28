@@ -189,7 +189,6 @@ const Orders = () => {
               backgroundColor: '#F4F6F8',
             },
             "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" }
-            
           }}
           autoHeight
           autoWidth
