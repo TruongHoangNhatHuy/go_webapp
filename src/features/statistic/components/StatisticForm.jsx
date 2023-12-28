@@ -242,12 +242,12 @@ export const StatisticForm = () => {
   return (
     <Grid container padding={2} spacing={1}>
       <Grid item xs={12} md={12} container spacing={2}>
-        <Grid item xs={1} md={'auto'}>
+        <Grid item xs={2} md={'auto'} display='flex' justifyContent='center'>
           <IconButton onClick={handleSubmit} sx={{ bgcolor: '#1976d2', boxShadow: 3, ":hover": { bgcolor: '#2e96ff' } }}>
             <SearchIcon sx={{ color: 'white' }}/>
           </IconButton>
         </Grid>
-        <Grid item xs={11} md={2}>
+        <Grid item xs={10} md={2}>
           <TextField select
             fullWidth
             variant='outlined'
@@ -261,7 +261,7 @@ export const StatisticForm = () => {
             <MenuItem value='date'>Các ngày</MenuItem>
           </TextField>
         </Grid>
-        <Grid item xs={12} md={2.25}>
+        <Grid item xs={true} md={2.25}>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
             <DatePicker 
               disableFuture
@@ -286,7 +286,7 @@ export const StatisticForm = () => {
             />
           </LocalizationProvider>
         </Grid>
-        <Grid item xs={12} md={2.25} display={timeSelect === 'date' ? 'flex' : 'none'}>
+        <Grid item xs={6} md={2.25} display={timeSelect === 'date' ? 'flex' : 'none'}>
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
             <DatePicker 
               disableFuture
@@ -310,7 +310,7 @@ export const StatisticForm = () => {
       </Grid>
       <Grid item xs={12} md={12} container spacing={2}>
         {overview.current.map(item => (
-          <Grid item xs={12} md={2}>
+          <Grid item xs={6} lg={2}>
             <Paper 
               component={Stack} direction='row' padding={1} spacing={1} alignItems='center' overflow={'clip'}
               sx={{ height: 100, bgcolor: item.bgcolor }}
