@@ -59,7 +59,7 @@ const driverMenu = [
 		menuIcon: <MdOutlineReceiptLong />
 	},
 	{
-		to: "analysis",
+		to: "statistic",
 		menuItem: "Thống kê",
 		menuIcon: <AssessmentIcon/>
 	},
@@ -77,6 +77,11 @@ const adminMenu = [
 	// 	menuIcon: <AccountBoxIcon />
 	// },
 	{
+		to: "statistic",
+		menuItem: "Thống kê",
+		menuIcon: <AssessmentIcon/>
+	},
+	{
 		to: "drivers",
 		menuItem: "Quản lí tài xế",
 		menuIcon: <BadgeIcon/>
@@ -85,11 +90,6 @@ const adminMenu = [
 		to: "customers",
 		menuItem: "Quản lí khách hàng",
 		menuIcon: <PeopleIcon/>
-	},
-	{
-		to: "analysis",
-		menuItem: "Thống kê",
-		menuIcon: <AssessmentIcon/>
 	},
 ]
 
