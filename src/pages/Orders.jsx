@@ -1,17 +1,11 @@
-import { Stack, Modal, Rating, ListItemText, Button, Grid, Box, TextField, Typography, MenuItem, Avatar, Divider, ListItemAvatar, ImageList, ImageListItem, InputAdornment, ListItem, IconButton } from "@mui/material"
-import { MdOutlineSearch, MdOutlineVisibility, MdDelete } from "react-icons/md";
+import { Rating, ListItemText, Grid, Avatar, ListItemAvatar, ListItem, IconButton } from "@mui/material"
+import { MdOutlineVisibility } from "react-icons/md";
 import Chip from '@mui/material-next/Chip';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import { useEffect,useState,useRef } from "react";
 import { useUserContext } from 'contexts/UserContext';
-import { getAllOrders } from 'services/be_server/api_orders';
-import dayjs from "dayjs";
-import { OrdersDetail } from "./OrdersDetail";
-
-
+import { getAllOrders } from 'features/order/services/api_orders';
+import { OrdersDetail } from "features/order";
 
 const Orders = () => {
   const [user, setUser] = useUserContext();
@@ -76,10 +70,10 @@ const Orders = () => {
       renderCell: (rowData) =>
         <ListItem>
           <ListItemAvatar>
-            <Avatar src={rowData.row.avatar}>
+            <Avatar src={rowData.row.driver?.avatarUrl}>
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary={rowData.row.driverId} secondary={rowData.row.license} />
+          <ListItemText primary={rowData.row.driver?.fullName == null ? "Không tìm thấy tài xế" : rowData.row.driver.fullName} secondary={rowData.row.driver?.licensePlate} />
         </ListItem>,
     },
     {
@@ -98,7 +92,7 @@ const Orders = () => {
     {
       field: 'rating', headerName: 'Đánh Giá', flex: 0.7, headerAlign: 'center',
       renderCell: (rowData) =>
-        <Rating defaultValue={rowData.row.rating} readOnly />, align: 'center'
+        <Rating defaultValue={rowData.row.driver?.rating} readOnly />, align: 'center'
     },
     {
       field: 'status', headerName: 'Trạng Thái', flex: 0.5, headerAlign: 'center',
@@ -129,8 +123,6 @@ const Orders = () => {
     }
     ,
   ]
-
-
 
   return (
     <Grid container height={"100%"} width={"90vw"} p={4} spacing={1} flexDirection={"row"}  borderRadius={4} border={"1px solid"} borderColor={"grey.300"} >
@@ -189,7 +181,6 @@ const Orders = () => {
               backgroundColor: '#F4F6F8',
             },
             "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": { outline: "none" }
-            
           }}
           autoHeight
           autoWidth
