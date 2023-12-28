@@ -1,5 +1,4 @@
-import { Paper, Stack, Modal, Rating, ListItemText, Button, Grid, Box, TextField, Typography, MenuItem, Avatar, Divider, ListItemAvatar, ImageList, ImageListItem, InputAdornment, ListItem, IconButton } from "@mui/material"
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { getRoute } from "features/booking/services/vietmap/api_route";
 import config from 'config.json';
 
@@ -11,6 +10,7 @@ export const MapTile = ({ startCoordinates, endCoordinates, vehicleType }) => {
   const endMarker = useRef(null);
   const routeRef = useRef(null);
   const mapRef = useRef(null);
+  
   const DrawRoute = () => {
     const tempStartCoordinates = [startCoordinates[1], startCoordinates[0]];
     const tempEndCoordinates = [endCoordinates[1], endCoordinates[0]];

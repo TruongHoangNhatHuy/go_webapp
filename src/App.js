@@ -8,7 +8,6 @@ import SignUp from './pages/SignUp';
 import Orders from 'pages/Orders';
 import Account from './pages/Account';
 import PaymentVerify from 'pages/PaymentVerify';
-import PaymentHistory from 'pages/PaymentHistory';
 import DriversManage from 'pages/DriversManage';
 import { UserContextProvider, useUserContext } from 'contexts/UserContext';
 import { BookingContextProvider } from 'contexts/BookingContext';

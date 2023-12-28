@@ -1,5 +1,5 @@
-import { Paper, Stack, Modal, Rating, ListItemText, Button, Grid, Box, TextField, Typography, MenuItem, Avatar, Divider, ListItemAvatar, ImageList, ImageListItem, InputAdornment, ListItem, IconButton, CircularProgress } from "@mui/material"
-import { useEffect, useState, useRef } from "react";
+import { Stack, Modal, Rating, ListItemText, Grid, Box, TextField, Avatar, ListItemAvatar, ListItem, IconButton, CircularProgress } from "@mui/material"
+import { useEffect, useState } from "react";
 import { MapTile } from "./MapTile";
 import { MdLocationOn, MdCommute, MdPayment, MdOutlineAttachMoney, MdOutlineAccessTime, MdInfo, MdClose } from "react-icons/md";
 import { TableBody, TableCell, TableContainer, TableRow, Table } from '@mui/material';
@@ -186,7 +186,7 @@ export const OrdersDetail = ({ ordersRef, open, setOpen }) => {
                         <TableCell component="th" scope="row" sx={{ padding: "16px 0px" }}>
                           <IconButton sx={{ pointerEvents: 'none', color: blue[700] }}><MdPayment /></IconButton>
                           Phương thức thanh toán</TableCell>
-                        <TableCell variant='head' align='right' sx={{ padding: "16px 16px" }}>{ordersDetail.payment?.paymentMethod}</TableCell>
+                        <TableCell variant='head' align='right' sx={{ padding: "16px 16px" }}>{ordersDetail.payment?.paymentMethod || 'Chưa thanh toán'}</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell variant='head' component="th" scope="row" sx={{ padding: "16px 0px" }}>
