@@ -13,18 +13,19 @@ import { getActiveBooking } from 'features/booking/services/be_server/api_bookin
 import dayjs from 'dayjs';
 import { getLocationByCoordinates } from 'features/booking/services/vietmap/api_reverse';
 import { ToastContainer, toast } from 'react-toastify';
+import { getRoute } from 'features/booking/services/vietmap/api_route';
 
 const Booking = () => {
   const [user,] = useUserContext();
   const [,setNotify] = useNotifyContext();
   // Thông tin đặt xe
   const [bookingInfo, setBookingInfo] = useBookingContext();
-  const updatedBookingInfo = bookingInfo;
+  const updatedBookingInfo = bookingInfo; // Để kiểm tra thay đổi dữ liệu, nên dùng biến này
   // UI state 
   const [bookingForm, setBookingForm] = useState(false);
   const [hadBooking, setHadBooking] = useState(false);
   const [updated, setUpdated] = useState(null); // trigger re-render
-  const [hadDriver, setHadDriver] = useState(bookingInfo.driverInfo === null ? false : true);
+  const [hadDriver, setHadDriver] = useState(updatedBookingInfo.driverInfo === null ? false : true);
   // Map state
   const [userPosition, setUserPosition] = useState(null);
   const [driverPosition, setDriverPosition] = useState(null);
@@ -48,7 +49,7 @@ const Booking = () => {
           updatedBookingInfo.timeSubmit = dayjs(result.createAt).format('DD/MM/YYYY[, ]HH:mm[ ]A');
           updatedBookingInfo.customerId = result.customer.id;
           updatedBookingInfo.driverId = (result.driver === null) ? null : result.driver.id;
-
+          //
           const pickUp = result.pickUpLocation.split(',');
           const startLocation = getLocationByCoordinates(pickUp[1], pickUp[0])[0];
           updatedBookingInfo.startLocation = {
@@ -88,42 +89,33 @@ const Booking = () => {
   }
   useEffect(() => {
     // lấy từ session storage
-    if (bookingInfo.status !== null) {
+    if (updatedBookingInfo.status !== null) {
       setHadBooking(true);
-      setStartLocation(bookingInfo.startLocation);
-      setEndLocation(bookingInfo.endLocation);
+      setStartLocation(updatedBookingInfo.startLocation);
+      setEndLocation(updatedBookingInfo.endLocation);
     }
     // request lại từ server
     else {
       restoreBookingInfo();
     }
+    // Vẽ lại tuyến đường
+    setTimeout(() => {
+      if (updatedBookingInfo.startLocation !== null && updatedBookingInfo.endLocation !== null && updatedBookingInfo.vehicleType !== null) {
+        var startLatLng = [updatedBookingInfo.startLocation.coordinates.lat, updatedBookingInfo.startLocation.coordinates.lng].toString();
+        var endLatLng = [updatedBookingInfo.endLocation.coordinates.lat, updatedBookingInfo.endLocation.coordinates.lng].toString();
+        const route = getRoute(startLatLng, endLatLng, updatedBookingInfo.vehicleType);
+        setVehicleRoute(route);
+      }
+    }, 2000);
   }, []);
-
-  // Hiện thị thông báo trạng thái đơn đặt
-  useEffect(() => {
-    switch (bookingInfo.status) {
-      // case 'WAITING': { toast('Đặt xe thành công, đang chờ thanh toán'); break; }
-      case 'PAID': { toast('Đã thanh toán thành công'); break; }
-      case 'FOUND': { toast('Đã tìm thấy tài xế'); break; }
-      case 'ARRIVED_PICKUP': { toast('Tài xế đã đón khách'); break; }
-      case 'ON_RIDE': { toast('Tài xế đang chở khách'); break; }
-      case 'COMPLETE': { toast('Đã hoàn thành chuyến xe'); break; }
-      case 'CANCELLED': { toast('Đã hủy chuyến xe'); break; }
-      case 'WAITING_REFUND': { toast('Đang thực hiện hoàn tiền'); break; }
-      case 'REFUNDED': { toast('Đã hoàn tiền'); break; }
-      default: { break; }
-    }
-  }, [updated])
 
   // WS code
   const socketClient = useSocketClient()
   const bookingStatusCallback = (result) => {
-    setNotify('booking');
-    setUpdated(dayjs());
     const data = JSON.parse(result);
     console.log('Booking status change:', data);
     // Update status
-    if (data.bookingId === bookingInfo.id) {
+    if (data.bookingId === updatedBookingInfo.id) {
       // Nếu status là hủy đơn
       if (data.status === 'CANCELLED') {
         console.log('Booking cancelled')
@@ -138,14 +130,14 @@ const Booking = () => {
         setBookingInfo(updatedBookingInfo);
         sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
       }
+      setNotify('booking');
+      setUpdated(dayjs());
     }
     else {
       console.log('Booking id not match, ignore result. Received:', data['bookingId'], '!= Current:', bookingInfo.id);
     }
   }
   const driverInfoCallback = async (result) => {
-    setNotify('booking');
-    setUpdated(dayjs());
     const data = JSON.parse(result);
     console.log('/user/customer_driver_info', data);
     // update driver id
@@ -162,6 +154,8 @@ const Booking = () => {
         console.log('Get driver info failed');
       })
 
+    setNotify('booking');
+    setUpdated(dayjs());
     setBookingInfo(updatedBookingInfo);
     sessionStorage.setItem('bookingSession', JSON.stringify(updatedBookingInfo));
   }
@@ -181,10 +175,10 @@ const Booking = () => {
   useEffect(() => {
     if (hadBooking) {
       SocketSubscriber(socketClient, '/user/booking_status', bookingStatusCallback);
-      if (bookingInfo.status === 'PAID') {
+      if (updatedBookingInfo.status === 'PAID') {
         SocketSubscriber(socketClient, '/user/customer_driver_info', driverInfoCallback);
       }
-      if (bookingInfo.status === 'FOUND') {
+      if (updatedBookingInfo.status === 'FOUND') {
         SocketSubscriber(socketClient, '/user/customer_driver_location', driverLocationCallback);
       }
     } else {
@@ -194,6 +188,22 @@ const Booking = () => {
       setDriverPosition(null);
     }
   }, [hadBooking, bookingInfo.status])
+
+  // Hiện thị thông báo trạng thái đơn đặt
+  useEffect(() => {
+    switch (updatedBookingInfo.status) {
+      // case 'WAITING': { toast('Đặt xe thành công, đang chờ thanh toán'); break; }
+      case 'PAID': { toast('Đã thanh toán thành công'); break; }
+      case 'FOUND': { toast('Đã tìm thấy tài xế'); break; }
+      case 'ARRIVED_PICKUP': { toast('Tài xế đã đón khách'); break; }
+      case 'ON_RIDE': { toast('Tài xế đang chở khách'); break; }
+      case 'COMPLETE': { toast('Đã hoàn thành chuyến xe'); break; }
+      case 'CANCELLED': { toast('Đã hủy chuyến xe'); break; }
+      case 'WAITING_REFUND': { toast('Đang thực hiện hoàn tiền'); break; }
+      case 'REFUNDED': { toast('Đã hoàn tiền'); break; }
+      default: { break; }
+    }
+  }, [updated])
   
   // Xử lý hủy đơn
   const handleBookingCancel = (status) => {
