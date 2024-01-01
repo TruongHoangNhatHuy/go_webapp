@@ -7,6 +7,8 @@ import { login } from 'services/be_server/api_login';
 import { useUserContext } from 'contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { getTokensByAuthCode } from 'services/gg_cloud/tokenHelper';
+import { GooglePlayButton } from 'react-mobile-app-button';
+import Wallpaper from 'assets/wallpaper.png';
 
 function Copyright(props) {
   return (
@@ -99,28 +101,26 @@ export default function SignInSide() {
     onError: (error) => console.log(error)
   })
 
-  // Admin login, will remove later
-  const handleAdminLogin = () => {
-    const adminSession = { token: '', role: 'admin' };
-    setUser(adminSession);
-    navigate("/admin");
-  }
-
   return (
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
-        <Grid item xs={false} sm={4} md={7}
-          sx={{
-            backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
-            backgroundRepeat: 'no-repeat',
-            backgroundColor: (t) =>
-              t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+        <Grid item xs={false} md={7}
+          // sx={{
+          //   backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
+          //   backgroundRepeat: 'no-repeat',
+          //   backgroundColor: (t) =>
+          //     t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
+          //   backgroundSize: 'cover',
+          //   backgroundPosition: 'center',
+          // }}
+        >
+          <Box component='img' src={Wallpaper} 
+            display={{ xs: 'none', md: 'block' }}
+            sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </Grid>
+        <Grid item xs={12} md={5} component={Paper} elevation={6} square>
           <Box sx={{ my: 8, mx: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <LockOutlinedIcon />
@@ -136,10 +136,17 @@ export default function SignInSide() {
                 onSuccess={(result) => console.log(result)}
                 onError={() => console.log('GoogleLogin component: failed')}
               /> */}
-              {/* will remove later */}
-              {/* <Button onClick={handleAdminLogin}>Admin sign in</Button> */}
             </Box>
-            <Copyright sx={{ mt: 20 }} />
+            <Box mt={10} display={'flex'} flexDirection={'column'} alignItems={'center'}>
+              <Typography variant='button' fontWeight='bold'>Tải về ứng dụng cho di động</Typography>
+              <GooglePlayButton
+                url={"https://drive.google.com/drive/folders/1KcAkgpJdYosGI0PjRmnh3AWvoLLiNAOZ?usp=drive_link"}
+                theme={"dark"}
+                height={50}
+                width={180}
+              />
+            </Box>
+            <Copyright sx={{ mt: 10 }} />
           </Box>
         </Grid>
       </Grid>

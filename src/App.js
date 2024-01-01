@@ -16,6 +16,7 @@ import { DriverInterviewForm, DriverManageForm } from 'features/account';
 import { SocketProvider } from 'services/websocket/StompOverSockJS';
 import CustomersManage from 'pages/CustomersManage';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import DriverPage from 'pages/DriverPage';
 
 // Router Protect layer
 const ProtectedRoute = ({
@@ -65,16 +66,14 @@ const ReactRouter = () => {
         <Route path='/payment-verify' element={<PaymentVerify/>}></Route>
         <Route path='/driver' element={
           <ProtectedRoute user={user} role={'driver'}>
-           <SocketProvider>
-              <MainLayout/>
-            </SocketProvider>
+            <DriverPage/>
           </ProtectedRoute>
         }>
-          <Route index element={<Navigate to={'orders'}/>} />
+          {/* <Route index element={<Navigate to={'orders'}/>} />
           <Route path='account' element={<Account />} />
           <Route path='orders' element={<Orders/>} />
           <Route path='ratings' element={<text>Đánh giá</text>} />
-          <Route path='statistic' element={<text>Thống kê</text>} />
+          <Route path='statistic' element={<text>Thống kê</text>} /> */}
         </Route>
         <Route path='/admin' element={<ProtectedRoute user={user} role={'admin'}><MainLayout/></ProtectedRoute>}>
           <Route index element={<Navigate to={'statistic'}/>} />
