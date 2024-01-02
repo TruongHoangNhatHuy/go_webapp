@@ -35,11 +35,11 @@ const customerMenu = [
 	// 	menuItem: "Lịch sử thanh toán",
 	// 	menuIcon: <MdHistory />
 	// },
-	{
-		to: "favorites",
-		menuItem: "Địa điểm",
-		menuIcon: <MdBookmarkBorder />
-	},
+	// {
+	// 	to: "favorites",
+	// 	menuItem: "Địa điểm",
+	// 	menuIcon: <MdBookmarkBorder />
+	// },
 ]
 // List menu của tài xế
 const driverMenu = [
