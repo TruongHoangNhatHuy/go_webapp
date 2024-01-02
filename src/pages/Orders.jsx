@@ -86,7 +86,10 @@ const Orders = () => {
         if (params.value == null) {
           return '';
         }
-        return `$${params.value.toLocaleString()}`;
+        return Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND'
+        }).format(params.value);
       },
     },
     {
